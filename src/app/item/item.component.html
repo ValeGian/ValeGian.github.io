@@ -1,0 +1,12 @@
+<div class="card w-100" [ngClass]="cardclass">
+  <div class="card-body d-flex flex-column">
+    <h4 class="card-title">{{title}}</h4>
+    <p class="card-text">{{description}}</p>
+    <ul class="d-flex flex-row l-list">
+      <ng-container *ngFor="let language of languages">
+        <div class="p-2">{{language}}</div>
+      </ng-container>
+      <app-icon class="ml-auto" link-type="external" [profile]="profile"></app-icon>
+    </ul>
+  </div>
+</div>

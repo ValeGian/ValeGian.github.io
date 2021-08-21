@@ -1,0 +1,182 @@
+{
+  "anagraphic":{
+    "fullname":{
+      "first": "Valerio",
+      "last": "Giannini"
+    },
+    "birthday":{
+      "day": 30,
+      "month": 12,
+      "year": 1998
+    },
+    "nationality": "Italian",
+    "picture": "https://drive.google.com/uc?export=view&id=1whRLgaCRXphJvCHeqXtSiyzRSNVbu_Co",
+    "bio": "I received my Bachelor Degree in &quot;Ingegneria Informatica&quot; from the University of Pisa, Italy, in September 2020 with the score of &quot;110/110 e lode&quot; (highest possible grade in the Italian system). I&apos;m now a Master Degree student in &quotArtificial Intelligence and Data Engineering;&quot;. I always loved solving problems, writing code and inventing new stuff.",
+    "qualifications": ["Master Degree Student", "Computer Engineer", "Artificial Intelligence Enthusiast"]
+  },
+  "digitalidentity":{
+    "website": "https://galatolo.me",
+    "email": "46gianninivalerio@gmail.com",
+    "profiles":[
+      {
+        "platform": "Telegram",
+        "link": "https://telegram.me/valeGiann",
+        "icon": "fab-telegram",
+        "description": "Send me a chat message!"
+      },
+      {
+        "platform": "GitHub",
+        "link": "https://github.com/ValeGian",
+        "icon": "fab-github",
+        "description": "The home of my projects!"
+      },
+      {
+        "platform": "Instagram",
+        "link": "https://www.instagram.com/valegiann/",
+        "icon": "fab-instagram",
+        "description": "Not very active"
+      }
+    ]
+  },
+  "projects":[
+    {
+      "title": "PacMan",
+      "description": "A version of the Pacman game written using Java8 and the JavaFX 2.2 API",
+      "type": "personal",
+      "date": {
+        "day": 4,
+        "month": 12,
+        "year": 2019
+      },
+      "link": "https://github.com/ValeGian/JavaFX_PacMan",
+      "languages": ["Java"]
+    },
+    {
+      "title": "Hardware-ECommerce-Website",
+      "description": "University project website for the exam \"Progettazione Web\" created using HTML5, CSS3, Javascript, PHP & AJAX.\n\nThe website is completeley in Italian",
+      "type": "university",
+      "date": {
+        "day": 20,
+        "month": 2,
+        "year": 2018
+      },
+      "link": "https://github.com/ValeGian/Hardware-ECommerce-Website",
+      "languages": ["Javascript", "Ajax", "PHP", "HTML5", "CSS3"]
+    },
+    {
+      "title": "UniMusic",
+      "description": "Project for the 'Large-Scale and Multi-Structured Databases' course",
+      "type": "university",
+      "date": {
+        "day": 2,
+        "month": 12,
+        "year": 2020
+      },
+      "link": "https://github.com/ValeGian/LargeScale-MultiStructuredDatabase_UniMusic",
+      "languages": ["Java", "JavaFx"]
+    },
+    {
+      "title": "CovidTracker",
+      "description": "Project for the 'Distributed Systems and Middleware Technologies' course",
+      "type": "university",
+      "date": {
+        "day": 24,
+        "month": 12,
+        "year": 2020
+      },
+      "link": "https://github.com/ValeGian/DistributedSystems-MiddlewareTechnologies_CovidTracker",
+      "languages": ["Java", "Erlang"]
+    },
+    {
+      "title": "FederatedDBSCAN",
+      "description": "Project for the 'Data Mining and Machine Learning' course",
+      "type": "university",
+      "date": {
+        "day": 5,
+        "month": 2,
+        "year": 2021
+      },
+      "link": "https://github.com/ValeGian/DataMining-MachineLearning_FederatedDBSCAN",
+      "languages": ["Python", "SciPy", "NumPy", "Scikit-learn", "Pandas"]
+    },
+    {
+      "title": "Frogger-Game",
+      "description": "A Java version of Frogger game developed using javaFX",
+      "type": "university",
+      "date": {
+        "day": 18,
+        "month": 4,
+        "year": 2020
+      },
+      "link": "https://github.com/ValeGian/Frogger-Game",
+      "languages": ["Java", "JavFx"]
+    },
+    {
+      "title": "Personal Website",
+      "description": "Repository with the source code of my Angular 7 + Boostrap 4 personal website",
+      "type": "personal",
+      "date": {
+        "day": 16,
+        "month": 8,
+        "year": 2021
+      },
+      "link": "https://github.com/ValeGian/ValeGian.github.io",
+      "languages": ["Javascript", "Angular 8", "RxJs", "Bootstrap 4"]
+    },
+    {
+      "title": "SmartPool",
+      "description": "Project for the 'Internet of Things' course",
+      "type": "university",
+      "date": {
+        "day": 16,
+        "month": 7,
+        "year": 2021
+      },
+      "link": "https://github.com/ValeGian/InternetOfThings_SmartPool",
+      "languages": ["C", "Java"]
+    },
+    {
+      "title": "Ceph File Manager",
+      "description": "Project for the 'Cloud Computing' course",
+      "type": "university",
+      "date": {
+        "day": 31,
+        "month": 5,
+        "year": 2021
+      },
+      "link": "https://github.com/ValeGian/CloudComputing_Ceph_File_Manager",
+      "languages": ["Python"]
+    },
+    {
+      "title": "PageRank",
+      "description": "Project for the 'Cloud Computing' course",
+      "type": "university",
+      "date": {
+        "day": 14,
+        "month": 5,
+        "year": 2021
+      },
+      "link": "https://github.com/ValeGian/CloudComputing_PageRank",
+      "languages": ["Java", "Python"]
+    }
+  ],
+  "programmingLanguages": [
+    {
+      "name": "Javascript",
+      "link": "",
+      "icon": "",
+      "libraries": [
+        {
+          "name": "Angular",
+          "link": "",
+          "icon": ""
+        },
+        {
+          "name": "RxJS",
+          "link": "",
+          "icon": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,20 +1,3 @@
 # me.json
 
-Myself as a JSON document.
-
-I use this file to generate my [personal site](https://valegian.github.io). If you like it, you can check the code [here](https://github.com/ValeGian/ValeGian.github.io)
-
-## Structure
-
-* `anagraphic`
-  * `fullname`
-    * `first` First Name
-    * `last` Last name
-  * `birthday`
-    * `day`
-    * `month`
-    * `year`
-  * `nationality`
-  * `picture`
-  * `bio`
-  * `qualifications`
+Repository with the source code of my Angular 8 + Boostrap 4 [personal website](https://valegian.github.io/) hosted using Github Pages.

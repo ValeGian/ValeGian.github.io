@@ -14,6 +14,11 @@ export class DataService {
   profiles : BehaviorSubject<Array<Profile>> = new BehaviorSubject<Array<Profile>>([]);
   universityProjects : BehaviorSubject<Array<Project>> = new BehaviorSubject<Array<Project>>([]);
   personalProjects : BehaviorSubject<Array<Project>> = new BehaviorSubject<Array<Project>>([]);
+  techSkills : BehaviorSubject<TechSkills> = new BehaviorSubject<TechSkills>({
+    programmingLanguages: [],
+    text: "",
+    tools: []
+  });
 
   constructor() {
     let data = meJson
@@ -55,6 +60,7 @@ export class DataService {
     this.universityProjects.next(_uni_projects.sort(this._sortDate))
     this.personalProjects.next(_pers_projects.sort(this._sortDate))
 
+    this.techSkills.next(data.technologicalSkills)
   }
 
   _parseName(fullname: any){
@@ -103,5 +109,9 @@ export class DataService {
     }
 
     return this.personalProjects
+  }
+
+  getTechSkills(){
+    return this.techSkills
   }
 }

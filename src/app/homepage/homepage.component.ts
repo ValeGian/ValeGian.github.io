@@ -13,14 +13,18 @@ import { fas } from '@fortawesome/free-solid-svg-icons'
 export class HomepageComponent implements OnInit {
   bio: any;
   profiles: any;
+  techSkills!: TechSkills;
 
   constructor(private data: DataService, library: FaIconLibrary) {
     library.addIconPacks(fas);
-    library.addIconPacks(fab)
+    library.addIconPacks(fab);
   }
 
   ngOnInit() {
     this.profiles = this.data.getProfiles();
-    this.bio = this.data.getBio()
+    this.bio = this.data.getBio();
+    this.data.getTechSkills().subscribe(data => {
+      this.techSkills = data
+    });
   }
 }

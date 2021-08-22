@@ -13,3 +13,9 @@ type Project = {
   link: string
   languages: string[]
 }
+
+type TechSkills = {
+  text: string,
+  programmingLanguages: string[],
+  tools: string[]
+}

@@ -11,7 +11,7 @@
     },
     "nationality": "Italian",
     "picture": "https://drive.google.com/uc?export=view&id=1whRLgaCRXphJvCHeqXtSiyzRSNVbu_Co",
-    "bio": "I received my Bachelor Degree in &quot;Ingegneria Informatica&quot; from the University of Pisa, Italy, in September 2020 with the score of &quot;110/110 e lode&quot; (highest possible grade in the Italian system). I&apos;m now a Master Degree student in &quotArtificial Intelligence and Data Engineering;&quot;. I always loved solving problems, writing code and inventing new stuff.",
+    "bio": "I received my Bachelor Degree in &quot;Ingegneria Informatica&quot; from the University of Pisa, Italy, in September 2020 with the score of &quot;110/110 e lode&quot; (highest possible grade in the Italian system). I&apos;m now a Master Degree student in &quotArtificial Intelligence and Data Engineering;&quot;. I always loved solving problems writing code.",
     "qualifications": ["Master Degree Student", "Computer Engineer", "Artificial Intelligence Enthusiast"]
   },
   "digitalidentity":{
@@ -160,23 +160,9 @@
       "languages": ["Java", "Python"]
     }
   ],
-  "programmingLanguages": [
-    {
-      "name": "Javascript",
-      "link": "",
-      "icon": "",
-      "libraries": [
-        {
-          "name": "Angular",
-          "link": "",
-          "icon": ""
-        },
-        {
-          "name": "RxJS",
-          "link": "",
-          "icon": ""
-        }
-      ]
-    }
-  ]
+  "technologicalSkills": {
+    "text" : "I have worked with a wide variety of programming languages and love learning how to use new tools. My interest mainly revolves around AI, but I continually try to expand my wealth of knowledge related to other areas by focusing mainly on the most cutting-edge technologies",
+    "programmingLanguages": ["Java", "Python", "C++", "C", "Matlab", "Javascript", "PHP", "Erlang"],
+    "tools": ["MySQL", "LevelDB", "MongoDB", "Neo4j", "Git", "Docker", "Kubernetes"]
+  }
 }

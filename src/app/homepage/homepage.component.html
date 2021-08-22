@@ -1,17 +1,49 @@
 <div class="container">
-  <div class="row justify-content-center">
-    <app-name class="col-10"></app-name>
-  </div>
-  <div class="row justify-content-center mt-2">
-    <div class="col-8">
-      <div class="row text-center">
-        <ng-container *ngFor="let profile of profiles | async">
-          <app-icon class="col-2 mx-auto" [profile]="profile"></app-icon>
-        </ng-container>
+  <section id="intro" class="pb-5">
+    <div class="row justify-content-center">
+      <app-name class="col-10"></app-name>
+    </div>
+    <div class="row justify-content-center mt-2">
+      <div class="col-8">
+        <div class="row text-center">
+          <ng-container *ngFor="let profile of profiles | async">
+            <app-icon class="col-2 mx-auto" [profile]="profile"></app-icon>
+          </ng-container>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="row justify-content-center mt-5">
-    <div class="mx-auto bg-dark col-10 border-0" [innerHtml]="bio | async"></div>
-  </div>
+  </section>
+  <section id="aboutme" class="pt-5 pb-5">
+    <h2 class="row">
+      <div class="col-auto">Hello, it's Me!</div>
+      <div class="col"><hr class="h-separator"></div>
+    </h2>
+    <div class="row mt-3">
+      <p class="mx-auto bg-dark col-10 border-0 text-justify" [innerHtml]="bio | async"></p>
+    </div>
+  </section>
+  <section id="skills" class="pt-5 pb-5">
+    <h2 class="row">
+      <div class="col"><hr class="h-separator float-end"></div>
+      <div class="col-auto">Technical Skills</div>
+    </h2>
+    <div class="row justify-content-center mt-3">
+      <p class="mx-auto bg-dark col-10 border-0 text-justify">{{techSkills.text}}</p>
+    </div>
+    <div class="container mt-5 col-8">
+      <div class="row text-center">
+        <ng-container *ngFor="let language of techSkills.programmingLanguages">
+          <div class="col mx-auto text-uppercase">{{language}}</div>
+        </ng-container>
+      </div>
+      <div class="mt-5 text-center">
+        <h4 class="text-uppercase">Used Tools</h4>
+        <div class="row text-center mt-4">
+          <ng-container *ngFor="let tool of techSkills.tools">
+            <div class="col mx-auto sf-f">{{tool}}</div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>

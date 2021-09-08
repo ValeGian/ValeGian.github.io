@@ -11,7 +11,7 @@
     },
     "nationality": "Italian",
     "picture": "https://drive.google.com/uc?export=view&id=1whRLgaCRXphJvCHeqXtSiyzRSNVbu_Co",
-    "bio": "I received my Bachelor Degree in &quot;Ingegneria Informatica&quot; from the University of Pisa, Italy, in September 2020 with the score of &quot;110/110 e lode&quot; (highest possible grade in the Italian system). I&apos;m now a Master Degree student in &quotArtificial Intelligence and Data Engineering;&quot;. I always loved solving problems writing code.",
+    "bio": "I received my Bachelor Degree in <a href=\"https://computer.ing.unipi.it/inginf-l\">&quot;Ingegneria Informatica&quot;</a> from the University of Pisa, Italy, in September 2020 with the score of &quot;110/110 e lode&quot; (highest possible grade in the Italian system). I&apos;m now a Master Degree student in <a href=\"https://computer.ing.unipi.it/aide-lm\">&quotArtificial Intelligence and Data Engineering;&quot;</a>. I always loved solving problems writing code.",
     "qualifications": ["Master Degree Student", "Computer Engineer", "Artificial Intelligence Enthusiast"]
   },
   "digitalidentity":{

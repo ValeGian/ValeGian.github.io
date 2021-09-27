@@ -149,7 +149,7 @@
     },
     {
       "title": "PageRank",
-      "description": "Project for the 'Cloud Computing' course",
+      "description": "Project for the 'Cloud Computing' course. Implementation of the Page Rank algorithm using Hadoop and Spark frameworks",
       "type": "university",
       "date": {
         "day": 14,

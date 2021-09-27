@@ -65,7 +65,7 @@
     },
     {
       "title": "UniMusic",
-      "description": "Project for the 'Large-Scale and Multi-Structured Databases' course",
+      "description": "Project for the 'Large-Scale and Multi-Structured Databases' course. Music application that uses a MongoDB and a Neo4j database",
       "type": "university",
       "date": {
         "day": 2,

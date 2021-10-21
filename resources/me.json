@@ -11,7 +11,7 @@
     },
     "nationality": "Italian",
     "picture": "https://drive.google.com/uc?export=view&id=1whRLgaCRXphJvCHeqXtSiyzRSNVbu_Co",
-    "bio": "I received my Bachelor Degree in <a href=\"https://computer.ing.unipi.it/inginf-l\">&quot;Ingegneria Informatica&quot;</a> from the University of Pisa, Italy, in September 2020 with the score of &quot;110/110 e lode&quot; (Full marks with honors, highest possible grade in the Italian system). I&apos;m now a Master Degree student in <a href=\"https://computer.ing.unipi.it/aide-lm\">&quotArtificial Intelligence and Data Engineering&quot</a>. I always loved solving problems writing code.",
+    "bio": "I received my Bachelor Degree in <a href=\"https://computer.ing.unipi.it/inginf-l/piano-di-studi-19-20\">&quot;Ingegneria Informatica&quot;</a> from the University of Pisa, Italy, in September 2020 with the score of &quot;110/110 e lode&quot; (Full marks with honors, highest possible grade in the Italian system). I&apos;m now a Master Degree student in <a href=\"https://computer.ing.unipi.it/aide-lm/study-plan-20-21\">&quotArtificial Intelligence and Data Engineering&quot</a>. I always loved solving problems writing code.",
     "qualifications": ["Master Degree Student", "Computer Engineer", "Artificial Intelligence Enthusiast"]
   },
   "digitalidentity":{
@@ -158,11 +158,23 @@
       },
       "link": "https://github.com/ValeGian/CloudComputing_PageRank",
       "languages": ["Java", "Python"]
+    },
+    {
+      "title": "MusicClassifier",
+      "description": "This project aims to generate highly accurate and reproducible machine learning models that can predict a song's genre based on its audio features.",
+      "type": "personal",
+      "date": {
+        "day": 25,
+        "month": 9,
+        "year": 2021
+      },
+      "link": "https://github.com/ValeGian/MusicClassifier",
+      "languages": ["Python", "NumPy", "Scikit-learn", "Pandas"]
     }
   ],
   "technologicalSkills": {
     "text" : "I have worked with a wide variety of programming languages and love learning how to use new tools. My interest mainly revolves around AI, but I continually try to expand my wealth of knowledge related to other areas by focusing mainly on the most cutting-edge technologies",
-    "programmingLanguages": ["Java", "Python", "C++", "C", "Matlab", "Javascript", "PHP", "Erlang"],
+    "programmingLanguages": ["Java", "Python", "C++", "C", "Matlab", "Javascript", "SQL", "PHP", "Erlang"],
     "tools": ["MySQL", "LevelDB", "MongoDB", "Neo4j", "Git", "Docker", "Kubernetes"]
   }
 }

@@ -1,4 +1,4 @@
-<a *ngIf="linktype == 'external'" href="{{profile.link}}" class="text-light">
+<a *ngIf="linktype == 'external'" href="{{profile.link}}" target="_blank" rel="noopener noreferrer" class="text-light">
   <fa-icon [icon]="[profile.icon.split('-')[0], profile.icon.split('-')[1]]" ngbPopover="{{profile.description}}"></fa-icon>
 </a>
 <a *ngIf="linktype == 'internal'" routerLink="{{profile.link}}" class="text-light">

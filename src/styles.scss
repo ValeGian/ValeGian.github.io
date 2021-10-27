@@ -47,3 +47,7 @@ html {
 
 /* Importing Bootstrap SCSS file. */
 @import '~bootstrap/scss/bootstrap';
+
+a {
+  text-decoration: none!important;
+}

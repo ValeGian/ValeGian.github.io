@@ -11,7 +11,7 @@
     },
     "nationality": "Italian",
     "picture": "https://drive.google.com/uc?export=view&id=1whRLgaCRXphJvCHeqXtSiyzRSNVbu_Co",
-    "bio": "I received my Bachelor Degree in <a href=\"https://computer.ing.unipi.it/inginf-l/piano-di-studi-19-20\">&quot;Ingegneria Informatica&quot;</a> from the University of Pisa, Italy, in September 2020 with the score of &quot;110/110 cum laude&quot; (Full marks with honors, maximum graduation mark in the Italian system). I&apos;m currently a Master Degree student in <a href=\"https://computer.ing.unipi.it/aide-lm/study-plan-20-21\">&quotArtificial Intelligence and Data Engineering&quot</a>. I always loved solving problems and writing code, and my current goal is to be able to make a profession out of a passion.",
+    "bio": "I received my Bachelor Degree in <a href=\"https://computer.ing.unipi.it/inginf-l/piano-di-studi-19-20\">&quot;Ingegneria Informatica&quot;</a> (Computer Engineering) from the University of Pisa, Italy, in September 2020 with the score of <b>&quot;110/110 cum laude&quot;</b> (Full marks with honors, maximum graduation mark in the Italian system). I&apos;m currently a Master Degree student in <a href=\"https://computer.ing.unipi.it/aide-lm/study-plan-20-21\">&quotArtificial Intelligence and Data Engineering&quot</a>.<br><br> I always loved solving problems and writing code. My current goal is to be able to make a profession out of a passion.",
     "qualifications": ["Master Degree Student", "Computer Engineer", "Artificial Intelligence Enthusiast"]
   },
   "digitalidentity":{
@@ -145,7 +145,7 @@
         "year": 2021
       },
       "link": "https://github.com/ValeGian/CloudComputing_Ceph_File_Manager",
-      "languages": ["Python"]
+      "languages": ["Python", "Docker"]
     },
     {
       "title": "PageRank",

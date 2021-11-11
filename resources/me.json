@@ -181,6 +181,6 @@
   "technologicalSkills": {
     "text" : "I have worked with a wide variety of programming languages and love learning how to use new tools. My interest mainly revolves around AI, but I continually try to expand my wealth of knowledge related to other areas, focusing mainly on the most cutting-edge technologies",
     "programmingLanguages": ["Java", "Python", "C++", "C", "Matlab", "Javascript", "SQL", "PHP", "Erlang"],
-    "tools": ["MySQL", "LevelDB", "MongoDB", "Neo4j", "Git", "Docker", "Kubernetes"]
+    "tools": ["MySQL", "LevelDB", "MongoDB", "Neo4j", "Git", "Docker", "Kubernetes", "GlassFish"]
   }
 }

@@ -79,7 +79,7 @@
         "year": 2020
       },
       "link": "https://github.com/ValeGian/LargeScale-MultiStructuredDatabase_UniMusic",
-      "languages": ["Java", "JavaFx"]
+      "languages": ["Java", "JavaFx", "mongoDB", "neo4J"]
     },
     {
       "title": "CovidTracker",

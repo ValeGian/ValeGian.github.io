@@ -35,6 +35,12 @@
         "link": "https://www.instagram.com/valegiann/",
         "icon": "fab-instagram",
         "description": "Not very active"
+      },
+      {
+        "platform": "LinkedIn",
+        "link": "www.linkedin.com/in/valerio-giannini/",
+        "icon": "fab-linkedin",
+        "description": "Offer me a job!"
       }
     ]
   },

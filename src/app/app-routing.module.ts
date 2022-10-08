@@ -5,6 +5,7 @@ import { ProjectsComponent } from "./projects/projects.component";
 
 const routes: Routes = [
   {path:"", component: HomepageComponent},
+  {path:"personal-website", component: HomepageComponent},
   {path:"projects", component: ProjectsComponent}
 ];
 

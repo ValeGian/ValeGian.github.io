@@ -10,7 +10,11 @@
  */
 
 /**
- * @param {{collection: {items: any[]}, wishlists: {items: any[]}[], manualCardIds: Iterable<string>, now?: string}} input
+ * @param {object} input
+ * @param {{items: any[]}} input.collection
+ * @param {{items: any[], owner?: string}[]} input.wishlists
+ * @param {Iterable<string>} input.manualCardIds
+ * @param {string} [input.now]
  */
 export function derivePublicFiles({ collection, wishlists, manualCardIds, now }) {
   const manual = new Set(manualCardIds);

@@ -7,7 +7,7 @@
  *
  * Frankfurter serves European Central Bank reference rates, free, with no key.
  */
-import type { Currency } from './types';
+import type { Currency } from './types.ts';
 
 const ENDPOINT = 'https://api.frankfurter.dev/v1';
 

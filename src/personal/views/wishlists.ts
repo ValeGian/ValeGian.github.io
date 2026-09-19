@@ -7,11 +7,11 @@
  * A card bought for a friend never enters the collection. It stays on their list, marked
  * bought, and its cost joins what they owe. Their cards are not my assets.
  */
-import { el, frag } from '../lib/dom';
-import { money, marketValue } from '../lib/money';
-import { displayName, subtitle, type NameTable } from '../lib/data';
-import { cardThumb } from './thumb';
-import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types';
+import { el, frag } from '../lib/dom.ts';
+import { money, marketValue } from '../lib/money.ts';
+import { displayName, subtitle, type NameTable } from '../lib/data.ts';
+import { cardThumb } from './thumb.ts';
+import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
 export interface WishlistViewState {
   lists: Record<string, Wishlist>;

@@ -1,5 +1,5 @@
-import { el } from '../lib/dom';
-import { thumbnail } from '../lib/data';
+import { el } from '../lib/dom.ts';
+import { thumbnail } from '../lib/data.ts';
 
 /**
  * A card thumbnail that degrades quietly.

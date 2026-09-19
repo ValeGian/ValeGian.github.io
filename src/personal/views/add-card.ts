@@ -6,13 +6,13 @@
  * and resolves later — because a set bought on release day in Japan can sit unpublished
  * for weeks, and the purchase still happened.
  */
-import { el, frag } from '../lib/dom';
-import { cardThumb } from './thumb';
-import { convert } from '../lib/fx';
-import { searchCards, cardDetail, pricedVariantId, type CardHit } from '../lib/tcgdex';
+import { el, frag } from '../lib/dom.ts';
+import { cardThumb } from './thumb.ts';
+import { convert } from '../lib/fx.ts';
+import { searchCards, cardDetail, pricedVariantId, type CardHit } from '../lib/tcgdex.ts';
 import { toEnglish } from '../../lib/card-name.mjs';
-import type { NameTable } from '../lib/data';
-import type { CollectionItem, Currency } from '../lib/types';
+import type { NameTable } from '../lib/data.ts';
+import type { CollectionItem, Currency } from '../lib/types.ts';
 
 export interface AddCardState {
   names: NameTable;

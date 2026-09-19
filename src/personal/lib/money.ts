@@ -4,7 +4,7 @@
  * Every figure the site shows comes from here, so there is one place to check when a
  * number looks wrong, and one place where the rules about which price to use live.
  */
-import type { CollectionItem, Price, PriceSnapshot } from './types';
+import type { CollectionItem, Price, PriceSnapshot } from './types.ts';
 
 const EUR = new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' });
 const SIGNED = new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', signDisplay: 'exceptZero' });
@@ -23,6 +23,13 @@ export const percent = (ratio: number): string => PERCENT.format(ratio);
  */
 export const marketValue = (price: Price | undefined): number | null => price?.avg30 ?? null;
 
+/**
+ * Money is exact to the cent wherever it is produced, not only where it is formatted.
+ * Binary floats make 252.58 - 140 into 112.58000000000001, which the display formatter
+ * hides but comparisons and sorts do not.
+ */
+const cents = (value: number): number => Math.round(value * 100) / 100;
+
 export interface Valued {
   item: CollectionItem;
   price?: Price;
@@ -36,15 +43,15 @@ export interface Valued {
 export function value(item: CollectionItem, snapshot: PriceSnapshot | null): Valued {
   const price = item.cardId ? snapshot?.prices[item.cardId] : undefined;
   const unit = marketValue(price);
-  const paid = item.purchase.amountEur * item.quantity;
-  const total = unit === null ? null : unit * item.quantity;
+  const paid = cents(item.purchase.amountEur * item.quantity);
+  const total = unit === null ? null : cents(unit * item.quantity);
 
   return {
     item,
     price,
     value: total,
     paid,
-    gain: total === null ? null : total - paid,
+    gain: total === null ? null : cents(total - paid),
     ratio: total === null || paid === 0 ? null : total / paid - 1,
   };
 }
@@ -61,15 +68,15 @@ export interface Totals {
 
 export function totals(valuedItems: Valued[]): Totals {
   const priced = valuedItems.filter((entry) => entry.value !== null);
-  const paidForPriced = priced.reduce((sum, entry) => sum + entry.paid, 0);
-  const valued = priced.reduce((sum, entry) => sum + (entry.value ?? 0), 0);
+  const paidForPriced = cents(priced.reduce((sum, entry) => sum + entry.paid, 0));
+  const valued = cents(priced.reduce((sum, entry) => sum + (entry.value ?? 0), 0));
 
   return {
     cards: valuedItems.reduce((sum, entry) => sum + entry.item.quantity, 0),
-    paid: valuedItems.reduce((sum, entry) => sum + entry.paid, 0),
+    paid: cents(valuedItems.reduce((sum, entry) => sum + entry.paid, 0)),
     valued,
     unpriced: valuedItems.length - priced.length,
-    gain: valued - paidForPriced,
+    gain: cents(valued - paidForPriced),
     ratio: paidForPriced === 0 ? null : valued / paidForPriced - 1,
   };
 }

@@ -77,6 +77,10 @@ export const importFileKey = (base64) =>
 /**
  * Builds an envelope: the payload under a file key, and that file key under a password.
  * Pass an existing key to keep a file readable through the keyring after a rewrite.
+ *
+ * @param {string} password
+ * @param {unknown} payload
+ * @param {CryptoKey | null} [fileKey]
  */
 export async function encrypt(password, payload, fileKey = null) {
   const key = fileKey ?? (await newFileKey());

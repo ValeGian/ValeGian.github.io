@@ -1,11 +1,11 @@
 /**
  * The collection: what is owned, what it cost, what it is worth now.
  */
-import { el, frag } from '../lib/dom';
-import { money, signedMoney, percent, totals, type Valued } from '../lib/money';
-import { apply, sort, type Filters, type SortKey } from '../lib/filters';
-import { displayName, subtitle, type NameTable } from '../lib/data';
-import { cardThumb } from './thumb';
+import { el, frag } from '../lib/dom.ts';
+import { money, signedMoney, percent, totals, type Valued } from '../lib/money.ts';
+import { apply, sort, type Filters, type SortKey } from '../lib/filters.ts';
+import { displayName, subtitle, type NameTable } from '../lib/data.ts';
+import { cardThumb } from './thumb.ts';
 
 export interface CollectionViewState {
   rows: Valued[];

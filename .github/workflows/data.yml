@@ -31,6 +31,9 @@ jobs:
       # holding a real password or a real file.
       - name: Encryption tests
         run: npm run test:crypto
+
+      - name: Unit tests
+        run: npm test
       # Personal files live under .local/ and are absent here by design; the script
       # checks what exists and requires only the public files.
       - name: Validate data files

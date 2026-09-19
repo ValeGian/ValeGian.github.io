@@ -5,9 +5,9 @@
  * TCGplayer are different markets, and a hand-checked figure is a different thing again,
  * so a number without its origin is not worth showing.
  */
-import { el } from '../lib/dom';
-import { money, signedMoney, percent, type Valued } from '../lib/money';
-import { displayName, fullImage, type CatalogOverride, type NameTable } from '../lib/data';
+import { el } from '../lib/dom.ts';
+import { money, signedMoney, percent, type Valued } from '../lib/money.ts';
+import { displayName, fullImage, type CatalogOverride, type NameTable } from '../lib/data.ts';
 
 const SOURCE_LABEL: Record<string, string> = {
   'cardmarket/tcgdex': 'Cardmarket 30-day average, all conditions',

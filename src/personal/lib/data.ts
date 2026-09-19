@@ -5,7 +5,7 @@
  * arrive already decrypted from the unlock step. Nothing here needs a key.
  */
 import { toEnglish } from '../../lib/card-name.mjs';
-import type { CollectionItem, PriceSnapshot, WishlistItem } from './types';
+import type { CollectionItem, PriceSnapshot, WishlistItem } from './types.ts';
 
 export interface NameTable {
   species: Record<string, string>;

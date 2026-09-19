@@ -4,7 +4,7 @@
  * Pure functions over already-valued rows, so they can be reasoned about and tested
  * without a DOM or a network.
  */
-import type { Valued } from './money';
+import type { Valued } from './money.ts';
 
 export interface Filters {
   text: string;

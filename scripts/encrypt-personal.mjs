@@ -13,7 +13,7 @@
  */
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { encrypt, exportFileKey } from '../src/lib/crypto.mjs';
+import { decrypt, encrypt, exportFileKey } from '../src/lib/crypto.mjs';
 import { askHidden } from './lib/prompt.mjs';
 
 const OUT = 'public/data/personal';
@@ -50,6 +50,25 @@ await mkdir(`${LOCAL}/wishlists`, { recursive: true });
 
 const keyring = {};
 
+/**
+ * Reuses the key a file already has.
+ *
+ * A fresh key on every run would leave each past revision readable only by the keyring
+ * that existed at the time, and git keeps those revisions forever — so scripts/audit.mjs
+ * could never walk the history. Keeping the key means today's password opens every
+ * version of the file that was ever committed.
+ */
+async function existingKey(file) {
+  const target = `${OUT}/${file.id}.enc`;
+  if (!existsSync(target)) return null;
+
+  const opened = await decrypt(passwords.get(file.owner), JSON.parse(await readFile(target, 'utf8')));
+  if (opened) return opened.key;
+
+  console.warn(`  ${file.id}: the current password does not open the existing file; issuing a new key.`);
+  return null;
+}
+
 for (const file of FILES) {
   const payload = existsSync(file.source) ? JSON.parse(await readFile(file.source, 'utf8')) : file.blank;
 
@@ -57,12 +76,14 @@ for (const file of FILES) {
     await writeFile(file.source, `${JSON.stringify(payload, null, 2)}\n`);
   }
 
-  const { envelope, key } = await encrypt(passwords.get(file.owner), payload);
+  const reused = await existingKey(file);
+  const { envelope, key } = await encrypt(passwords.get(file.owner), payload, reused);
   keyring[file.id] = await exportFileKey(key);
 
   await writeFile(`${OUT}/${file.id}.enc`, `${JSON.stringify(envelope)}\n`);
   const size = Object.keys(payload).includes('items') ? payload.items.length : '-';
-  console.log(`  ${file.id.padEnd(11)} opened by ${file.owner.padEnd(8)} ${size} item(s)`);
+  const keyNote = reused ? 'key kept' : 'new key';
+  console.log(`  ${file.id.padEnd(11)} opened by ${file.owner.padEnd(8)} ${String(size).padStart(3)} item(s)  ${keyNote}`);
 }
 
 const { envelope: keyringEnvelope } = await encrypt(adminPassword, keyring);

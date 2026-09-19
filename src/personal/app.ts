@@ -5,21 +5,22 @@
  * in a readable form, so closing the tab locks it; only ciphertext and already-public
  * JSON are ever written to the device.
  */
-import { el, frag, need } from './lib/dom';
-import { createStore } from './lib/store';
-import { emptyFilters, type Filters, type SortKey } from './lib/filters';
-import { value, type Valued } from './lib/money';
-import { loadPublicData, stalenessDays, type PublicData } from './lib/data';
-import { renderCollection } from './views/collection';
-import { renderDetail } from './views/detail';
-import { renderWishlists } from './views/wishlists';
-import { renderAddCard, type AddCardState } from './views/add-card';
-import { renderPublishBar } from './views/publish-bar';
-import { addCard, deleteCard, markBought, newCardId, type Envelope, type Vault } from './lib/vault';
-import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync';
+import { el, frag, need } from './lib/dom.ts';
+import { createStore } from './lib/store.ts';
+import { emptyFilters, type Filters, type SortKey } from './lib/filters.ts';
+import { value, type Valued } from './lib/money.ts';
+import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
+import { renderCollection } from './views/collection.ts';
+import { renderDetail } from './views/detail.ts';
+import { renderWishlists } from './views/wishlists.ts';
+import { renderAddCard, type AddCardState } from './views/add-card.ts';
+import { renderPublishBar } from './views/publish-bar.ts';
+import { addCard, deleteCard, markBought, newCardId, type Envelope, type Vault } from './lib/vault.ts';
+import { savePending } from './lib/local.ts';
+import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
 import { unlock } from '../lib/unlock.mjs';
 import { decryptWithKey } from '../lib/crypto.mjs';
-import type { Collection, CollectionItem, Wishlist } from './lib/types';
+import type { Collection, CollectionItem, Wishlist } from './lib/types.ts';
 
 type Friend = { role: 'friend'; owner: string; wishlist: Wishlist };
 
@@ -218,7 +219,7 @@ function lockScreen(state: AppState): DocumentFragment {
 async function saveCard(item: CollectionItem): Promise<void> {
   const { vault } = store.get();
   if (!vault) return;
-  await addCard(vault, item);
+  await savePending(await addCard(vault, item));
   await refreshPendingCount();
   store.update({ adding: false, add: { ...blankAdd } });
 }
@@ -226,7 +227,7 @@ async function saveCard(item: CollectionItem): Promise<void> {
 async function removeCard(itemId: string): Promise<void> {
   const { vault } = store.get();
   if (!vault) return;
-  await deleteCard(vault, itemId);
+  await savePending(await deleteCard(vault, itemId));
   await refreshPendingCount();
   store.update({ openItemId: null });
 }
@@ -332,7 +333,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
             const date = new Date().toISOString().slice(0, 10);
             const { convert } = await import('./lib/fx');
             const money = await convert(amount, currency, date);
-            await markBought(vault, owner, itemId, {
+            const { writes } = await markBought(vault, owner, itemId, {
               date,
               amount,
               currency,
@@ -340,6 +341,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
               fxRate: money.fxRate,
               fxSource: currency === 'EUR' ? 'identity' : 'frankfurter',
             });
+            await savePending(writes);
             await refreshPendingCount();
             store.update({});
           },

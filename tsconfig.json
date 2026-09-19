@@ -12,12 +12,18 @@
       "@data/*": [
         "src/data/*"
       ]
-    }
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "types": [
+      "node"
+    ]
   },
   "include": [
     ".astro/types.d.ts",
     "**/*.ts",
-    "**/*.astro"
+    "**/*.astro",
+    "tests/**/*.ts"
   ],
   "exclude": [
     "dist"

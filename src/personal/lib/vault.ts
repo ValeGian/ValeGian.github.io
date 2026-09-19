@@ -5,14 +5,14 @@
  * password: saving reseals a payload under the key it already has, so nothing needs to
  * keep a password in memory in order to write.
  *
- * Every mutation goes through `commit`, which reseals the file it touched, regenerates
- * the public derived files, and queues the lot. That is the only path that writes, so it
- * is the only place to look when something reaches GitHub that should not have.
+ * Nothing here touches storage. Every mutation returns the files that would have to be
+ * written, and the caller decides what to do with them. That keeps the rules about whose
+ * money is whose testable without a browser, and leaves one place — the caller — where
+ * anything reaches the device or GitHub.
  */
 import { resealPayload } from '../../lib/crypto.mjs';
 import { derivePublicFiles } from '../../lib/watchlist.mjs';
-import { savePending } from './local';
-import type { Collection, CollectionItem, Purchase, Wishlist, WishlistItem } from './types';
+import type { Collection, CollectionItem, Purchase, Wishlist, WishlistItem } from './types.ts';
 
 const PERSONAL_PATH = 'public/data/personal';
 const DATA_PATH = 'public/data';
@@ -44,13 +44,23 @@ export const newCardId = (vault: Vault): string =>
 
 export const newWishId = (list: Wishlist): string => nextId('wish', list.items.map((item) => item.id));
 
+export interface Write {
+  path: string;
+  content: string;
+  savedAt: string;
+}
+
 /**
- * Reseals the files that changed and queues them with the regenerated public files.
- * `touched` names the personal files to rewrite; the derived files always go along,
- * because a card added without its watchlist entry would never be priced.
+ * Reseals the files that changed and returns everything that has to be written.
+ *
+ * `touched` names the personal files to rewrite; the derived public files always go
+ * along, because a card added without its watchlist entry would never be priced.
+ *
+ * Kept separate from storing the result so it can be tested without a browser — this is
+ * the function that decides what reaches GitHub.
  */
-export async function commit(vault: Vault, touched: string[]): Promise<void> {
-  const writes: { path: string; content: string; savedAt: string }[] = [];
+export async function buildWrites(vault: Vault, touched: string[]): Promise<Write[]> {
+  const writes: Write[] = [];
   const savedAt = new Date().toISOString();
 
   for (const name of new Set(touched)) {
@@ -76,35 +86,35 @@ export async function commit(vault: Vault, touched: string[]): Promise<void> {
     { path: `${DATA_PATH}/pending.json`, content: `${JSON.stringify(pending, null, 2)}\n`, savedAt },
   );
 
-  await savePending(writes);
+  return writes;
 }
 
-export async function addCard(vault: Vault, item: CollectionItem): Promise<void> {
+export async function addCard(vault: Vault, item: CollectionItem): Promise<Write[]> {
   vault.collection.items.push(item);
-  await commit(vault, ['collection']);
+  return buildWrites(vault, ['collection']);
 }
 
-export async function updateCard(vault: Vault, id: string, patch: Partial<CollectionItem>): Promise<void> {
+export async function updateCard(vault: Vault, id: string, patch: Partial<CollectionItem>): Promise<Write[]> {
   const item = vault.collection.items.find((candidate) => candidate.id === id);
   if (!item) throw new Error(`No card ${id}`);
   Object.assign(item, patch);
-  await commit(vault, ['collection']);
+  return buildWrites(vault, ['collection']);
 }
 
-export async function deleteCard(vault: Vault, id: string): Promise<void> {
+export async function deleteCard(vault: Vault, id: string): Promise<Write[]> {
   vault.collection.items = vault.collection.items.filter((item) => item.id !== id);
-  await commit(vault, ['collection']);
+  return buildWrites(vault, ['collection']);
 }
 
-export async function addWish(vault: Vault, owner: string, item: WishlistItem): Promise<void> {
+export async function addWish(vault: Vault, owner: string, item: WishlistItem): Promise<Write[]> {
   vault.wishlists[owner].items.push(item);
-  await commit(vault, [owner]);
+  return buildWrites(vault, [owner]);
 }
 
-export async function deleteWish(vault: Vault, owner: string, id: string): Promise<void> {
+export async function deleteWish(vault: Vault, owner: string, id: string): Promise<Write[]> {
   const list = vault.wishlists[owner];
   list.items = list.items.filter((item) => item.id !== id);
-  await commit(vault, [owner]);
+  return buildWrites(vault, [owner]);
 }
 
 /**
@@ -119,7 +129,7 @@ export async function markBought(
   owner: string,
   wishId: string,
   purchase: Purchase,
-): Promise<{ addedToCollection: boolean }> {
+): Promise<{ addedToCollection: boolean; writes: Write[] }> {
   const list = vault.wishlists[owner];
   const item = list.items.find((candidate) => candidate.id === wishId);
   if (!item) throw new Error(`No wishlist item ${wishId}`);
@@ -128,8 +138,7 @@ export async function markBought(
     item.status = 'bought';
     item.boughtAt = purchase.date;
     item.purchase = purchase;
-    await commit(vault, [owner]);
-    return { addedToCollection: false };
+    return { addedToCollection: false, writes: await buildWrites(vault, [owner]) };
   }
 
   const card: CollectionItem = {
@@ -152,6 +161,5 @@ export async function markBought(
 
   vault.collection.items.push(card);
   list.items = list.items.filter((candidate) => candidate.id !== wishId);
-  await commit(vault, ['collection', owner]);
-  return { addedToCollection: true };
+  return { addedToCollection: true, writes: await buildWrites(vault, ['collection', owner]) };
 }

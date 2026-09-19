@@ -5,7 +5,7 @@
  * signal loses nothing. The count is always visible, because a queue that fills up
  * silently is the failure that costs real work.
  */
-import { el, frag } from '../lib/dom';
+import { el, frag } from '../lib/dom.ts';
 
 export interface PublishBarState {
   pendingCount: number;

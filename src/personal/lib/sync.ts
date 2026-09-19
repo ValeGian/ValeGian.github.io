@@ -9,7 +9,7 @@
  * rotate. "Forget token" removes it from this device.
  */
 import { checkToken, commitFiles } from '../../lib/github.mjs';
-import { clearPending, listPending, savePending, type PendingWrite } from './local';
+import { clearPending, listPending, savePending, type PendingWrite } from './local.ts';
 
 const TOKEN_KEY = 'valegian.personal.token';
 const TARGET = { owner: 'ValeGian', repo: 'ValeGian.github.io', branch: 'master' };

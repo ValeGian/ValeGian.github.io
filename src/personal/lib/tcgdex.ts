@@ -6,7 +6,7 @@
  * species name first, using the same table the display names come from, and the search
  * runs on that.
  */
-import type { NameTable } from './data';
+import type { NameTable } from './data.ts';
 
 const BASE = 'https://api.tcgdex.net/v2/ja';
 const LIMIT = 24;

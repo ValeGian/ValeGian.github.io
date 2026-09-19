@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phases 1–5 done, Phase 6 read side done. Next: the write path.
+**Status:** Phases 1–6 essentially done. Next: Phase 7, hardening.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 16 — collection and wishlist screens)
+**Last updated:** 2026-09-19 (rev 17 — the write path)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -606,10 +606,13 @@ static lookup, never fetched at runtime.
 - [x] Wishlists: per-list view, combined shopping view, target vs market
 - [x] Friend read-only view + balance + settlements
 - [x] Mobile verified at a true 360 px viewport
-- [ ] **Add / delete / edit, TCGdex picker, pending path, photo upload**
-- [ ] **PAT unlock, offline queue, batched commits, *N unsynced* badge, *Forget token***
-- [ ] Value-over-time charts — needs more than one day of history
+- [x] Add and delete cards, TCGdex picker, pending path
+- [x] PAT unlock, offline queue, batched commits, unpublished-count badge, Forget token
+- [x] Mark bought, both behaviours
 - [x] Staleness banner
+- [ ] Editing an existing card in place (delete-and-re-add works today)
+- [ ] Photo upload for pending cards
+- [ ] Value-over-time charts — needs more than one day of history
 
 ### Phase 7 — Hardening
 - [ ] `scripts/audit.mjs` — decrypt-and-diff history (§7.4)
@@ -634,6 +637,38 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 17 (the write path) ✅
+- **Saving never needs the password.** `resealPayload` replaces an envelope's contents
+  while keeping its wrapping untouched, so a write uses the file key held since the
+  unlock. Nothing keeps a password in memory to write, and the keyring still opens the
+  file because its key did not change.
+- **The queue survives a reload without storing a secret.** Changes are kept on the
+  device as ciphertext for the personal files and already-public JSON for the derived
+  ones. Verified: add a card, reload, unlock — the card and the queue are both still
+  there. That is what a shop basement with no signal needs.
+- The queued copy wins over what GitHub serves, because it has not been published yet.
+  Publishing from a second device while changes are queued here is a real conflict, and
+  the count and banner put it in front of a person rather than resolving it quietly.
+  **Discard** exists for a queue that should not be published.
+- **Search translates before it queries.** TCGdex holds Japanese cards under Japanese
+  names; "Mega Rayquaza" is mapped through the species table and searched as レックウザ.
+  Each word is tried, which is what makes a query that is not itself a species work.
+- **Verified the commit flow against the real repository without moving the branch**:
+  created blobs, tree and commit objects, then checked the resulting tree — **98 files
+  including the nightly price snapshots survive a browser save through `base_tree`**.
+  Unreferenced objects are collected, so nothing landed. The one step not exercised is
+  the final ref update, which needs a token this machine should not put in a browser.
+- End-to-end in the browser: added a card (46 → 47, €1218,97 → €1506,53 paid, FX fetched
+  for the purchase date), reloaded, unlocked, found it still queued, deleted it, and the
+  figures returned exactly to €1218,97 / €2657,71 / +118 %.
+- `watchlist.json` and `pending.json` are now derived by **one shared module** used by
+  both the script and the browser — publishing from a laptop and from a phone must not
+  produce different files.
+
+  **Left for later:** editing a card in place (delete-and-re-add works today), photo
+  upload for pending cards, and value-over-time charts, which need more than one day of
+  history.
 
 ### 2026-09-19 — rev 16 (collection and wishlist screens) ◐
 - **No framework.** Preact was installed and removed within the hour: it broke the build

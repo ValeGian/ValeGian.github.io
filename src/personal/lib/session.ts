@@ -21,6 +21,7 @@
 import { exportFileKey, importFileKey } from '../../lib/crypto.mjs';
 
 const KEY = 'personal.session';
+const TAB_KEY = 'personal.tab';
 
 /** What survives a reload. Keys are raw AES-256 material, base64, as the keyring holds them. */
 export type SavedSession =
@@ -61,8 +62,35 @@ export function loadSession(): SavedSession | null {
 export function clearSession(): void {
   try {
     sessionStorage.removeItem(KEY);
+    sessionStorage.removeItem(TAB_KEY);
   } catch {
     // Nothing to do; the tab closing clears it anyway.
+  }
+}
+
+export type TabName = 'collection' | 'wishlists';
+
+/**
+ * Which tab was open, kept for the same reason the keys are.
+ *
+ * Reloading while reading a wishlist used to land back on the collection, which is the
+ * sort of thing that is merely odd on a laptop and genuinely annoying on a phone in a
+ * shop, where a reload is how you recover from a bad connection.
+ */
+export function saveTab(tab: TabName): void {
+  try {
+    sessionStorage.setItem(TAB_KEY, tab);
+  } catch {
+    // The tab is a convenience; losing it costs one click.
+  }
+}
+
+export function loadTab(): TabName | null {
+  try {
+    const saved = sessionStorage.getItem(TAB_KEY);
+    return saved === 'collection' || saved === 'wishlists' ? saved : null;
+  } catch {
+    return null;
   }
 }
 

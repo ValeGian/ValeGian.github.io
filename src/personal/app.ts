@@ -21,7 +21,7 @@ import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markB
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
 import { resume, unlock } from '../lib/unlock.mjs';
-import { clearSession, loadSession, saveSession, sessionKeys } from './lib/session.ts';
+import { clearSession, loadSession, loadTab, saveSession, saveTab, sessionKeys } from './lib/session.ts';
 import { decryptWithKey } from '../lib/crypto.mjs';
 import type { Collection, CollectionItem, Wishlist, WishlistItem } from './lib/types.ts';
 
@@ -383,6 +383,7 @@ async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void
     data,
     vault,
     readOnly,
+    tab: loadTab() ?? 'collection',
     hasToken: !readOnly && Boolean(getToken()),
   });
   if (keep) await saveSession({ role: opened.role, keys: opened.keys });
@@ -641,7 +642,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
         'aria-selected': String(state.tab === tab),
         class: state.tab === tab ? 'tab on' : 'tab',
         text: tab === 'collection' ? 'Collection' : 'Wishlists',
-        onClick: () =>
+        onClick: () => {
+          saveTab(tab);
           store.update({
             tab,
             openItemId: null,
@@ -649,7 +651,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
             adding: false,
             add: blankAdd(tab === 'collection' ? 'collection' : 'wishlist'),
             reveal: '.tabs',
-          }),
+          });
+        },
       }),
     ),
     state.readOnly

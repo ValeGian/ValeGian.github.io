@@ -15,6 +15,25 @@ const API = 'https://api.github.com';
 /** The daily price job pushes to the same branch, so a save can always land on a moved head. */
 const RETRIES = 3;
 
+/**
+ * How long to wait before reading the branch again, per attempt.
+ *
+ * Retrying immediately does not work, for two reasons that both need real time to pass.
+ * GitHub serves `git/ref` with `cache-control: public, max-age=60`, so a retry inside
+ * that minute is answered from the browser's cache with the same stale head and rebuilds
+ * on it — four attempts in a few milliseconds all failed with the same 422. `cache:
+ * no-store` below deals with that; the waits deal with the rest, which is that GitHub's
+ * own read replicas take a moment to catch up with a push.
+ */
+const BACKOFF_MS = [400, 1200, 3000];
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Said instead of the raw 422, which reads as data loss and is not. */
+const BRANCH_KEPT_MOVING =
+  `The branch moved during each of ${RETRIES + 1} attempts to save. Nothing was lost — the ` +
+  'changes are still queued on this device. Try publishing again in a minute.';
+
 const textEncoder = new TextEncoder();
 
 /** GitHub wants base64, and btoa cannot take multi-byte characters such as card names. */
@@ -37,10 +56,15 @@ function createClient({ token, owner, repo }) {
   return async function request(path, { method = 'GET', body } = {}) {
     const response = await fetch(`${API}/repos/${owner}/${repo}${path}`, {
       method,
+      // Never from the cache. GitHub marks these responses publicly cacheable for a
+      // minute, and a commit built on a minute-old head is rejected as not a fast
+      // forward — which is exactly the failure this retries out of.
+      cache: 'no-store',
       headers: {
         Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${token}`,
         'X-GitHub-Api-Version': '2022-11-28',
+        'Cache-Control': 'no-cache',
         ...(body ? { 'Content-Type': 'application/json' } : {}),
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
@@ -73,6 +97,8 @@ export async function commitFiles(target, files, message) {
   const request = createClient(target);
 
   for (let attempt = 0; attempt <= RETRIES; attempt += 1) {
+    if (attempt > 0) await wait(BACKOFF_MS[attempt - 1]);
+
     const ref = await request(`/git/ref/heads/${branch}`);
     const head = ref.object.sha;
     const headCommit = await request(`/git/commits/${head}`);
@@ -112,11 +138,13 @@ export async function commitFiles(target, files, message) {
       return { sha: commit.sha, url: `https://github.com/${target.owner}/${target.repo}/commit/${commit.sha}` };
     } catch (error) {
       const branchMoved = error instanceof GitHubError && (error.status === 422 || error.status === 409);
-      if (!branchMoved || attempt === RETRIES) throw error;
+      if (!branchMoved) throw error;
+      // The last attempt reports what happened in words, not as a 422 quoting the API.
+      if (attempt === RETRIES) throw new Error(BRANCH_KEPT_MOVING);
     }
   }
 
-  throw new Error(`The branch kept moving; gave up after ${RETRIES + 1} attempts`);
+  throw new Error(BRANCH_KEPT_MOVING);
 }
 
 /**

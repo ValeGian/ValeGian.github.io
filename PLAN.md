@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 21 — wishlist add flow)
+**Last updated:** 2026-09-19 (rev 22 — artwork and caret fixes)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -630,9 +630,6 @@ static lookup, never fetched at runtime.
 
 ## 12. Still open
 
-0. **Before the Japan trip:** create the fine-grained PAT and confirm one **Publish**
-   from the browser. The ref update is the only step never exercised (§13 rev 17).
-   Everything else that was outstanding is now automated or answered.
 1. **Bio copy** — a few lines for the front page. Deferred by you; needed in Phase 2.
 2. *(optional)* Strengthen `cvalgian` with a random suffix (§7.3). Recommended, not a
    blocker.
@@ -643,6 +640,30 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 22 (artwork, caret; token confirmed in production) ✅
+- **The token works.** Four cards published to two wishlists from the browser — the ref
+  update was the last unexercised step in the system and it is now confirmed in
+  production. §12.0 is closed.
+- **Typing 30 into the target price produced 03.** Views rebuild on every state change,
+  which replaces the element the caret is in, and **`selectionStart` is null on a number
+  input**, so the caret could not be restored and every keystroke landed at the start.
+  The rebuild was pointless there — the DOM already showed what was typed. Field edits
+  now record their value *without* notifying subscribers; only changes that alter the
+  view rebuild it. Four tests pin the distinction, because the symptom is invisible until
+  someone types a second character.
+- **TCGdex's `image` field is not reliable.** `SV10-127` has no image in the API while
+  the file is served perfectly well, so every card in that set rendered as a blank frame
+  — and the empty string was written into the saved items, so it would have stayed wrong.
+  The path is predictable (series letters, set id, number) and is **derived** when the API
+  offers nothing; the existing error handler covers files that really are absent. Items
+  already saved heal themselves, because the path is worked out at render time rather
+  than read from storage.
+- **Wishlist thumbnails load eagerly.** Those rows appear on a tab switch and the lazy
+  loader never fired for them — five seconds in, the requests had not started.
+- Verified against the four published cards: `SV10-127` shows artwork, `M2a-245` falls
+  back to an empty frame because TCGdex genuinely has none, target accepts 30 as 30.
+- 40 tests.
 
 ### 2026-09-19 — rev 21 (wishlist add flow) ✅
 - **Search results were ordered by card id**, which put the 1996 sets first — and TCGdex

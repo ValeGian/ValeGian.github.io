@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://valegian.github.io/schemas/watchlist.schema.json",
+  "title": "Cards to price",
+  "description": "Every card the daily job should snapshot. Deliberately carries no owner, no price paid and no target, so the pipeline never needs a decryption key and this file can be public.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "generatedAt", "cards"],
+  "properties": {
+    "version": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cardId", "variantId"],
+        "properties": {
+          "cardId": { "$ref": "common.schema.json#/$defs/cardId" },
+          "variantId": { "type": "string" }
+        }
+      }
+    }
+  }
+}

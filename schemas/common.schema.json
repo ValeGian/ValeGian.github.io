@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://valegian.github.io/schemas/common.schema.json",
+  "title": "Shared definitions",
+  "$defs": {
+    "isoDate": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "currency": {
+      "enum": ["EUR", "JPY", "USD"]
+    },
+    "condition": {
+      "description": "Cardmarket condition grades. v1 records NM only, but the vocabulary is complete so nothing has to change when it isn't.",
+      "enum": ["M", "NM", "EX", "GD", "LP", "PL", "PO"]
+    },
+    "cardId": {
+      "description": "TCGdex identifier, set id and zero-padded local id: S12a-261.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9.+-]{1,12}-[0-9A-Za-z]{1,6}$"
+    },
+    "purchase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["date", "amount", "currency", "amountEur", "fxRate", "fxSource"],
+      "properties": {
+        "date": { "$ref": "#/$defs/isoDate" },
+        "dateIsBootstrap": {
+          "type": "boolean",
+          "description": "True when the real purchase date is unknown and the import date stands in. Charts must not imply history before this point."
+        },
+        "amount": { "type": "number", "exclusiveMinimum": 0 },
+        "currency": { "$ref": "#/$defs/currency" },
+        "amountEur": { "type": "number", "exclusiveMinimum": 0 },
+        "fxRate": { "type": "number", "exclusiveMinimum": 0 },
+        "fxSource": { "enum": ["user-recorded", "frankfurter", "identity"] },
+        "vendor": { "type": "string" }
+      }
+    },
+    "catalogHint": {
+      "description": "What is known about a card the catalog has not published yet.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["setCode", "number"],
+      "properties": {
+        "setName": { "type": "string" },
+        "setCode": { "type": "string", "minLength": 1 },
+        "number": { "type": "string", "minLength": 1 },
+        "nameJa": { "type": "string" },
+        "nameEn": { "type": "string" }
+      }
+    }
+  }
+}

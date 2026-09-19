@@ -16,13 +16,11 @@ interface Exam {
   isFinalExam?: boolean;
 }
 
+/**
+ * Only the fields this component renders. transcripts.json carries more — provenance
+ * notes and completeness flags — but those are working notes, not page content.
+ */
 interface Record {
-  isComplete: boolean;
-  creditsRecorded: number;
-  creditsExpected: number;
-  creditsNote?: string;
-  incompleteNote?: string;
-  snapshotDate?: string;
   exams: Exam[];
   unrecorded?: Exam[];
 }
@@ -45,29 +43,34 @@ interface Props {
 
 const { degree, record } = Astro.props;
 
-const graded = record.exams.filter((exam) => !exam.isFinalExam && exam.mark !== undefined);
+/** One curriculum, in the order it was taken. Exams still awaiting a mark sit in place. */
+const curriculum = [...record.exams, ...(record.unrecorded ?? [])].sort((a, b) =>
+  (a.date ?? '9999').localeCompare(b.date ?? '9999'),
+);
+
+const graded = curriculum.filter((exam) => !exam.isFinalExam && exam.mark !== undefined);
 const creditsGraded = graded.reduce((total, exam) => total + exam.credits, 0);
+const credits = curriculum.reduce((total, exam) => total + exam.credits, 0);
 const weightedAverage =
   graded.reduce((total, exam) => total + (exam.mark ?? 0) * exam.credits, 0) / creditsGraded;
 
 const monthYear = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' });
 const asMonthYear = (iso?: string) => (iso ? monthYear.format(new Date(iso)) : '');
 
-const figures = [
-  { label: 'Exams recorded', value: String(record.exams.length) },
-  { label: 'ECTS credits', value: `${record.creditsRecorded} of ${record.creditsExpected}` },
+const figures: { label: string; value: string; note?: string }[] = [
+  { label: 'Exams', value: String(curriculum.length) },
+  { label: 'ECTS credits', value: String(credits) },
   { label: 'Weighted average', value: `${weightedAverage.toFixed(2)} / 30` },
-  { label: 'Final grade', value: degree.grade ?? 'Not in this record' },
+  ...(degree.grade
+    ? [{ label: 'Final grade', value: degree.grade, note: degree.gradeNote }]
+    : []),
 ];
 ---
 
 <section class="record">
   <header>
     <h2>{degree.degree}</h2>
-    <p class="meta ui">
-      {degree.institution}, {degree.startYear}–{degree.endYear ?? 'present'}
-      {degree.gradeNote && <span class="muted"> · {degree.gradeNote}</span>}
-    </p>
+    <p class="meta ui">{degree.institution}, {degree.startYear}–{degree.endYear ?? 'present'}</p>
   </header>
 
   <dl class="figures">
@@ -75,23 +78,21 @@ const figures = [
       <div>
         <dt class="ui">{figure.label}</dt>
         <dd class="numeric">{figure.value}</dd>
+        {figure.note && <dd class="figure-note">{figure.note}</dd>}
       </div>
     ))}
   </dl>
 
-  {!record.isComplete && record.incompleteNote && (
-    <p class="caveat">{record.incompleteNote}</p>
-  )}
-  {record.creditsNote && <p class="caveat quiet">{record.creditsNote}</p>}
-
   <ol class="exams">
-    {record.exams.map((exam) => (
+    {curriculum.map((exam) => (
       <li class:list={['exam', { final: exam.isFinalExam }]}>
         <span class="exam-title">{exam.title}</span>
-        <span class="exam-mark numeric">
-          {exam.mark}
-          {exam.cumLaude && <span class="laude"> cum laude</span>}
-        </span>
+        {exam.mark !== undefined && (
+          <span class="exam-mark numeric">
+            {exam.mark}
+            {exam.cumLaude && <span class="laude"> cum laude</span>}
+          </span>
+        )}
         <span class="exam-meta numeric">
           {exam.credits} ECTS
           {exam.date && <span class="when">{asMonthYear(exam.date)}</span>}
@@ -99,21 +100,6 @@ const figures = [
       </li>
     ))}
   </ol>
-
-  {record.unrecorded && record.unrecorded.length > 0 && (
-    <div class="pending">
-      <h3>Passed later, marks not in this export</h3>
-      <ol class="exams">
-        {record.unrecorded.map((exam) => (
-          <li class="exam">
-            <span class="exam-title">{exam.title}</span>
-            <span class="exam-mark muted ui">—</span>
-            <span class="exam-meta numeric">{exam.credits} ECTS</span>
-          </li>
-        ))}
-      </ol>
-    </div>
-  )}
 
   <p class="source ui">
     <a href={degree.transcript}>Original transcript (PDF)</a>
@@ -156,17 +142,12 @@ const figures = [
     font-size: var(--size-lg);
   }
 
-  .caveat {
-    border-left: 2px solid var(--accent);
-    padding-left: var(--space-4);
-    margin-bottom: var(--space-8);
-    color: var(--ink);
-  }
-
-  .caveat.quiet {
-    border-left-color: var(--rule-strong);
+  .figures .figure-note {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    line-height: var(--leading-snug);
     color: var(--muted);
-    font-size: var(--size-sm);
+    max-width: 22ch;
   }
 
   .exams {
@@ -215,16 +196,6 @@ const figures = [
     color: var(--muted);
     display: flex;
     gap: var(--space-4);
-  }
-
-  .pending {
-    margin-top: var(--space-12);
-  }
-
-  .pending h3 {
-    font-size: var(--size-md);
-    color: var(--muted);
-    margin-bottom: var(--space-3);
   }
 
   .source {

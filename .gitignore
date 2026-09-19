@@ -19,3 +19,10 @@ Thumbs.db
 # environment
 .env
 .env.production
+
+# Personal collection data in the clear.
+#
+# The repository is public and git history is append-only, so anything committed
+# here is public forever — including after Phase 5 encrypts the served copies.
+# Migration inputs and decrypted working copies live here and are never committed.
+.local/

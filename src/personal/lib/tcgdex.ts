@@ -39,28 +39,27 @@ export interface CardHit {
  * Japanese sets paired with the English set that prints the same cards at the same
  * numbers, for the two cases where the Japanese catalog entry is not enough.
  *
- * **A row may only be added when the numbering matches.** That is what makes the English
- * card at a given number the same card, and it is not the usual arrangement: Japanese
- * sets are smaller than English ones and are recombined for the worldwide release, so
- * M6 card 113 and me01 card 113 are different cards. Simultaneous worldwide releases
- * like the 30th Anniversary set are the exception, and the only kind that belongs here.
+ * **The numbering does not carry across, not even for a simultaneous release.** This was
+ * assumed at first and it was wrong: Cardmarket lists the Japanese Moltres as m6a 105 and
+ * m6a 006, where the English set has its two Moltres at 011 and 130 — no offset, no
+ * pattern. A pairing therefore supplies a name and a picture and never a number. Anything
+ * that needs the number has to get it from the card itself.
  *
  * The pairing does two jobs:
  *
  * - **The set is missing from the Japanese catalog.** Four days after the 30th
  *   Anniversary launch TCGdex had the English set complete with artwork for all 158
  *   cards and no Japanese M6a at all, so a card bought on release day could not be found
- *   by name, by number, or at all. The English twin stands in, and the card is saved as
- *   pending under its Japanese set code — never the English card id, which is a
- *   different Cardmarket product and would be priced wrong.
- * - **The set is there but the cards have not been scanned.** Every card in M2a, M4, M5,
- *   M6 and SV11W has Cardmarket prices and no picture. Those cards are priced correctly
- *   from the Japanese entry; only the picture is borrowed, and only until the daily job
- *   finds the real one (see artwork.json).
+ *   by name, by number, or at all. The English twin stands in for the name and the
+ *   picture — never the card id, which is a different Cardmarket product, and never the
+ *   number, which is a different number.
+ * A row disables itself as soon as the Japanese set appears, so leaving one behind costs
+ * nothing.
  *
- * A row can be deleted once its Japanese set is both published and scanned. Leaving it
- * costs nothing: the first use disables itself as soon as the set appears, and the
- * second is overridden by the real artwork the moment it exists.
+ * Borrowing a picture for a Japanese card that *is* in the catalog but has not been
+ * scanned — every card in M2a, M4, M5, M6 and SV11W has prices and no picture — was tried
+ * and removed: it can only be done by number, and the numbers do not correspond. Those
+ * cards get their artwork from artwork.json when the daily job finds it.
  */
 const MIRRORED_SETS: { japanese: string; setName: string; english: string }[] = [
   { japanese: 'M6a', setName: '30th Anniversary', english: '30th' },
@@ -239,21 +238,6 @@ async function mirrorTail(text: string, names: NameTable): Promise<CardHit[]> {
   }
 
   return hits;
-}
-
-/**
- * The English twin's artwork for a Japanese card, when there is a safe one.
- *
- * Only for a set in MIRRORED_SETS, where the numbering is known to match — anywhere else
- * this would confidently show a picture of a different card, which is worse than showing
- * none.
- */
-export async function standInArtwork(setCode: string, localId: string): Promise<string | null> {
-  const mirror = MIRRORED_SETS.find((entry) => entry.japanese.toLowerCase() === setCode.toLowerCase());
-  if (!mirror) return null;
-
-  const twin = (await cardsInSet(EN, mirror.english)).find((card) => card.localId === localId);
-  return twin?.image ?? null;
 }
 
 async function query(base: string, name: string, page: number): Promise<CardHit[]> {

@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-20 (rev 28 — sessions survive a reload, set-scoped search, artwork discovery)
+**Last updated:** 2026-09-20 (rev 29 — the numbering does not carry across; TCGdex looks frozen)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -523,13 +523,45 @@ price job already fetches every watched card daily, and it now records where eac
 picture is. `picture()` prefers that over whatever was stored, so artwork appears the day
 TCGdex uploads it — no vault write, nothing to remember.
 
-**Borrowing a picture is only safe where the numbering matches.** Japanese sets are
-smaller than English ones and are recombined for the worldwide release, so M6 card 113 and
-me01 card 113 are different cards. Only a simultaneous worldwide release like the 30th
-Anniversary set belongs in `MIRRORED_SETS`; anywhere else the stand-in would confidently
-show the wrong card, which is worse than showing none.
+**The numbering does not carry across, not even for a simultaneous worldwide release.**
+Assumed at first, and wrong: Cardmarket lists the Japanese Moltres as `m6a 105` and
+`m6a 006`, where the English set has its two Moltres at `011` and `130`. No offset, no
+pattern. A pairing therefore supplies a **name and a picture, never a number**. A card
+added from a stand-in asks for the number printed on it, because only the card knows;
+a wanted card, which nobody is holding, is stored without one and stays out of the retry
+queue. A wrong match is worse than no match — it would attach another card's price
+silently, the day the set is published.
 
-### 8.4 Sets the catalog has not published yet
+### 8.4 TCGdex's price mirror looks frozen — open
+
+Measured 2026-09-20 on `S12a-212`, the same minute in both places:
+
+| | TCGdex | Cardmarket | drift |
+|---|---|---|---|
+| avg30 | 109.69 | 104.46 | +5.0% |
+| avg7 | 81.30 | 92.53 | −12.1% |
+| avg1 | 84.00 | 93.00 | −9.7% |
+| low | 68.00 | 65.00 | +4.6% |
+
+And across 18 watched cards, the 19 Sep snapshot and the next day's TCGdex values are
+byte-identical **including `avg1`**, which cannot happen to eighteen cards at once if the
+figure were live. TCGdex re-stamps `updated` daily — its refresh pass runs at ~22:54 UTC
+and takes about 25 seconds — so `updated` is its own fetch time and says nothing about the
+age of the numbers. It matched Cardmarket to the cent when this was first verified, so
+this is an upstream regression rather than a wrong assumption.
+
+Consequences, unresolved: the history may be recording one datapoint repeatedly, and a
+flat chart would look like a quiet market rather than a dead feed. **Not yet fixed** — the
+options are a duplicate-day detector that raises an issue when a whole day's readings are
+unchanged, waiting for TCGdex to recover, or the official Cardmarket API (OAuth, an app
+registration, and a secret to keep, against the no-maintenance rule).
+
+Scraping the website is not an option for the daily job: Cloudflare blocks non-browser
+clients outright — even `robots.txt` returns a challenge page — and getting past that
+means defeating bot detection. A real browser loads the pages fine, which is what the
+hand-checked override path in `catalog-overrides.json` already exists for.
+
+### 8.5 Sets the catalog has not published yet
 
 TCGdex publishes the English side of a worldwide release first. Four days after the 30th
 Anniversary launch it carried the English `30th` set complete with artwork for all 158
@@ -550,7 +582,7 @@ and the set is fetched once per session rather than per keystroke.
 Other free catalogues were checked and rejected: `apitcg.com` needs an API key,
 `api.pokemontcg.io` was unreachable and is English-only regardless.
 
-### 8.5 What read-only friends cost
+### 8.6 What read-only friends cost
 
 Every wishlist change comes through me: they message me a card, I add it with the same
 picker I use for my own (feature 10). Accepted as a manual step — no importer, no paste
@@ -721,6 +753,21 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-20 — rev 29 (the numbering does not carry across) ⚠️
+- **A bug I introduced, caught by checking against Cardmarket.** `MIRRORED_SETS` assumed
+  the English twin numbers its cards the same way. It does not: Moltres is `m6a 105` and
+  `m6a 006` against `011` and `130` in the English set. Every one of the 36 wanted M6a
+  cards carried an English number labelled `M6a`, and the resolver matches on set code
+  plus number — so the day M6a is published it would have attached the wrong card's price
+  to all of them, silently. The fabricated numbers are removed, the stand-in no longer
+  writes one, and an owned card added from a stand-in now asks for the number printed on
+  it. The retry queue is empty again rather than wrong.
+- Artwork borrowed from the English twin **by number** is removed for the same reason; it
+  would have shown a different card's picture. Those cards get their artwork from
+  `artwork.json` instead, which is keyed by the card's own id.
+- **TCGdex's price mirror appears to have stopped updating** (§8.4). Not yet fixed, and
+  it affects every price on the site, so it is the next thing to decide.
 
 ### 2026-09-20 — rev 28 (sessions survive a reload, set-scoped search, artwork) ✅
 - **Refreshing no longer asks for the password.** The unwrapped file keys are kept in

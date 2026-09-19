@@ -16,7 +16,7 @@
  */
 import { el, frag } from '../lib/dom.ts';
 import { convert } from '../lib/fx.ts';
-import { searchCards, cardDetail, pricedVariantId, looksLikeCardId, standInArtwork, type CardHit } from '../lib/tcgdex.ts';
+import { searchCards, cardDetail, pricedVariantId, looksLikeCardId, type CardHit } from '../lib/tcgdex.ts';
 import { toEnglish } from '../../lib/card-name.mjs';
 import { cardThumb } from './thumb.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
@@ -145,16 +145,17 @@ async function submitWish(state: AddCardState): Promise<void> {
       return;
     }
 
+    // A stand-in identifies the card and its artwork, and nothing more. It carries no
+    // number and no hint on purpose: the English twin's number is not this card's number
+    // — Cardmarket lists Moltres as m6a 105 and m6a 006 where the English set has it at
+    // 011 and 130 — so writing one would put it in the retry queue to be matched against
+    // the wrong Japanese card the day the set is published. No match beats a wrong one.
     if (state.picked.mirrorOf) {
-      const { setCode, setName } = state.picked.mirrorOf;
       await state.onSaveWish(state.owners, {
         ...shared,
-        setId: setCode,
-        number: state.picked.localId,
+        setId: state.picked.mirrorOf.setCode,
         nameEn: state.picked.name,
         imageBase: state.picked.image ?? '',
-        hint: { setCode, setName, number: state.picked.localId, nameEn: state.picked.name },
-        pendingSince: today(),
       });
       return;
     }
@@ -167,24 +168,11 @@ async function submitWish(state: AddCardState): Promise<void> {
       number: detail.localId,
       nameJa: detail.name,
       nameEn: toEnglish(detail.name, state.names),
-      imageBase: await artworkFor(detail),
+      imageBase: detail.image ?? '',
     });
   } catch (error) {
     state.onChange({ saving: false, error: error instanceof Error ? error.message : String(error) });
   }
-}
-
-/**
- * The picture to store for a card found in the Japanese catalog.
- *
- * Usually the catalog's own. When the set has been listed but not yet scanned, the
- * English twin's picture stands in — the card is still priced from its Japanese entry,
- * because it is the Japanese entry that was found. The daily job replaces the stand-in
- * with the real artwork as soon as TCGdex has it; nothing has to be re-saved.
- */
-async function artworkFor(detail: { image?: string; set: { id: string }; localId: string }): Promise<string> {
-  if (detail.image) return detail.image;
-  return (await standInArtwork(detail.set.id, detail.localId).catch(() => null)) ?? '';
 }
 
 function field(id: string, label: string, input: HTMLElement): HTMLElement {
@@ -489,21 +477,33 @@ export function renderAddCard(state: AddCardState): HTMLElement {
         return;
       }
 
-      // A stand-in for a set TCGdex has not published. It names and pictures the card but
-      // is a different Cardmarket product, so it is recorded as pending under the Japanese
-      // set code and priced only once scripts/resolve-pending.mjs finds the real one.
+      // A card you are holding, from a set TCGdex has not published. The English twin
+      // names and pictures it, but its number is the English one and this card's number
+      // is not — so the number has to be read off the card in hand. Until then it is
+      // saved with the hint the person typed, or not at all.
       if (state.picked.mirrorOf) {
+        const number = fields.manualNumber.trim();
+        if (!number) {
+          state.onChange({
+            saving: false,
+            error:
+              `Type the number printed on the card. ${state.picked.mirrorOf.setCode} numbers its cards ` +
+              'differently from the English set this picture comes from, so it cannot be guessed.',
+          });
+          return;
+        }
+
         await state.onSave({
           ...base,
           status: 'pending',
           hint: {
             setCode: state.picked.mirrorOf.setCode,
             setName: state.picked.mirrorOf.setName,
-            number: state.picked.localId,
+            number,
             nameEn: state.picked.name,
           },
           nameEn: state.picked.name,
-          number: state.picked.localId,
+          number,
           imageBase: state.picked.image ?? '',
           pendingSince: fields.date,
         });
@@ -521,7 +521,7 @@ export function renderAddCard(state: AddCardState): HTMLElement {
         nameJa: detail.name,
         nameEn: toEnglish(detail.name, state.names),
         rarity: detail.rarity ?? null,
-        imageBase: await artworkFor(detail),
+        imageBase: detail.image ?? '',
         catalogSource: 'tcgdex',
       });
     } catch (error) {
@@ -559,6 +559,29 @@ export function renderAddCard(state: AddCardState): HTMLElement {
         el('span', { text: 'Not in the catalog yet — I will type what is on the card' }),
       ),
       state.manual ? photoField(state) : null,
+      // A stand-in cannot supply the number, so the person has to. Only for a card being
+      // added to the collection: that is the case where the card is physically in hand.
+      state.picked?.mirrorOf && state.mode === 'collection' && !state.manual
+        ? el(
+            'div',
+            { class: 'grid-fields' },
+            field(
+              'add-number',
+              `Number printed on the card (${state.picked.mirrorOf.setCode})`,
+              textField('add-number', state.manualNumber, (manualNumber) => state.onField({ manualNumber }), {
+                type: 'text',
+                placeholder: '045',
+                required: true,
+              }),
+            ),
+            el('p', {
+              class: 'search-status ui',
+              text:
+                'The picture comes from the English printing, which numbers its cards differently — ' +
+                'so this one has to be read off the card.',
+            }),
+          )
+        : null,
       state.manual
         ? el(
             'div',

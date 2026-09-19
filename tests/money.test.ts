@@ -76,3 +76,33 @@ test('an empty collection has no ratio rather than a ratio of zero', () => {
   assert.equal(figures.cards, 0);
   assert.equal(figures.ratio, null);
 });
+
+test('a set of cards with no prices has no value, which is not a value of zero', () => {
+  const rows = [value(card({ cardId: 'X' }), snapshot({}))];
+  const figures = totals(rows);
+
+  assert.equal(figures.valued, 0);
+  assert.equal(figures.unpriced, 1);
+  assert.equal(figures.ratio, null, 'no basis to compare against, so no percentage');
+  // The screen reads this pair to decide between a figure and a dash.
+  assert.ok(figures.ratio === null && figures.valued === 0, 'the two together mean "unknown", not "worthless"');
+});
+
+test('the 7-day average stands in when there is no 30-day one, and says so', async () => {
+  const { quote } = await import('../src/personal/lib/money.ts');
+
+  assert.deepEqual(
+    quote({ source: 'cardmarket/tcgdex', currency: 'EUR', updated: null, avg30: 41.82, avg7: 48.19, trend: null, low: null }),
+    { value: 41.82, basis: 'avg30' },
+  );
+  assert.deepEqual(
+    quote({ source: 'cardmarket/tcgdex', currency: 'EUR', updated: null, avg30: null, avg7: 48.19, trend: null, low: null }),
+    { value: 48.19, basis: 'avg7' },
+    'a card too new for a 30-day average still gets a figure, labelled',
+  );
+  assert.equal(
+    quote({ source: 'cardmarket/tcgdex', currency: 'EUR', updated: null, avg30: null, avg7: null, trend: 12, low: 3 }),
+    null,
+    'trend and low are never used as a valuation',
+  );
+});

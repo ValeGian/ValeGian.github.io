@@ -500,6 +500,91 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     border: 1px solid currentColor;
   }
 
+  .personal .photo-field {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .personal .photo-field input[type='file'] {
+    padding: var(--space-2);
+    font-size: var(--size-xs);
+  }
+
+  .personal .photo-preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--size-xs);
+  }
+
+  .personal .photo-preview img {
+    width: 60px;
+    border-radius: 2px;
+  }
+
+  .personal .wish-open {
+    background: none;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .personal .wish-open:disabled {
+    cursor: default;
+  }
+
+  .personal .wanters-heading {
+    margin: var(--space-6) 0 var(--space-2);
+    font-size: var(--size-xs);
+    color: var(--muted);
+  }
+
+  .personal .wanters {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .personal .wanter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    padding-block: var(--space-2);
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+  }
+
+  .personal .wanter-name {
+    min-width: 5rem;
+  }
+
+  .personal .wanter-note {
+    flex-basis: 100%;
+    font-size: var(--size-xs);
+    color: var(--muted);
+  }
+
+  .personal .card-edit {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .personal .card-edit button[type='submit'] {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    min-height: 2.75rem;
+    padding: 0 var(--space-6);
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
   .personal .wish-actions {
     grid-column: 2;
     display: flex;

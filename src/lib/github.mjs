@@ -60,7 +60,9 @@ function createClient({ token, owner, repo }) {
  * Writes `files` as one commit.
  *
  * @param {{token: string, owner: string, repo: string, branch?: string}} target
- * @param {{path: string, content: string}[]} files
+ * @param {{path: string, content: string, encoding?: 'utf8' | 'base64'}[]} files
+ *   `base64` content is passed through untouched, for images and anything else whose
+ *   bytes would not survive being read as text.
  * @param {string} message
  * @returns {Promise<{sha: string, url: string}>}
  */
@@ -79,7 +81,10 @@ export async function commitFiles(target, files, message) {
       files.map(async (file) => {
         const blob = await request('/git/blobs', {
           method: 'POST',
-          body: { content: toBase64Utf8(file.content), encoding: 'base64' },
+          body: {
+            content: file.encoding === 'base64' ? file.content : toBase64Utf8(file.content),
+            encoding: 'base64',
+          },
         });
         return { path: file.path, mode: '100644', type: 'blob', sha: blob.sha };
       }),

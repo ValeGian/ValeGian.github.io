@@ -53,11 +53,23 @@ function gainCell(entry: Valued): HTMLElement {
 
 function summary(rows: Valued[]): HTMLElement {
   const figures = totals(rows);
+  // With nothing priced there is no value to state. Printing 0,00 would say these cards
+  // are worth nothing, which is the opposite of what an absent price means.
+  const nothingPriced = figures.ratio === null && figures.valued === 0;
+
   const cells: [string, string, string?][] = [
     ['Cards', String(figures.cards)],
     ['Paid', money(figures.paid)],
-    ['Value now', money(figures.valued), figures.unpriced > 0 ? `${figures.unpriced} without a price` : undefined],
-    ['Gain', signedMoney(figures.gain), figures.ratio === null ? undefined : percent(figures.ratio)],
+    [
+      'Value now',
+      nothingPriced ? '—' : money(figures.valued),
+      figures.unpriced > 0 ? `${figures.unpriced} without a price` : undefined,
+    ],
+    [
+      'Gain',
+      nothingPriced ? '—' : signedMoney(figures.gain),
+      figures.ratio === null ? undefined : percent(figures.ratio),
+    ],
   ];
 
   return el(

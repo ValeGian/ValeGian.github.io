@@ -60,7 +60,11 @@ export async function publish(summary: string): Promise<PublishResult> {
   try {
     const commit = await commitFiles(
       { ...TARGET, token },
-      pending.map((write: PendingWrite) => ({ path: write.path, content: write.content })),
+      pending.map((write: PendingWrite) => ({
+        path: write.path,
+        content: write.content,
+        encoding: write.encoding ?? 'utf8',
+      })),
       summary,
     );
     await clearPending();

@@ -15,7 +15,7 @@ const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'));
 const ajv = new Ajv({ allErrors: true, strict: true, strictRequired: false });
 addFormats(ajv);
 
-for (const name of ['common', 'collection', 'catalog-overrides', 'watchlist']) {
+for (const name of ['common', 'collection', 'catalog-overrides', 'watchlist', 'wishlist']) {
   ajv.addSchema(await readJson(`schemas/${name}.schema.json`), `${name}.schema.json`);
 }
 
@@ -53,7 +53,55 @@ const pending = {
   pendingSince: '2026-10-14',
 };
 
+const wish = {
+  id: 'wish_0001',
+  status: 'wanted',
+  cardId: 'M6-113',
+  targetPriceEur: 700,
+  priority: 'normal',
+  addedAt: '2026-09-19',
+};
+
+const list = (items) => ({ owner: 'Tommy', items, settlements: [] });
+
 const cases = [
+  ['wishlist', 'a wanted card', list([wish]), true],
+  [
+    'wishlist',
+    'a wanted card with no target, which means any price',
+    list([{ ...wish, targetPriceEur: null }]),
+    true,
+  ],
+  [
+    'wishlist',
+    'a bought card carrying what it cost',
+    list([{ ...wish, status: 'bought', boughtAt: '2026-10-14', purchase }]),
+    true,
+  ],
+  [
+    'wishlist',
+    'a bought card with no purchase, which would leave a debt unrecorded',
+    list([{ ...wish, status: 'bought', boughtAt: '2026-10-14' }]),
+    false,
+  ],
+  [
+    'wishlist',
+    'a wanted card carrying a purchase, which has not happened',
+    list([{ ...wish, purchase }]),
+    false,
+  ],
+  [
+    'wishlist',
+    'a free-text priority',
+    list([{ ...wish, priority: 'urgent' }]),
+    false,
+  ],
+  [
+    'wishlist',
+    'a settlement with no amount',
+    { owner: 'Tommy', items: [], settlements: [{ date: '2026-11-02' }] },
+    false,
+  ],
   ['collection', 'a resolved TCGdex card', { version: 1, items: [resolved] }, true],
   ['collection', 'a pending card with only a hint', { version: 1, items: [pending] }, true],
   [

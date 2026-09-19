@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://valegian.github.io/schemas/wishlist.schema.json",
+  "title": "One person's wanted cards",
+  "description": "Encrypted before it is served. This validates the plaintext working copy under .local/, which is where it is edited and where a mistake would otherwise go unnoticed until it was published.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "owner",
+    "items",
+    "settlements"
+  ],
+  "properties": {
+    "owner": {
+      "type": "string",
+      "minLength": 1
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    },
+    "settlements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "date",
+          "amountEur"
+        ],
+        "properties": {
+          "date": {
+            "$ref": "common.schema.json#/$defs/isoDate"
+          },
+          "amountEur": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "targetPriceEur",
+        "priority",
+        "addedAt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^wish_[0-9]{4,}$"
+        },
+        "status": {
+          "enum": [
+            "wanted",
+            "bought"
+          ]
+        },
+        "cardId": {
+          "$ref": "common.schema.json#/$defs/cardId"
+        },
+        "setId": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        },
+        "nameJa": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "imageBase": {
+          "type": "string"
+        },
+        "targetPriceEur": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0,
+          "description": "Null is meaningful: wanting a card at any price is an answer, not a missing field."
+        },
+        "priority": {
+          "enum": [
+            "high",
+            "normal",
+            "low"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        },
+        "addedAt": {
+          "$ref": "common.schema.json#/$defs/isoDate"
+        },
+        "boughtAt": {
+          "$ref": "common.schema.json#/$defs/isoDate"
+        },
+        "purchase": {
+          "$ref": "common.schema.json#/$defs/purchase"
+        },
+        "movedToItemId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "bought"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "purchase",
+              "boughtAt"
+            ]
+          },
+          "$comment": "A bought card has to say what it cost, or nobody can be told what they owe."
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "wanted"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "purchase"
+              ]
+            }
+          },
+          "$comment": "A wanted card has not been bought, so it cannot carry a purchase."
+        }
+      ]
+    }
+  }
+}

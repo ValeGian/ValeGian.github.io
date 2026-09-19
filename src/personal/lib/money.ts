@@ -14,14 +14,31 @@ export const money = (value: number): string => EUR.format(value);
 export const signedMoney = (value: number): string => SIGNED.format(value);
 export const percent = (ratio: number): string => PERCENT.format(ratio);
 
+export interface Quote {
+  value: number;
+  /** Which field the figure came from, so the screen can say when it is not the usual one. */
+  basis: 'avg30' | 'avg7';
+}
+
 /**
- * The market value of one card.
+ * What one card is worth.
  *
- * `avg30` and nothing else. Checked against Cardmarket's own pages, it agreed within
- * 2.3% while `avg7` and `avg1` were out by up to 33%, and `low` is the cheapest listing
- * in any condition — a damaged copy — so it is never a valuation.
+ * `avg30` by preference: checked against Cardmarket's own pages it agreed within 2.3%,
+ * while `avg7` and `avg1` were out by up to 33%. A card too new or too thinly traded to
+ * have a 30-day average falls back to the 7-day one, which is better than showing
+ * nothing — but it is labelled wherever it appears, because the two are not the same
+ * measurement and a reader should not have to assume.
+ *
+ * `low` is never used: it is the cheapest listing in any condition, which means a
+ * damaged copy.
  */
-export const marketValue = (price: Price | undefined): number | null => price?.avg30 ?? null;
+export function quote(price: Price | undefined): Quote | null {
+  if (typeof price?.avg30 === 'number') return { value: price.avg30, basis: 'avg30' };
+  if (typeof price?.avg7 === 'number') return { value: price.avg7, basis: 'avg7' };
+  return null;
+}
+
+export const marketValue = (price: Price | undefined): number | null => quote(price)?.value ?? null;
 
 /**
  * Money is exact to the cent wherever it is produced, not only where it is formatted.
@@ -33,6 +50,8 @@ const cents = (value: number): number => Math.round(value * 100) / 100;
 export interface Valued {
   item: CollectionItem;
   price?: Price;
+  /** Null when there is no price at all; otherwise says which average was used. */
+  basis: Quote['basis'] | null;
   /** Null when the card has no price yet, which is not the same as being worth nothing. */
   value: number | null;
   paid: number;
@@ -42,13 +61,15 @@ export interface Valued {
 
 export function value(item: CollectionItem, snapshot: PriceSnapshot | null): Valued {
   const price = item.cardId ? snapshot?.prices[item.cardId] : undefined;
-  const unit = marketValue(price);
+  const reading = quote(price);
+  const unit = reading?.value ?? null;
   const paid = cents(item.purchase.amountEur * item.quantity);
   const total = unit === null ? null : cents(unit * item.quantity);
 
   return {
     item,
     price,
+    basis: reading?.basis ?? null,
     value: total,
     paid,
     gain: total === null ? null : cents(total - paid),

@@ -47,6 +47,7 @@ export const newWishId = (list: Wishlist): string => nextId('wish', list.items.m
 export interface Write {
   path: string;
   content: string;
+  encoding?: 'utf8' | 'base64';
   savedAt: string;
 }
 
@@ -89,9 +90,70 @@ export async function buildWrites(vault: Vault, touched: string[]): Promise<Writ
   return writes;
 }
 
-export async function addCard(vault: Vault, item: CollectionItem): Promise<Write[]> {
+export interface Resolution {
+  id: string;
+  cardId: string;
+  variantId?: string;
+  setId: string;
+  number: string;
+  nameJa: string;
+  rarity?: string | null;
+  imageBase?: string;
+  resolvedOn: string;
+}
+
+/**
+ * Promotes cards the catalog has caught up with.
+ *
+ * A card bought on release day in Japan goes in with only what is printed on it. The
+ * daily job retries those and publishes the answers; this applies them, so a card fills
+ * itself in without anyone remembering to check. The hint is kept: it is what was read
+ * off the physical card, and it is the only record if the match ever turns out wrong.
+ */
+export async function applyResolutions(vault: Vault, resolutions: Resolution[]): Promise<Write[] | null> {
+  const byId = new Map(resolutions.map((entry) => [entry.id, entry]));
+  let applied = 0;
+
+  for (const item of vault.collection.items) {
+    if (item.status !== 'pending') continue;
+    const found = byId.get(item.id);
+    if (!found) continue;
+
+    item.status = 'resolved';
+    item.cardId = found.cardId;
+    item.variantId = found.variantId;
+    item.setId = found.setId;
+    item.number = found.number;
+    item.nameJa = found.nameJa;
+    item.rarity = found.rarity ?? null;
+    item.imageBase = found.imageBase ?? '';
+    item.catalogSource = 'tcgdex';
+    delete item.pendingSince;
+    applied += 1;
+  }
+
+  return applied === 0 ? null : buildWrites(vault, ['collection']);
+}
+
+export async function addCard(
+  vault: Vault,
+  item: CollectionItem,
+  photo?: { base64: string } | null,
+): Promise<Write[]> {
   vault.collection.items.push(item);
-  return buildWrites(vault, ['collection']);
+  const writes = await buildWrites(vault, ['collection']);
+
+  if (photo) {
+    // Public, like the card art it stands in for. It is a photograph of a trading card.
+    writes.push({
+      path: `public/data/photos/${item.id}.jpg`,
+      content: photo.base64,
+      encoding: 'base64',
+      savedAt: new Date().toISOString(),
+    });
+  }
+
+  return writes;
 }
 
 export async function updateCard(vault: Vault, id: string, patch: Partial<CollectionItem>): Promise<Write[]> {

@@ -19,6 +19,7 @@ import { convert } from '../lib/fx.ts';
 import { searchCards, cardDetail, pricedVariantId, looksLikeCardId, type CardHit } from '../lib/tcgdex.ts';
 import { toEnglish } from '../../lib/card-name.mjs';
 import { cardThumb } from './thumb.ts';
+import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import type { NameTable } from '../lib/data.ts';
 import type { CollectionItem, Currency, WishlistItem } from '../lib/types.ts';
 
@@ -49,13 +50,23 @@ export interface AddCardState extends AddCardFields {
   searching: boolean;
   picked: CardHit | null;
   manual: boolean;
+  /** A photo of a card the catalog cannot show, taken in the shop. */
+  photo: PreparedPhoto | null;
   error: string;
   saving: boolean;
   onChange(change: Partial<AddCardState>): void;
   /** For a field's own text, which the DOM already shows. See Store.set. */
   onField(change: Partial<AddCardFields>): void;
+  /**
+   * The current field values at the moment they are read.
+   *
+   * Field edits deliberately do not rebuild the view, so the props this component was
+   * rendered with go stale as soon as anything is typed. Submitting has to ask for the
+   * live values rather than trust the snapshot it closed over.
+   */
+  latest(): AddCardFields;
   onSearch(query: string): void;
-  onSave(item: CollectionItem): Promise<void>;
+  onSave(item: CollectionItem, photo?: PreparedPhoto | null): Promise<void>;
   onSaveWish(owners: string[], item: Omit<WishlistItem, 'id'>): Promise<void>;
   onCancel(): void;
   nextId(): string;
@@ -83,12 +94,14 @@ export const blankFields = (): AddCardFields => ({
  * absence is meaningful too — "I want this at any price" is a real answer.
  */
 async function submitWish(state: AddCardState): Promise<void> {
+  const fields = state.latest();
+
   if (state.owners.length === 0) {
     state.onChange({ error: 'Choose whose list this goes on.' });
     return;
   }
 
-  const target = state.target.trim() === '' ? null : Number(state.target);
+  const target = fields.target.trim() === '' ? null : Number(fields.target);
   if (target !== null && (!Number.isFinite(target) || target <= 0)) {
     state.onChange({ error: 'A target price has to be a number, or left empty.' });
     return;
@@ -100,17 +113,17 @@ async function submitWish(state: AddCardState): Promise<void> {
     const shared = {
       status: 'wanted' as const,
       targetPriceEur: target,
-      priority: state.priority,
-      notes: state.notes,
+      priority: fields.priority,
+      notes: fields.notes,
       addedAt: today(),
     };
 
     if (state.manual || !state.picked) {
       await state.onSaveWish(state.owners, {
         ...shared,
-        setId: state.manualSet.trim(),
-        number: state.manualNumber.trim(),
-        nameJa: state.manualName.trim(),
+        setId: fields.manualSet.trim(),
+        number: fields.manualNumber.trim(),
+        nameJa: fields.manualName.trim(),
       });
       return;
     }
@@ -177,6 +190,55 @@ function searchStatus(state: AddCardState): HTMLElement | null {
     });
   }
   return null;
+}
+
+/**
+ * A photo stands in until the catalog publishes artwork. It is shrunk before it is
+ * accepted, and refused if it will not shrink: the repository keeps every version of
+ * everything, so an oversized image would be permanent.
+ */
+function photoField(state: AddCardState): HTMLElement {
+  return el(
+    'div',
+    { class: 'photo-field' },
+    el(
+      'label',
+      { class: 'field', for: 'add-photo' },
+      el('span', { text: 'Photo of the card (optional)' }),
+      el('input', {
+        id: 'add-photo',
+        type: 'file',
+        accept: 'image/*',
+        capture: 'environment',
+        onChange: async (event: Event) => {
+          const file = (event.target as HTMLInputElement).files?.[0];
+          if (!file) return;
+          try {
+            state.onChange({ photo: await preparePhoto(file), error: '' });
+          } catch (error) {
+            state.onChange({ photo: null, error: error instanceof Error ? error.message : String(error) });
+          }
+        },
+      }),
+    ),
+    state.photo
+      ? el(
+          'div',
+          { class: 'photo-preview' },
+          el('img', { src: state.photo.dataUrl, alt: 'The card you photographed', width: 60 }),
+          el('span', {
+            class: 'ui muted',
+            text: `${state.photo.width}×${state.photo.height}, ${Math.round(state.photo.bytes / 1024)} KB`,
+          }),
+          el('button', {
+            type: 'button',
+            class: 'chip',
+            text: 'Remove photo',
+            onClick: () => state.onChange({ photo: null }),
+          }),
+        )
+      : null,
+  );
 }
 
 function purchaseFields(state: AddCardState): HTMLElement {
@@ -284,7 +346,8 @@ export function renderAddCard(state: AddCardState): HTMLElement {
       return;
     }
 
-    const amount = Number(state.amount);
+    const fields = state.latest();
+    const amount = Number(fields.amount);
     if (!Number.isFinite(amount) || amount <= 0) {
       state.onChange({ error: 'Enter what the card cost.' });
       return;
@@ -293,34 +356,38 @@ export function renderAddCard(state: AddCardState): HTMLElement {
     state.onChange({ saving: true, error: '' });
 
     try {
-      const money = await convert(amount, state.currency, state.date);
+      const money = await convert(amount, fields.currency, fields.date);
       const base = {
         id: state.nextId(),
         condition: 'NM' as const,
         isGraded: false as const,
-        quantity: Number(state.quantity) || 1,
+        quantity: Number(fields.quantity) || 1,
         purchase: {
-          date: state.date,
+          date: fields.date,
           amount,
-          currency: state.currency,
+          currency: fields.currency,
           amountEur: money.amountEur,
           fxRate: money.fxRate,
-          fxSource: (state.currency === 'EUR' ? 'identity' : 'frankfurter') as 'identity' | 'frankfurter',
+          fxSource: (fields.currency === 'EUR' ? 'identity' : 'frankfurter') as 'identity' | 'frankfurter',
         },
-        notes: state.notes,
+        notes: fields.notes,
       };
 
       if (state.manual || !state.picked) {
-        await state.onSave({
-          ...base,
-          status: 'pending',
-          hint: {
-            setCode: state.manualSet.trim(),
-            number: state.manualNumber.trim(),
-            nameJa: state.manualName.trim(),
+        await state.onSave(
+          {
+            ...base,
+            status: 'pending',
+            hint: {
+              setCode: fields.manualSet.trim(),
+              number: fields.manualNumber.trim(),
+              nameJa: fields.manualName.trim(),
+            },
+            pendingSince: fields.date,
+            ...(state.photo ? { photoUrl: `/data/photos/${base.id}.jpg` } : {}),
           },
-          pendingSince: state.date,
-        });
+          state.photo,
+        );
         return;
       }
 
@@ -374,6 +441,7 @@ export function renderAddCard(state: AddCardState): HTMLElement {
         }),
         el('span', { text: 'Not in the catalog yet — I will type what is on the card' }),
       ),
+      state.manual ? photoField(state) : null,
       state.manual
         ? el(
             'div',

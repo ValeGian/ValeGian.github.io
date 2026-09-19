@@ -8,8 +8,8 @@
  * bought, and its cost joins what they owe. Their cards are not my assets.
  */
 import { el, frag } from '../lib/dom.ts';
-import { money, marketValue } from '../lib/money.ts';
-import { displayName, subtitle, type NameTable } from '../lib/data.ts';
+import { money, quote } from '../lib/money.ts';
+import { displayName, subtitle, fullImage, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
@@ -36,6 +36,9 @@ export interface WishlistViewState {
   onCancelEdit?(): void;
   onSaveEdit?(): Promise<void>;
   onDeleteWish?(owner: string, itemId: string): Promise<void>;
+  /** The card whose detail panel is open, by card id. */
+  openCardId?: string | null;
+  onOpenCard?(cardId: string | null): void;
 }
 
 const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | undefined =>
@@ -50,8 +53,91 @@ export function balance(list: Wishlist): { bought: number; settled: number; owed
   return { bought, settled, owed: bought - settled };
 }
 
+/**
+ * Everyone who wants this card, and what each of them would pay.
+ *
+ * The combined shopping view shows one row per person, so opening a card is the only
+ * place the whole picture appears at once — useful when two people want it at different
+ * prices and only one of them is worth buying today.
+ */
+function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | null {
+  const wanters = Object.entries(state.lists).flatMap(([owner, list]) =>
+    list.items.filter((item) => item.cardId === cardId).map((item) => ({ owner, list, item })),
+  );
+  if (wanters.length === 0) return null;
+
+  const sample = wanters[0].item;
+  const price = state.prices?.prices[cardId];
+  const reading = quote(price);
+  const image = fullImage(sample);
+  const measure = reading?.basis === 'avg7' ? '7-day average' : '30-day average';
+
+  const row = (owner: string, list: Wishlist, item: WishlistItem) => {
+    const bought = item.status === 'bought';
+    const under = reading && item.targetPriceEur !== null && reading.value <= item.targetPriceEur;
+    return el(
+      'div',
+      { class: 'wanter' },
+      el('span', { class: 'wanter-name', text: list.owner }),
+      el('span', {
+        class: 'numeric',
+        text: item.targetPriceEur === null ? 'any price' : `target ${money(item.targetPriceEur)}`,
+      }),
+      bought
+        ? el('span', { class: 'bought-badge ui', text: `bought ${item.purchase ? money(item.purchase.amountEur) : ''}`.trim() })
+        : reading
+          ? el('span', { class: under ? 'target under' : 'target over', text: under ? 'at or under target' : 'over target' })
+          : el('span', { class: 'muted ui', text: 'no price yet' }),
+      item.notes ? el('span', { class: 'wanter-note', text: item.notes }) : null,
+    );
+  };
+
+  return el(
+    'div',
+    { class: 'detail' },
+    el(
+      'div',
+      { class: 'detail-actions' },
+      el('button', { type: 'button', class: 'detail-close', text: 'Close', onClick: () => state.onOpenCard?.(null) }),
+    ),
+    el(
+      'div',
+      { class: 'detail-body' },
+      image
+        ? el('img', { class: 'detail-image', src: image, alt: displayName(sample, state.names), loading: 'eager' })
+        : el('div', { class: 'detail-image detail-image-empty ui', text: 'No artwork in the catalog yet' }),
+      el(
+        'div',
+        {},
+        el('h3', { text: displayName(sample, state.names) }),
+        sample.nameJa ? el('p', { class: 'detail-ja', text: sample.nameJa }) : null,
+        el(
+          'dl',
+          { class: 'detail-lines' },
+          el('div', { class: 'detail-line' }, el('dt', { text: 'Set' }), el('dd', { text: subtitle(sample) || '—' })),
+          el(
+            'div',
+            { class: 'detail-line' },
+            el('dt', { text: 'Market' }),
+            el(
+              'dd',
+              {},
+              reading ? money(reading.value) : 'No price yet',
+              price
+                ? el('span', { class: 'detail-note', text: `Cardmarket ${measure}, all conditions` })
+                : null,
+            ),
+          ),
+        ),
+        el('p', { class: 'wanters-heading ui', text: wanters.length === 1 ? 'Wanted by' : `Wanted by ${wanters.length} people` }),
+        el('div', { class: 'wanters' }, ...wanters.map(({ owner, list, item }) => row(owner, list, item))),
+      ),
+    ),
+  );
+}
+
 function targetMarker(item: WishlistItem, price: Price | undefined): HTMLElement | null {
-  const market = marketValue(price);
+  const market = quote(price)?.value ?? null;
   if (market === null || item.targetPriceEur === null) return null;
   const under = market <= item.targetPriceEur;
   return el('span', {
@@ -162,7 +248,7 @@ function wishRow(
   }
 
   const price = priceFor(item, state.prices);
-  const market = marketValue(price);
+  const market = quote(price)?.value ?? null;
   const bought = item.status === 'bought';
 
   return el(
@@ -172,8 +258,13 @@ function wishRow(
     // loader does not reliably fire for freshly inserted elements.
     cardThumb(item, { width: 40, height: 56 }, 'eager'),
     el(
-      'span',
-      { class: 'card-name' },
+      'button',
+      {
+        type: 'button',
+        class: 'card-name wish-open',
+        disabled: !item.cardId || !state.onOpenCard,
+        onClick: () => item.cardId && state.onOpenCard?.(item.cardId),
+      },
       el('span', { class: 'card-title', text: displayName(item, state.names) }),
       el(
         'span',
@@ -293,7 +384,10 @@ export function renderWishlists(state: WishlistViewState): DocumentFragment {
   // With one list there is nothing to combine, so the toggle would only be noise.
   const showToggle = owners.length > 1;
 
+  const detail = state.openCardId ? wishDetail(state.openCardId, state) : null;
+
   return frag(
+    detail,
     showToggle
       ? el(
           'div',

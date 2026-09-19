@@ -11,6 +11,8 @@ const STORE = 'pending-writes';
 export interface PendingWrite {
   path: string;
   content: string;
+  /** `base64` for images; the commit passes those bytes through unchanged. */
+  encoding?: 'utf8' | 'base64';
   savedAt: string;
 }
 

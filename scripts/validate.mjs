@@ -12,7 +12,7 @@ import { existsSync } from 'node:fs';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
-const SCHEMAS = ['common', 'collection', 'catalog-overrides', 'watchlist', 'pending', 'price-snapshot'];
+const SCHEMAS = ['common', 'collection', 'catalog-overrides', 'watchlist', 'pending', 'price-snapshot', 'wishlist'];
 
 const TARGETS = [
   { file: 'public/data/catalog-overrides.json', schema: 'catalog-overrides', required: true },
@@ -21,6 +21,14 @@ const TARGETS = [
   { file: 'public/data/prices/latest.json', schema: 'price-snapshot', required: false },
   { file: '.local/collection.json', schema: 'collection', required: false },
 ];
+
+/** Decrypted working copies, when they are present. Absent in CI, by design. */
+const wishlistDir = '.local/wishlists';
+if (existsSync(wishlistDir)) {
+  for (const name of (await readdir(wishlistDir)).filter((file) => file.endsWith('.json')).sort()) {
+    TARGETS.push({ file: `${wishlistDir}/${name}`, schema: 'wishlist', required: true });
+  }
+}
 
 const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'));
 

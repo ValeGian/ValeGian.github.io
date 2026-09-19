@@ -11,11 +11,11 @@ import { emptyFilters, type Filters, type SortKey } from './lib/filters.ts';
 import { value, type Valued } from './lib/money.ts';
 import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
 import { renderCollection } from './views/collection.ts';
-import { renderDetail } from './views/detail.ts';
+import { renderDetail, type CardEdit } from './views/detail.ts';
 import { renderWishlists, type WishlistEdit } from './views/wishlists.ts';
 import { blankFields, renderAddCard, searchCards, type AddCardState, type AddMode } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
-import { addCard, addWishToMany, deleteCard, deleteWish, markBought, newCardId, updateWish, type Envelope, type Vault } from './lib/vault.ts';
+import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markBought, newCardId, updateCard, updateWish, type Envelope, type Resolution, type Vault } from './lib/vault.ts';
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
 import { unlock } from '../lib/unlock.mjs';
@@ -37,7 +37,10 @@ interface AppState {
   combined: boolean;
   openItemId: string | null;
   adding: boolean;
-  add: Omit<AddCardState, 'names' | 'lists' | 'onChange' | 'onField' | 'onSearch' | 'onSave' | 'onSaveWish' | 'onCancel' | 'nextId'>;
+  add: Omit<
+    AddCardState,
+    'names' | 'lists' | 'onChange' | 'onField' | 'latest' | 'onSearch' | 'onSave' | 'onSaveWish' | 'onCancel' | 'nextId'
+  >;
   pendingCount: number;
   hasToken: boolean;
   publishBusy: boolean;
@@ -45,6 +48,8 @@ interface AppState {
   lastCommitUrl: string | null;
   askingForToken: boolean;
   editingWish: WishlistEdit | null;
+  editingCard: CardEdit | null;
+  openWishCardId: string | null;
   /** Bumped to force a rebuild when the change was to the vault, not to this object. */
   tick: number;
 }
@@ -59,6 +64,7 @@ const blankAdd = (mode: AddMode = 'collection'): AppState['add'] => ({
   searching: false,
   picked: null,
   manual: false,
+  photo: null,
   error: '',
   saving: false,
 });
@@ -93,6 +99,8 @@ const store = createStore<AppState>({
   lastCommitUrl: null,
   askingForToken: false,
   editingWish: null,
+  editingCard: null,
+  openWishCardId: null,
   tick: 0,
 });
 
@@ -144,6 +152,31 @@ async function buildVault(
     envelopes,
     manualCardIds: [...data.overrides.keys()],
   };
+}
+
+/**
+ * Fills in cards the catalog has published since they were added.
+ *
+ * The daily job cannot write to the collection — it holds no key — so it publishes what
+ * it found and this applies it on the next visit. Nothing has to be triggered by hand.
+ */
+async function catchUpOnResolutions(vault: Vault): Promise<void> {
+  try {
+    const response = await fetch('/data/resolutions.json', { cache: 'no-cache' });
+    if (!response.ok) return;
+
+    const { resolved } = (await response.json()) as { resolved?: Resolution[] };
+    if (!resolved?.length) return;
+
+    const writes = await applyResolutions(vault, resolved);
+    if (!writes) return;
+
+    await savePending(writes);
+    store.update({ publishMessage: 'Cards that were awaiting the catalog have been filled in.' });
+    schedulePublish();
+  } catch {
+    // A missing or unreadable file just means nothing to catch up on.
+  }
 }
 
 function valuedRows(state: AppState): Valued[] {
@@ -199,6 +232,7 @@ function lockScreen(state: AppState): DocumentFragment {
 
           const vault = await buildVault(opened.files, opened.keys, opened.envelopes, data);
           store.update({ phase: 'open', message: '', data, vault, hasToken: Boolean(getToken()) });
+          await catchUpOnResolutions(vault);
           await refreshPendingCount();
         } catch (error) {
           store.update({
@@ -293,10 +327,10 @@ function schedulePublish(): void {
   }, PUBLISH_DELAY_MS);
 }
 
-async function saveCard(item: CollectionItem): Promise<void> {
+async function saveCard(item: CollectionItem, photo?: { base64: string } | null): Promise<void> {
   const { vault } = store.get();
   if (!vault) return;
-  await savePending(await addCard(vault, item));
+  await savePending(await addCard(vault, item, photo));
   await refreshPendingCount();
   store.update({ adding: false, add: blankAdd() });
   schedulePublish();
@@ -311,12 +345,63 @@ async function saveWish(owners: string[], item: Omit<WishlistItem, 'id'>): Promi
   schedulePublish();
 }
 
+/**
+ * Applies an edit to an owned card.
+ *
+ * The exchange rate is only re-fetched when the money actually changed. A card bought at
+ * a rate that was recorded at the time keeps it — recomputing from today would restate
+ * what was paid, which is the one thing a ledger must not do.
+ */
+async function saveCardEdit(): Promise<void> {
+  const { vault, editingCard } = store.get();
+  if (!vault || !editingCard) return;
+
+  const item = vault.collection.items.find((candidate) => candidate.id === editingCard.itemId);
+  if (!item) return;
+
+  const amount = Number(editingCard.amount);
+  const quantity = Number(editingCard.quantity);
+  if (!Number.isFinite(amount) || amount <= 0 || !Number.isFinite(quantity) || quantity < 1) return;
+
+  const moneyChanged =
+    amount !== item.purchase.amount ||
+    editingCard.currency !== item.purchase.currency ||
+    editingCard.date !== item.purchase.date;
+
+  let purchase = { ...item.purchase, amount, currency: editingCard.currency, date: editingCard.date };
+
+  if (moneyChanged) {
+    const { convert } = await import('./lib/fx.ts');
+    const converted = await convert(amount, editingCard.currency, editingCard.date);
+    purchase = {
+      ...purchase,
+      amountEur: converted.amountEur,
+      fxRate: converted.fxRate,
+      fxSource: editingCard.currency === 'EUR' ? 'identity' : 'frankfurter',
+      // The import date no longer stands in once a real one has been given.
+      dateIsBootstrap: editingCard.date === item.purchase.date ? item.purchase.dateIsBootstrap : false,
+    };
+  }
+
+  await savePending(
+    await updateCard(vault, editingCard.itemId, {
+      condition: editingCard.condition,
+      quantity,
+      notes: editingCard.notes,
+      purchase,
+    }),
+  );
+  await refreshPendingCount();
+  store.update({ editingCard: null });
+  schedulePublish();
+}
+
 async function removeCard(itemId: string): Promise<void> {
   const { vault } = store.get();
   if (!vault) return;
   await savePending(await deleteCard(vault, itemId));
   await refreshPendingCount();
-  store.update({ openItemId: null });
+  store.update({ openItemId: null, editingCard: null });
   schedulePublish();
 }
 
@@ -409,7 +494,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
               sortKey: key,
               sortDescending: current.sortKey === key ? !current.sortDescending : true,
             })),
-          onOpen: (itemId) => store.update({ openItemId: itemId, adding: false }),
+          onOpen: (itemId) => store.update({ openItemId: itemId, adding: false, editingCard: null }),
         })
       : renderWishlists({
           lists: vault.wishlists,
@@ -418,6 +503,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           combined: state.combined,
           canEdit: true,
           editing: state.editingWish,
+          openCardId: state.openWishCardId,
+          onOpenCard: (cardId) => store.update({ openWishCardId: cardId }),
           onToggleCombined: () => store.update((current) => ({ combined: !current.combined })),
           onStartEdit: (edit) => store.update({ editingWish: edit }),
           // Silent, for the same reason the add form's fields are: rebuilding replaces
@@ -483,13 +570,33 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           nextId: () => newCardId(vault),
           onChange: (change) => store.update((current) => ({ add: { ...current.add, ...change } })),
           onField: (change) => store.set((current) => ({ add: { ...current.add, ...change } })),
+          latest: () => store.get().add,
           onSearch: runCatalogSearch,
           onSave: saveCard,
           onSaveWish: saveWish,
           onCancel: () => store.update({ adding: false, add: blankAdd(state.add.mode) }),
         })
       : null,
-    open ? renderDetail(open, names, state.data?.overrides ?? new Map(), () => store.update({ openItemId: null }), removeCard) : null,
+    open
+      ? renderDetail(
+          open,
+          names,
+          state.data?.overrides ?? new Map(),
+          {
+            onClose: () => store.update({ openItemId: null, editingCard: null }),
+            onDelete: removeCard,
+            onStartEdit: (edit) => store.update({ editingCard: edit }),
+            // Silent, like every other field: rebuilding would move the caret.
+            onEditField: (change) =>
+              store.set((current) => ({
+                editingCard: current.editingCard ? { ...current.editingCard, ...change } : null,
+              })),
+            onCancelEdit: () => store.update({ editingCard: null }),
+            onSaveEdit: () => void saveCardEdit(),
+          },
+          state.editingCard,
+        )
+      : null,
     body,
   );
 }
@@ -502,6 +609,8 @@ function friendView(state: AppState, friend: Friend): DocumentFragment {
     combined: false,
     canEdit: false,
     editing: null,
+    openCardId: state.openWishCardId,
+    onOpenCard: (cardId) => store.update({ openWishCardId: cardId }),
     onToggleCombined: () => undefined,
   });
 }

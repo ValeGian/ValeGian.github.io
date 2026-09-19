@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phases 1–2 complete and live. Next: Phase 3, the collection data layer.
+**Status:** Phases 1–3 complete. Next: Phase 4, the price pipeline.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 12 — Phase 2 deployed)
+**Last updated:** 2026-09-19 (rev 13 — Phase 3 complete)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -567,14 +567,15 @@ static lookup, never fetched at runtime.
 - [x] 360 px verified with zero horizontal overflow on all three pages; AA contrast on
       both themes; zero client JavaScript shipped
 
-### Phase 3 — Data layer
-- [ ] Schemas + CI validation: collection, friend files, overrides
-- [ ] `migrate-sheet.mjs`: 46 cards, FX verbatim, bootstrap dates, condition NM
-- [ ] `catalog-overrides.json`: CLK Squirtle, PMCG1-001, PMCG1-014
-- [ ] `pending` state modelled end to end
-- [ ] `build-watchlist.mjs` → public `watchlist.json`
-- [ ] JA↔EN name table generated at build
-- [ ] Totals reconcile to €1218,97
+### Phase 3 — Data layer  ✅ **complete**
+- [x] Schemas + CI validation: collection, overrides, watchlist
+- [x] `migrate-sheet.mjs`: 46 cards, FX verbatim, bootstrap dates, condition NM
+- [x] `catalog-overrides.json`: CLK Squirtle, PMCG1-001, PMCG1-014
+- [x] `pending` state modelled end to end, with schema tests both ways
+- [x] `build-watchlist.mjs` → public `watchlist.json`, 43 cards
+- [x] JA↔EN name table generated from PokéAPI, translates 45/45
+- [x] Totals reconcile to €1218,97
+- [ ] Friend-list schema — deferred to Phase 6, when the wishlist UI defines its shape
 
 ### Phase 4 — Price pipeline
 - [ ] `snapshot-prices.mjs` — TCGdex, variant-aware → `latest.json` + `daily/<date>.json`
@@ -619,10 +620,48 @@ static lookup, never fetched at runtime.
 2. *(optional)* Strengthen `cvalgian` with a random suffix (§7.3). Recommended, not a
    blocker.
 3. *(optional, later)* JustTCG as a clearly-separate TCGplayer/USD series. Default: no.
+4. **Public watchlist, or encrypted with an Actions secret?** It lists which cards are in
+   the collection, nothing more. Default: leave it public (§13 rev 13).
 
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 13 (Phase 3 complete) ✅
+- **Nothing personal is committed, and `.local/` is gitignored.** The repository is
+  public and git history is append-only, so a plaintext commit of purchase prices would
+  stay readable forever — including after Phase 5 encrypts the served copies. Migration
+  input and output both live under `.local/`.
+- **Schemas** (JSON Schema 2020-12) for collection, overrides and watchlist, with
+  `additionalProperties: false` throughout. Requirements depend on state: a TCGdex card
+  carries its cached display fields, an override-sourced card carries none, a pending
+  card must carry its hint. `scripts/test-schemas.mjs` checks 12 rules from both sides.
+- **Import reconciles to €1218,97.** Every row verified to equal `amount × rate` to the
+  cent. The sheet's own total reads €1218,94 because it sums before rounding; the import
+  sums per-row cent values, which is what a ledger should hold. Both are correct, they
+  answer different questions — recorded here so the 3-cent gap is never re-investigated.
+- Three rows resolved via a fixup table that keeps the reasoning beside the mapping.
+- **Variant-aware**: a `variantId` is stored only when that variant is the one Cardmarket
+  prices. The two 1996 cards have two unpriced variants each, so storing either id would
+  have been meaningless — they fall through to manual overrides instead.
+- **Manual prices captured** from Cardmarket for the three unpriced cards. Worth noting
+  what they showed: the 1996 Charmander is **from €0,45 but avg30 €12,32**, and Bulbasaur
+  **from €0,34 but avg30 €5,30**. That spread is the §4.3 NM caveat made concrete — on
+  vintage, "From" is a damaged copy and nowhere near what an NM card is worth.
+- **Name table** from PokéAPI in one GraphQL query (1025 species, 35 KB), plus form
+  prefixes, owner prefixes and suffixes in `src/lib/card-name.mjs`. Translates 45/45 of
+  the collection, including メガレックウザex → Mega Rayquaza ex and Nのレシラム → N's
+  Reshiram.
+- Added retry with exponential backoff to the TCGdex client after a 503 during the first
+  import run. The daily job must not lose a day of history to one blip.
+- `data.yml` runs the schema tests and validation on every push and pull request.
+
+  **One decision to re-confirm (§12.4):** `watchlist.json` is public and lists the 43 card
+  ids. It carries no owner, no price paid and no target — but since the collection is
+  mine, the card list is effectively mine too. That was accepted in rev 7 in exchange for
+  the daily job never needing a key. If you would rather close it, the job can read an
+  encrypted watchlist with the key in GitHub Actions secrets, which are private and
+  server-side. Say so and it changes in Phase 4.
 
 ### 2026-09-19 — rev 12 (Phase 2 deployed) ✅
 - **Design direction.** The subject is inference work, so the site is built like an

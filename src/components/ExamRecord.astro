@@ -57,10 +57,16 @@ const weightedAverage =
 const monthYear = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' });
 const asMonthYear = (iso?: string) => (iso ? monthYear.format(new Date(iso)) : '');
 
+/**
+ * An average over part of a degree is not that degree's average. Shown only when every
+ * exam on the record carries a mark; the final grade stands on its own otherwise.
+ */
+const everyExamMarked = curriculum.every((exam) => exam.isFinalExam || exam.mark !== undefined);
+
 const figures: { label: string; value: string; note?: string }[] = [
   { label: 'Exams', value: String(curriculum.length) },
   { label: 'ECTS credits', value: String(credits) },
-  { label: 'Weighted average', value: `${weightedAverage.toFixed(2)} / 30` },
+  ...(everyExamMarked ? [{ label: 'Weighted average', value: `${weightedAverage.toFixed(2)} / 30` }] : []),
   ...(degree.grade
     ? [{ label: 'Final grade', value: degree.grade, note: degree.gradeNote }]
     : []),

@@ -24,7 +24,8 @@
     "admin:commit": "node scripts/admin-commit.mjs",
     "test:crypto:real": "node scripts/test-crypto.mjs",
     "test": "node --test \"tests/*.test.ts\"",
-    "audit": "node scripts/audit.mjs"
+    "audit": "node scripts/audit.mjs",
+    "data:calibrate": "node scripts/calibrate.mjs"
   },
   "dependencies": {
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",

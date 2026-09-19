@@ -45,10 +45,11 @@
       "country": "Italy",
       "startYear": 2020,
       "endYear": 2023,
-      "grade": null,
+      "grade": "110/110 cum laude",
       "syllabus": "https://computer.ing.unipi.it/aide-lm/study-plan-20-21",
       "transcript": "/resources/master-transcript.pdf",
-      "shortName": "M.Sc. Artificial Intelligence and Data Engineering"
+      "shortName": "M.Sc. Artificial Intelligence and Data Engineering",
+      "gradeNote": "Full marks with honours, the maximum mark in the Italian system"
     },
     {
       "degree": "B.Sc. Ingegneria Informatica (Computer Engineering)",

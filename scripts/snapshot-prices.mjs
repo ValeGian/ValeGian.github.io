@@ -1,10 +1,18 @@
 /**
  * Takes one day's price reading for every card on the watchlist.
  *
- * Writes two things:
+ * Writes two things, and they answer different questions:
  *
- *   prices/daily/<date>.json   immutable. Written once, never touched again.
- *   prices/latest.json         rewritten each run, so the site has one file to read.
+ *   prices/daily/<date>.json   what was actually observed that day. A card that could
+ *                              not be read is simply absent; a gap in the record is a
+ *                              real gap and is recorded as one.
+ *   prices/latest.json         the best price currently known for each card, which may
+ *                              have been carried over from an earlier day. Every reading
+ *                              carries the timestamp it was read at, so a carried value
+ *                              is visible as an old one rather than a missing one.
+ *
+ * The distinction matters: dropping a card from latest.json because one lookup failed
+ * makes the site say a card has no price when it plainly does.
  *
  * Only immutable files accumulate history. A rolling history file would be rewritten
  * every day, and because git stores a version per commit that costs roughly a hundred
@@ -100,12 +108,21 @@ if (expected > 0 && got / expected < 1 - MAX_LOSS_RATIO) {
   process.exit(1);
 }
 
-const snapshot = {
+const observed = {
   version: 1,
   date: options.date,
   generatedAt: new Date().toISOString(),
   prices,
 };
+
+// Today's readings over whatever was already known, so one failed lookup does not erase
+// a card from the site. The per-reading `updated` field still says how old each one is.
+const current = {
+  ...observed,
+  prices: { ...previous.prices, ...prices },
+};
+
+const carried = Object.keys(current.prices).length - Object.keys(prices).length;
 
 if (options['dry-run']) {
   console.log(`priced ${Object.keys(prices).length} cards (dry run, nothing written)`);
@@ -119,15 +136,43 @@ if (existsSync(dailyPath)) {
   console.log(`${dailyPath} already exists; leaving it alone`);
 } else {
   // Compact on purpose: this file is written once and kept forever.
-  await writeFile(dailyPath, `${JSON.stringify(snapshot)}\n`);
+  await writeFile(dailyPath, `${JSON.stringify(observed)}\n`);
 }
 
-await writeFile(`${DATA}/prices/latest.json`, `${JSON.stringify(snapshot, null, 2)}\n`);
+await writeFile(`${DATA}/prices/latest.json`, `${JSON.stringify(current, null, 2)}\n`);
+
+/**
+ * Hand-checked prices go stale silently, because nothing fetches them. Cardmarket
+ * refuses automated clients, so the figure has to be re-read by a person; what can be
+ * automated is noticing that it is old.
+ */
+const STALE_MANUAL_DAYS = 90;
+const stale = overrides.cards.filter((card) => {
+  if (!card.price?.checkedOn) return false;
+  const age = (Date.now() - Date.parse(card.price.checkedOn)) / 86_400_000;
+  return age > STALE_MANUAL_DAYS;
+});
 
 const days = (await readdir(`${DATA}/prices/daily`)).filter((name) => name.endsWith('.json'));
-const total = Object.values(prices).reduce((sum, price) => sum + (price.avg30 ?? 0), 0);
+const total = Object.values(current.prices).reduce((sum, price) => sum + (price.avg30 ?? 0), 0);
 
 console.log(`priced        ${Object.keys(prices).length} cards`);
+if (carried > 0) console.log(`carried over  ${carried} card(s) from an earlier reading`);
 if (lost.length > 0) console.log(`lost price    ${lost.join(', ')}`);
 console.log(`days on file  ${days.length}`);
+if (stale.length > 0) {
+  console.log(`\nhand-checked prices older than ${STALE_MANUAL_DAYS} days:`);
+  for (const card of stale) console.log(`  ${card.cardId}  last checked ${card.price.checkedOn}  ${card.cardmarketUrl ?? ''}`);
+  await writeFile(
+    '.stale-prices.md',
+    [
+      `${stale.length} hand-checked price(s) are more than ${STALE_MANUAL_DAYS} days old.`,
+      '',
+      'Cardmarket refuses automated clients, so these have to be re-read by hand and',
+      'updated in `public/data/catalog-overrides.json`.',
+      '',
+      ...stale.map((card) => `- [\`${card.cardId}\`](${card.cardmarketUrl ?? ''}) — last checked ${card.price.checkedOn}`),
+    ].join('\n'),
+  );
+}
 console.log(`sum of avg30  EUR ${total.toFixed(2)}`);

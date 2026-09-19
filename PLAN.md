@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 25 — charts, grid, layout)
+**Last updated:** 2026-09-19 (rev 26 — detail layout, lightbox, pictures)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -641,6 +641,27 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 26 (detail layout, lightbox, the last three pictures) ✅
+- **The chart is a column beside the card**, not a block under it, and the empty state
+  holds that same space — so the chart appears where the message was instead of shifting
+  the panel. On a phone it is behind a chart button; there is no room for three columns
+  and the card is what the panel was opened for.
+- The button is an **inline SVG, not an emoji**: emoji render differently on every
+  platform, can arrive monochrome or missing, and would be the only pictographs on a site
+  that is otherwise entirely typographic.
+- **Every card now has a picture.** The three TCGdex has no artwork for were supplied and
+  checked before publishing — the Charmander reads **No.004** on its face, the Pokédex
+  number that made it the fourteenth card of the 1996 set, and the Squirtle carries the
+  Classic set symbol. Attached with `npm run photo`, each under 200 KB.
+- **Clicking a picture opens it full-screen.** The overlay lives on the body, not in the
+  view, because the view is rebuilt on every state change and an overlay in that tree
+  would be destroyed mid-look. Closes on Escape, backdrop and button; returns focus.
+- **Worth remembering:** encrypting *after* building leaves the old ciphertext in `dist/`,
+  so the served data is a version behind and changes look like they had no effect. Build
+  after encrypting.
+- Wishlists also got the list-or-grid choice, and cards whose catalog entry is a
+  hand-written override now show their card id where the set would be.
 
 ### 2026-09-19 — rev 25 (charts, grid, wider dashboard) ✅
 - **No free source of Cardmarket EUR history exists.** Checked directly:

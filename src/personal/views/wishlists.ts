@@ -58,7 +58,9 @@ function wishRow(
   return el(
     'li',
     { class: bought ? 'wish-row bought' : 'wish-row' },
-    cardThumb(item),
+    // Eager: a wishlist is short, and these rows appear on a tab switch, where the lazy
+    // loader does not reliably fire for freshly inserted elements.
+    cardThumb(item, { width: 40, height: 56 }, 'eager'),
     el(
       'span',
       { class: 'card-name' },

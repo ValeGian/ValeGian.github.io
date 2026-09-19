@@ -87,3 +87,28 @@ test('rarity is searchable, because it is how a shelf gets browsed', () => {
   ];
   assert.deepEqual(apply(rows, { ...emptyFilters, text: 'secret' }).map((e) => e.item.id), ['a']);
 });
+
+test('an image path is derived when the catalog does not supply one', async () => {
+  const { thumbnail } = await import('../src/personal/lib/data.ts');
+
+  // TCGdex reports no image for SV10-127, yet the file is served. Trusting the field
+  // left a whole set blank, so the path is derived from the card id instead.
+  assert.equal(
+    thumbnail({ cardId: 'SV10-127', setId: 'SV10', number: '127' }),
+    'https://assets.tcgdex.net/ja/SV/SV10/127/low.webp',
+  );
+
+  // A supplied path always wins over a derived one.
+  assert.equal(
+    thumbnail({ imageBase: 'https://assets.tcgdex.net/ja/S/S12a/261', cardId: 'S12a-261' }),
+    'https://assets.tcgdex.net/ja/S/S12a/261/low.webp',
+  );
+
+  // The series is the letters in front of the set id, however long.
+  assert.equal(
+    thumbnail({ cardId: 'PMCG1-001' }),
+    'https://assets.tcgdex.net/ja/PMCG/PMCG1/001/low.webp',
+  );
+
+  assert.equal(thumbnail({}), null, 'with nothing to go on, nothing is guessed');
+});

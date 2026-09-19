@@ -52,6 +52,8 @@ export interface AddCardState extends AddCardFields {
   error: string;
   saving: boolean;
   onChange(change: Partial<AddCardState>): void;
+  /** For a field's own text, which the DOM already shows. See Store.set. */
+  onField(change: Partial<AddCardFields>): void;
   onSearch(query: string): void;
   onSave(item: CollectionItem): Promise<void>;
   onSaveWish(owners: string[], item: Omit<WishlistItem, 'id'>): Promise<void>;
@@ -138,6 +140,8 @@ function textField(
   onInput: (value: string) => void,
   extra: Record<string, unknown> = {},
 ): HTMLInputElement {
+  // The handler records the value; it must not trigger a rebuild, or the element the
+  // caret is in gets replaced mid-word.
   return el('input', {
     id,
     value,
@@ -154,7 +158,7 @@ function resultTile(hit: CardHit, state: AddCardState): HTMLElement {
       class: state.picked?.id === hit.id ? 'result on' : 'result',
       onClick: () => state.onChange({ picked: hit, manual: false, error: '' }),
     },
-    cardThumb({ imageBase: hit.image }, { width: 48, height: 67 }, 'eager'),
+    cardThumb({ imageBase: hit.image, cardId: hit.id }, { width: 48, height: 67 }, 'eager'),
     el(
       'span',
       { class: 'result-text' },
@@ -179,7 +183,7 @@ function purchaseFields(state: AddCardState): HTMLElement {
   return el(
     'div',
     { class: 'grid-fields' },
-    field('add-amount', 'Paid', textField('add-amount', state.amount, (amount) => state.onChange({ amount }), { type: 'number', min: '0', step: '0.01', inputmode: 'decimal', required: true })),
+    field('add-amount', 'Paid', textField('add-amount', state.amount, (amount) => state.onField({ amount }), { type: 'number', min: '0', step: '0.01', inputmode: 'decimal', required: true })),
     field(
       'add-currency',
       'Currency',
@@ -193,8 +197,8 @@ function purchaseFields(state: AddCardState): HTMLElement {
         el('option', { value: 'EUR', text: 'EUR €', selected: state.currency === 'EUR' }),
       ),
     ),
-    field('add-date', 'Date', textField('add-date', state.date, (date) => state.onChange({ date }), { type: 'date', required: true })),
-    field('add-quantity', 'Copies', textField('add-quantity', state.quantity, (quantity) => state.onChange({ quantity }), { type: 'number', min: '1', step: '1' })),
+    field('add-date', 'Date', textField('add-date', state.date, (date) => state.onField({ date }), { type: 'date', required: true })),
+    field('add-quantity', 'Copies', textField('add-quantity', state.quantity, (quantity) => state.onField({ quantity }), { type: 'number', min: '1', step: '1' })),
   );
 }
 
@@ -229,7 +233,7 @@ function wishFields(state: AddCardState): DocumentFragment {
       field(
         'add-target',
         'Target price (€)',
-        textField('add-target', state.target, (target) => state.onChange({ target }), {
+        textField('add-target', state.target, (target) => state.onField({ target }), {
           type: 'number',
           min: '0',
           step: '0.01',
@@ -245,7 +249,7 @@ function wishFields(state: AddCardState): DocumentFragment {
           {
             id: 'add-priority',
             onChange: (event: Event) =>
-              state.onChange({ priority: (event.target as HTMLSelectElement).value as WishlistItem['priority'] }),
+              state.onField({ priority: (event.target as HTMLSelectElement).value as WishlistItem['priority'] }),
           },
           ...(['high', 'normal', 'low'] as const).map((level) =>
             el('option', { value: level, text: level, selected: state.priority === level }),
@@ -374,16 +378,16 @@ export function renderAddCard(state: AddCardState): HTMLElement {
         ? el(
             'div',
             { class: 'grid-fields' },
-            field('add-set', 'Set code', textField('add-set', state.manualSet, (manualSet) => state.onChange({ manualSet }), { type: 'text', placeholder: 'M6a' })),
-            field('add-number', 'Number', textField('add-number', state.manualNumber, (manualNumber) => state.onChange({ manualNumber }), { type: 'text', placeholder: '045' })),
-            field('add-name', 'Name as printed', textField('add-name', state.manualName, (manualName) => state.onChange({ manualName }), { type: 'text', placeholder: 'ピカチュウ' })),
+            field('add-set', 'Set code', textField('add-set', state.manualSet, (manualSet) => state.onField({ manualSet }), { type: 'text', placeholder: 'M6a' })),
+            field('add-number', 'Number', textField('add-number', state.manualNumber, (manualNumber) => state.onField({ manualNumber }), { type: 'text', placeholder: '045' })),
+            field('add-name', 'Name as printed', textField('add-name', state.manualName, (manualName) => state.onField({ manualName }), { type: 'text', placeholder: 'ピカチュウ' })),
           )
         : null,
       state.mode === 'collection' ? purchaseFields(state) : wishFields(state),
       field(
         'add-notes',
         'Notes',
-        textField('add-notes', state.notes, (notes) => state.onChange({ notes }), {
+        textField('add-notes', state.notes, (notes) => state.onField({ notes }), {
           type: 'text',
           placeholder: state.mode === 'collection' ? 'Shop, condition remarks…' : 'Only if well centred, no whitening…',
         }),

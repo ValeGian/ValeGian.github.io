@@ -37,7 +37,7 @@ interface AppState {
   combined: boolean;
   openItemId: string | null;
   adding: boolean;
-  add: Omit<AddCardState, 'names' | 'lists' | 'onChange' | 'onSearch' | 'onSave' | 'onSaveWish' | 'onCancel' | 'nextId'>;
+  add: Omit<AddCardState, 'names' | 'lists' | 'onChange' | 'onField' | 'onSearch' | 'onSave' | 'onSaveWish' | 'onCancel' | 'nextId'>;
   pendingCount: number;
   hasToken: boolean;
   publishBusy: boolean;
@@ -449,6 +449,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           lists: Object.entries(vault.wishlists).map(([id, list]) => ({ id, label: list.owner })),
           nextId: () => newCardId(vault),
           onChange: (change) => store.update((current) => ({ add: { ...current.add, ...change } })),
+          onField: (change) => store.set((current) => ({ add: { ...current.add, ...change } })),
           onSearch: runCatalogSearch,
           onSave: saveCard,
           onSaveWish: saveWish,

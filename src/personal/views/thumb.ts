@@ -9,7 +9,7 @@ import { thumbnail } from '../lib/data.ts';
  * than a broken-image icon.
  */
 export function cardThumb(
-  item: { imageBase?: string },
+  item: { imageBase?: string; cardId?: string; setId?: string; number?: string },
   size = { width: 40, height: 56 },
   /**
    * Search results are eager: they appear because someone just asked for them, and

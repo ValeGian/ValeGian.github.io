@@ -70,15 +70,39 @@ export const subtitle = (item: CollectionItem | WishlistItem): string => {
 };
 
 /**
- * TCGdex serves several sizes from one base; `low` is right for a list thumbnail.
- * Artwork can be missing while the card data exists — normal for a set published days
- * ago — so callers must handle the image failing as well as being absent.
+ * Where a card's artwork lives.
+ *
+ * TCGdex's `image` field is not reliable: `SV10-127` has no image in the API while the
+ * file is served perfectly well, so trusting the field left a whole set blank. The path
+ * is predictable — series letters, set id, number — so it is derived when the API has
+ * nothing, and the caller's error handler deals with the cases where the file really is
+ * absent. Guessing and falling back beats not asking.
  */
-export const thumbnail = (item: { imageBase?: string }): string | null =>
-  item.imageBase ? `${item.imageBase}/low.webp` : null;
+function derivedBase(item: { cardId?: string; setId?: string; number?: string }): string | null {
+  const setId = item.setId ?? item.cardId?.split('-')[0];
+  const number = item.number ?? item.cardId?.split('-').slice(1).join('-');
+  if (!setId || !number) return null;
 
-export const fullImage = (item: { imageBase?: string }): string | null =>
-  item.imageBase ? `${item.imageBase}/high.webp` : null;
+  const series = setId.match(/^[A-Za-z]+/)?.[0];
+  if (!series) return null;
+
+  return `https://assets.tcgdex.net/ja/${series}/${setId}/${number}`;
+}
+
+type Illustrated = { imageBase?: string; cardId?: string; setId?: string; number?: string };
+
+const base = (item: Illustrated): string | null => item.imageBase || derivedBase(item);
+
+/** TCGdex serves several sizes from one base; `low` is right for a list thumbnail. */
+export const thumbnail = (item: Illustrated): string | null => {
+  const found = base(item);
+  return found ? `${found}/low.webp` : null;
+};
+
+export const fullImage = (item: Illustrated): string | null => {
+  const found = base(item);
+  return found ? `${found}/high.webp` : null;
+};
 
 /** How old the price data is, in whole days, or null when there is none. */
 export function stalenessDays(snapshot: PriceSnapshot | null): number | null {

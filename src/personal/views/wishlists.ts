@@ -23,12 +23,22 @@ export interface WishlistEdit {
   notes: string;
 }
 
+/** 'all' is a filter value, not a priority a card can have. */
+export type PriorityFilter = 'all' | WishlistItem['priority'];
+export type WishSort = 'priority' | 'set' | 'target' | 'market';
+
+export const PRIORITY_RANK: Record<WishlistItem['priority'], number> = { high: 0, normal: 1, low: 2 };
+
 export interface WishlistViewState {
   lists: Record<string, Wishlist>;
   prices: PriceSnapshot | null;
   names: NameTable;
   combined: boolean;
   view: 'list' | 'grid';
+  priority: PriorityFilter;
+  sort: WishSort;
+  onPriority?(priority: PriorityFilter): void;
+  onSort?(sort: WishSort): void;
   canEdit: boolean;
   /** The row currently open for editing, if any. */
   editing: WishlistEdit | null;
@@ -51,6 +61,34 @@ export interface WishlistViewState {
 
 const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | undefined =>
   item.cardId ? prices?.prices[item.cardId] : undefined;
+
+/**
+ * How much this one matters, on the row itself.
+ *
+ * Shown for every card rather than only the urgent ones. A list of thirty cards is read
+ * by scanning it, and "no tag" is not something you can scan for — it reads as a card
+ * whose priority nobody set. Normal is deliberately the quietest of the three, so the
+ * ones that are not normal are what the eye lands on.
+ */
+const priorityTag = (item: WishlistItem): HTMLElement =>
+  el('span', { class: `flag priority-${item.priority}`, text: item.priority });
+
+/** Filter by priority, then order. Shared by every view so they cannot disagree. */
+function arrange(items: WishlistItem[], state: WishlistViewState): WishlistItem[] {
+  const kept = state.priority === 'all' ? items : items.filter((item) => item.priority === state.priority);
+  const setKey = (item: WishlistItem) => `${item.setId ?? ''}${(item.number ?? '').padStart(4, '0')}`;
+
+  const by: Record<WishSort, (a: WishlistItem, b: WishlistItem) => number> = {
+    priority: (a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority] || setKey(a).localeCompare(setKey(b)),
+    set: (a, b) => setKey(a).localeCompare(setKey(b)),
+    // A card with no target is "at any price", which is the loosest, so it sorts last.
+    target: (a, b) => (a.targetPriceEur ?? Infinity) - (b.targetPriceEur ?? Infinity),
+    market: (a, b) =>
+      (quote(priceFor(b, state.prices))?.value ?? -Infinity) - (quote(priceFor(a, state.prices))?.value ?? -Infinity),
+  };
+
+  return [...kept].sort(by[state.sort]);
+}
 
 /** Balance is computed from the purchases behind it, never stored, so it cannot drift. */
 export function balance(list: Wishlist): { bought: number; settled: number; owed: number } {
@@ -299,7 +337,7 @@ function wishRow(
         { class: 'card-meta ui' },
         subtitle(item),
         showOwner ? el('span', { class: 'owner', text: state.lists[owner]?.owner ?? owner }) : null,
-        item.priority === 'high' ? el('span', { class: 'flag', text: 'priority' }) : null,
+        bought ? null : priorityTag(item),
       ),
       item.notes ? el('span', { class: 'wish-note', text: item.notes }) : null,
     ),
@@ -388,6 +426,7 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
         'span',
         { class: 'tile-figures ui' },
         showOwner ? el('span', { class: 'owner', text: state.lists[owner]?.owner ?? owner }) : null,
+        bought ? null : priorityTag(item),
         bought
           ? el('span', { class: 'bought-badge ui', text: 'bought' })
           : market === null
@@ -405,7 +444,9 @@ function rows(items: WishlistItem[], owner: string, state: WishlistViewState, sh
 }
 
 function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTMLElement {
-  const wanted = list.items.filter((item) => item.status !== 'bought');
+  const wanted = arrange(list.items.filter((item) => item.status !== 'bought'), state);
+  // Bought cards keep their own order and sit at the end: the list is for shopping, and
+  // these are the part of it that is finished.
   const purchased = list.items.filter((item) => item.status === 'bought');
   const figures = balance(list);
   const isFriend = owner !== 'valerio';
@@ -425,7 +466,9 @@ function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTM
       : null,
     list.items.length === 0
       ? el('p', { class: 'empty', text: 'Nothing on this list yet.' })
-      : rows([...wanted, ...purchased], owner, state, false),
+      : wanted.length + purchased.length === 0
+        ? el('p', { class: 'empty', text: `Nothing on this list at ${state.priority} priority.` })
+        : rows([...wanted, ...purchased], owner, state, false),
     list.settlements.length === 0
       ? null
       : el(
@@ -439,24 +482,89 @@ function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTM
 }
 
 function combinedView(state: WishlistViewState): HTMLElement {
-  const rank = { high: 0, normal: 1, low: 2 };
-  const wanted = Object.entries(state.lists).flatMap(([owner, list]) =>
-    list.items.filter((item) => item.status !== 'bought').map((item) => ({ owner, list, item })),
-  );
+  // Arranged as one list, then matched back to owners: the same card wanted by two people
+  // has to stay next to itself, which sorting each list separately would not do.
+  const owners = new Map<WishlistItem, string>();
+  for (const [owner, list] of Object.entries(state.lists)) {
+    for (const item of list.items) if (item.status !== 'bought') owners.set(item, owner);
+  }
 
-  wanted.sort(
-    (a, b) =>
-      rank[a.item.priority] - rank[b.item.priority] ||
-      `${a.item.setId}${a.item.number}`.localeCompare(`${b.item.setId}${b.item.number}`),
-  );
+  const wanted = arrange([...owners.keys()], state).map((item) => ({ item, owner: owners.get(item) as string }));
 
   if (wanted.length === 0) {
-    return el('p', { class: 'empty', text: 'Nothing on anyone’s list yet.' });
+    return el('p', {
+      class: 'empty',
+      text:
+        state.priority === 'all'
+          ? 'Nothing on anyone’s list yet.'
+          : `Nothing on anyone’s list at ${state.priority} priority.`,
+    });
   }
 
   return state.view === 'grid'
     ? el('ul', { class: 'card-grid' }, ...wanted.map(({ owner, item }) => gridTile(item, owner, state, true)))
     : el('ul', { class: 'wish-rows' }, ...wanted.map(({ owner, item }) => wishRow(item, owner, state, true)));
+}
+
+/**
+ * Which cards to show and in what order.
+ *
+ * Two rows rather than one: filtering and ordering answer different questions, and thirty
+ * cards from one set makes both worth having. They are labelled, unlike the view toggle
+ * above, because "High" and "Target" say nothing on their own about what they do.
+ */
+function priorityControls(state: WishlistViewState): DocumentFragment {
+  if (!state.onPriority && !state.onSort) return frag();
+
+  const group = (
+    label: string,
+    options: readonly (readonly [string, string])[],
+    current: string,
+    choose: (value: string) => void,
+  ): HTMLElement =>
+    el(
+      'div',
+      { class: 'chips filter-row' },
+      el('span', { class: 'chips-label ui', text: label }),
+      ...options.map(([value, text]) =>
+        el('button', {
+          type: 'button',
+          'aria-pressed': String(current === value),
+          class: current === value ? 'chip on' : 'chip',
+          text,
+          onClick: () => choose(value),
+        }),
+      ),
+    );
+
+  return frag(
+    state.onPriority
+      ? group(
+          'Priority',
+          [
+            ['all', 'All'],
+            ['high', 'High'],
+            ['normal', 'Normal'],
+            ['low', 'Low'],
+          ],
+          state.priority,
+          (value) => state.onPriority?.(value as PriorityFilter),
+        )
+      : null,
+    state.onSort
+      ? group(
+          'Sort',
+          [
+            ['priority', 'Priority'],
+            ['set', 'Set'],
+            ['target', 'Target'],
+            ['market', 'Value'],
+          ],
+          state.sort,
+          (value) => state.onSort?.(value as WishSort),
+        )
+      : null,
+  );
 }
 
 export function renderWishlists(state: WishlistViewState): DocumentFragment {
@@ -506,6 +614,7 @@ export function renderWishlists(state: WishlistViewState): DocumentFragment {
           )
         : null,
     ),
+    priorityControls(state),
     state.combined && showToggle
       ? combinedView(state)
       : frag(...owners.map((owner) => listBlock(owner, state.lists[owner], state))),

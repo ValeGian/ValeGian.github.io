@@ -14,7 +14,7 @@ import { RANGES, cardSeries, daysNeeded, ensureDays, holdingsSeries, loadHistory
 import { renderChart, renderRangeTabs } from './views/chart.ts';
 import { renderCollection } from './views/collection.ts';
 import { renderDetail, type CardEdit } from './views/detail.ts';
-import { renderWishlists, type WishlistEdit } from './views/wishlists.ts';
+import { renderWishlists, type PriorityFilter, type WishlistEdit, type WishSort } from './views/wishlists.ts';
 import { blankFields, renderAddCard, searchCards, type AddCardState, type AddMode } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
 import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markBought, newCardId, updateCard, updateWish, type Envelope, type Resolution, type Vault } from './lib/vault.ts';
@@ -44,6 +44,9 @@ interface AppState {
   sortKey: SortKey;
   sortDescending: boolean;
   combined: boolean;
+  /** Wishlist tabs only; the collection has its own filters. */
+  wishPriority: PriorityFilter;
+  wishSort: WishSort;
   openItemId: string | null;
   adding: boolean;
   add: Omit<
@@ -117,6 +120,8 @@ const store = createStore<AppState>({
   sortKey: 'value',
   sortDescending: true,
   combined: true,
+  wishPriority: 'all',
+  wishSort: 'priority',
   openItemId: null,
   adding: false,
   add: blankAdd(),
@@ -697,6 +702,10 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           combined: state.combined,
           view: state.view,
           onView: (view) => store.update({ view }),
+          priority: state.wishPriority,
+          sort: state.wishSort,
+          onPriority: (wishPriority) => store.update({ wishPriority }),
+          onSort: (wishSort) => store.update({ wishSort }),
           canEdit: !state.readOnly,
           editing: state.editingWish,
           openCardId: state.openWishCardId,
@@ -813,6 +822,10 @@ function friendView(state: AppState, friend: Friend): DocumentFragment {
     combined: false,
     view: state.view,
     onView: (view) => store.update({ view }),
+    priority: state.wishPriority,
+    sort: state.wishSort,
+    onPriority: (wishPriority) => store.update({ wishPriority }),
+    onSort: (wishSort) => store.update({ wishSort }),
     canEdit: false,
     editing: null,
     openCardId: state.openWishCardId,

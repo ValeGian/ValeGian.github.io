@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-19T23:07:04.695Z",
+  "generatedAt": "2026-09-19T23:16:59.812Z",
   "items": [
     {
       "id": "lotad/wish_0002",
@@ -61,6 +61,306 @@
         "nameEn": "Articuno"
       },
       "pendingSince": "2026-09-19"
+    },
+    {
+      "id": "valerio/wish_0005",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "023",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0006",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "024",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0007",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "025",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0008",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "026",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0009",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "027",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0010",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "028",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0011",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "029",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0012",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "030",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0013",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "031",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0014",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "032",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0015",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "033",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0016",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "034",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0017",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "035",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0018",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "036",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0019",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "037",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0020",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "038",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0021",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "039",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0022",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "040",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0023",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "041",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0024",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "042",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0025",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "043",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0026",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "044",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0027",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "045",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0028",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "046",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0029",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "047",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0030",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "048",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0031",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "049",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0032",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "050",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0033",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "051",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0034",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "052",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
     }
   ]
 }

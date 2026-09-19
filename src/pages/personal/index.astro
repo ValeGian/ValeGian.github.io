@@ -302,6 +302,39 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     padding: 0 var(--space-2);
   }
 
+  /* Every card carries its priority, so normal has to be the quietest of the three or a
+     list of thirty reads as thirty tags. High borrows the accent; low recedes further. */
+  .personal .priority-high {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .personal .priority-normal {
+    border-color: var(--rule);
+    color: var(--muted);
+  }
+
+  .personal .priority-low {
+    border-color: var(--rule);
+    color: var(--muted);
+    opacity: 0.65;
+  }
+
+  /* A control row that says what it controls. "High" and "Target" mean nothing alone. */
+  .personal .filter-row {
+    margin-bottom: var(--space-2);
+  }
+
+  .personal .chips-label {
+    color: var(--muted);
+    margin-right: var(--space-1);
+  }
+
+  .personal .filter-row:last-of-type {
+    margin-bottom: var(--space-4);
+  }
+
   .personal .card-figures {
     grid-column: 2;
     min-width: 0;

@@ -1,0 +1,61 @@
+{
+  "note": "Extracted from the University of Pisa study-plan PDFs in public/resources/. Student ID deliberately omitted.",
+  "bachelor": {
+    "degreeId": "bsc",
+    "documentType": "study plan export",
+    "isComplete": true,
+    "creditsRecorded": 177,
+    "creditsExpected": 180,
+    "creditsNote": "The export lists 177 ECTS of marked exams. Italian engineering bachelors are 180 ECTS; the 3 missing credits are most likely an unmarked English-proficiency credit, which these exports omit. Unconfirmed.",
+    "exams": [
+      { "code": "758II", "title": "Fundamentals of Programming", "credits": 12, "date": "2018-01-17", "mark": 28 },
+      { "code": "004AA", "title": "Mathematical Analysis I", "credits": 12, "date": "2018-01-19", "mark": 26 },
+      { "code": "011BB", "title": "General Physics I", "credits": 12, "date": "2018-06-11", "mark": 30 },
+      { "code": "756II", "title": "Algorithms and Data Structures", "credits": 6, "date": "2018-06-20", "mark": 27 },
+      { "code": "073II", "title": "Electrotechnics", "credits": 6, "date": "2019-01-14", "mark": 30 },
+      { "code": "591AA", "title": "Linear Algebra and Mathematical Analysis II", "credits": 12, "date": "2019-01-17", "mark": 30 },
+      { "code": "757II", "title": "Data Bases", "credits": 6, "date": "2019-02-08", "mark": 26 },
+      { "code": "173AA", "title": "Numerical Calculus", "credits": 6, "date": "2019-02-12", "mark": 27 },
+      { "code": "074II", "title": "Logic and Computer Design Fundamentals", "credits": 9, "date": "2019-06-11", "mark": 27 },
+      { "code": "170AA", "title": "Operational Research", "credits": 9, "date": "2019-09-20", "mark": 24 },
+      { "code": "116II", "title": "Corporate Organization and Management", "credits": 6, "date": "2019-09-21", "mark": 25 },
+      { "code": "078II", "title": "Computer Architecture", "credits": 9, "date": "2019-09-26", "mark": 30 },
+      { "code": "374II", "title": "Software Engineering", "credits": 6, "date": "2019-11-27", "mark": 30 },
+      { "code": "077II", "title": "Foundations of Systems and Control Theory", "credits": 9, "date": "2020-01-15", "mark": 30 },
+      { "code": "544II", "title": "Operating Systems", "credits": 9, "date": "2020-01-28", "mark": 27 },
+      { "code": "080II", "title": "Web Design", "credits": 6, "date": "2020-02-28", "mark": 28 },
+      { "code": "545II", "title": "Computer Networks", "credits": 9, "date": "2020-06-15", "mark": 29 },
+      { "code": "759II", "title": "Programming Laboratory", "credits": 6, "date": "2020-06-18", "mark": 30, "cumLaude": true },
+      { "code": "633AA", "title": "Cloud & Green Computing", "credits": 6, "date": "2020-06-19", "mark": 30, "cumLaude": true },
+      { "code": "076II", "title": "Digital Electronics", "credits": 9, "date": "2020-07-09", "mark": 27 },
+      { "code": "075II", "title": "Digital Communications", "credits": 9, "date": "2020-07-27", "mark": 28 },
+      { "code": "304ZZ", "title": "Final Exam", "credits": 3, "date": "2020-09-25", "mark": 30, "isFinalExam": true }
+    ]
+  },
+  "master": {
+    "degreeId": "msc",
+    "documentType": "study plan export",
+    "isComplete": false,
+    "snapshotDate": "2021-11-17",
+    "incompleteNote": "This PDF is a study-plan snapshot taken on 2021-11-17, not a final transcript. It records six passed exams; the remaining seven were still upcoming at the time. The degree was completed in 2023, so marks for those are missing from the repository and have to be supplied separately.",
+    "creditsRecorded": 51,
+    "creditsExpected": 120,
+    "exams": [
+      { "code": "883II", "title": "Large-Scale and Multi-Structured Databases", "credits": 9, "date": "2021-01-14", "mark": 30 },
+      { "code": "879II", "title": "Distributed Systems and Middleware Technologies", "credits": 6, "date": "2021-02-01", "mark": 29 },
+      { "code": "878II", "title": "Data Mining and Machine Learning", "credits": 12, "date": "2021-02-25", "mark": 29 },
+      { "code": "876II", "title": "Cloud Computing", "credits": 9, "date": "2021-06-11", "mark": 29 },
+      { "code": "875II", "title": "Business and Project Management", "credits": 9, "date": "2021-07-27", "mark": 27 },
+      { "code": "696AA", "title": "Optimization Methods and Game Theory", "credits": 6, "date": "2021-09-21", "mark": 30 }
+    ],
+    "unrecorded": [
+      { "code": "882II", "title": "Internet of Things", "credits": 9 },
+      { "code": "877II", "title": "Computational Intelligence and Deep Learning", "credits": 6 },
+      { "code": "886II", "title": "Multimedia Information Retrieval and Computer Vision", "credits": 9 },
+      { "code": "888II", "title": "Process Mining and Intelligence", "credits": 6 },
+      { "code": "893II", "title": "Symbolic and Evolutionary Artificial Intelligence", "credits": 6 },
+      { "code": "649AA", "title": "Human Language Technologies", "credits": 9 },
+      { "code": "1801Z", "title": "Final Examination", "credits": 24, "isFinalExam": true }
+    ]
+  }
+}

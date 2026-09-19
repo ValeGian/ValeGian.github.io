@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phase 1 complete and deployed. Next: Phase 2.
+**Status:** Phase 1 complete. Phase 2 content gathered; build not started.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 10 — Phase 1 deployed)
+**Last updated:** 2026-09-19 (rev 11 — transcripts extracted, profile filled)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -88,9 +88,18 @@ Bio as **AI Tech Lead / AI Inference Engineer**, plus recent non-university work
 
 ### 3.2 University section
 
-Everything kept — exams, transcripts, thesis, coursework — but recomposed: degree
-summary cards, a real transcript table (PDFs stay as downloads), coursework grouped by
+Everything kept — exams, transcripts, coursework — but recomposed: degree summary cards,
+a real exam table per degree (PDFs stay as downloads), coursework projects grouped by
 course instead of one flat list.
+
+Exam data now lives in `src/data/transcripts.json`, extracted from the two PDFs
+(§13 rev 11). **The student ID in both PDFs is deliberately not carried over** — it is a
+personal identifier with no reason to be on a public page. Note the PDFs themselves are
+served publicly at `/resources/…` and do contain it; if that matters, they should be
+redacted or moved behind the gate.
+
+Derived figures — weighted averages, credit totals — are **computed in the component,
+never stored**, so they cannot drift from the exam rows behind them.
 
 ---
 
@@ -613,6 +622,35 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 11 (transcripts extracted, profile filled)
+- **Extracted both transcripts into `src/data/transcripts.json`.** No PDF library was
+  available and none was installed; wrote a ~60-line extractor that inflates the content
+  streams and reads the text operators directly.
+- **Bachelor — complete.** 22 rows, 177 ECTS, weighted average **28,07/30** (≈ 102,9/110)
+  excluding the final exam. Two *30 cum laude*: Programming Laboratory and Cloud & Green
+  Computing. The transcript totals 177 rather than the expected 180 ECTS; the likeliest
+  explanation is an unmarked English-proficiency credit that these exports omit, recorded
+  as unconfirmed rather than invented.
+- **Master — incomplete, and this matters.** The PDF is a study-plan snapshot dated
+  **2021-11-17**, not a final transcript. It records **6 passed exams (51 ECTS, weighted
+  average 28,94/30)** and lists the other 7 as *"Currently Attending"* or *"Will attend"*.
+  The degree finished in 2023, so **marks for Internet of Things, Computational
+  Intelligence and Deep Learning, Multimedia Information Retrieval and Computer Vision,
+  Process Mining and Intelligence, Symbolic and Evolutionary AI, Human Language
+  Technologies and the Final Examination are not in the repository.** Stored under
+  `unrecorded` with credits but no marks. Needed from you, along with the graduation mark.
+  *(The 13 rows sum to exactly 120 ECTS, which confirms nothing was lost in extraction.)*
+- **Student ID omitted** from the extracted data. Flagged that the PDFs themselves are
+  served publicly and still contain it.
+- Master's `endYear` set to **2023**.
+- **LinkedIn has no About section** — the profile is a top card only, so there was no bio
+  to copy. Took what is there: headline *"AI Tech Lead @ Translated | Ex SDE Intern @
+  Amazon Luxembourg"*, location Livorno, pronouns he/him. Added an `experience` array with
+  Translated and Amazon Luxembourg, **dates left null** rather than guessed. Drafted a
+  three-sentence bio from those facts plus this repository, flagged
+  `bioStatus: "draft"` with its source recorded — to be replaced with your own words.
+- Build and `astro check` still clean.
 
 ### 2026-09-19 — rev 10 (Phase 1 deployed) ✅
 - Switched Pages `build_type` from `legacy` to `workflow`, then pushed both branches.

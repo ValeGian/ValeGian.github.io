@@ -6,16 +6,36 @@
     "nationality": "Italian",
     "birthday": "1998-12-30",
     "portrait": "/images/portrait.jpg",
-    "bio": "",
-    "bioStatus": "placeholder"
+    "bio": "I'm an AI Tech Lead at Translated, working on LLM inference. Before that I was a software development engineer intern at Amazon in Luxembourg. I studied Computer Engineering and then Artificial Intelligence and Data Engineering at the University of Pisa.\n\nMost of what I build in my own time is inference infrastructure: liteinfer, an engine written from scratch to make paged KV caches and continuous batching readable, and variantGPT, a testbed for comparing attention mechanisms under identical conditions.",
+    "bioStatus": "draft",
+    "pronouns": "he/him",
+    "location": "Livorno, Tuscany, Italy",
+    "linkedinHeadline": "AI Tech Lead @ Translated | Ex SDE Intern @ Amazon Luxembourg",
+    "bioSource": "Assembled from the LinkedIn top card and this repository. LinkedIn has no About section to copy."
   },
   "links": {
     "email": "46gianninivalerio@gmail.com",
     "profiles": [
-      { "platform": "GitHub", "url": "https://github.com/ValeGian", "handle": "ValeGian" },
-      { "platform": "LinkedIn", "url": "https://www.linkedin.com/in/valerio-giannini/", "handle": "valerio-giannini" },
-      { "platform": "Telegram", "url": "https://telegram.me/valeGiann", "handle": "valeGiann" },
-      { "platform": "Instagram", "url": "https://www.instagram.com/valegiann/", "handle": "valegiann" }
+      {
+        "platform": "GitHub",
+        "url": "https://github.com/ValeGian",
+        "handle": "ValeGian"
+      },
+      {
+        "platform": "LinkedIn",
+        "url": "https://www.linkedin.com/in/valerio-giannini/",
+        "handle": "valerio-giannini"
+      },
+      {
+        "platform": "Telegram",
+        "url": "https://telegram.me/valeGiann",
+        "handle": "valeGiann"
+      },
+      {
+        "platform": "Instagram",
+        "url": "https://www.instagram.com/valegiann/",
+        "handle": "valegiann"
+      }
     ]
   },
   "education": [
@@ -24,7 +44,7 @@
       "institution": "University of Pisa",
       "country": "Italy",
       "startYear": 2020,
-      "endYear": null,
+      "endYear": 2023,
       "grade": null,
       "syllabus": "https://computer.ing.unipi.it/aide-lm/study-plan-20-21",
       "transcript": "/resources/master-transcript.pdf"
@@ -42,11 +62,53 @@
       "transcript": "/resources/bachelor-transcript.pdf"
     }
   ],
-  "experience": [],
+  "experience": [
+    {
+      "role": "AI Tech Lead",
+      "organisation": "Translated",
+      "location": "Italy",
+      "startDate": null,
+      "endDate": null,
+      "isCurrent": true,
+      "summary": ""
+    },
+    {
+      "role": "Software Development Engineer Intern",
+      "organisation": "Amazon",
+      "location": "Luxembourg",
+      "startDate": null,
+      "endDate": null,
+      "isCurrent": false,
+      "summary": ""
+    }
+  ],
   "skills": {
     "summary": "I have worked with a wide variety of programming languages and love learning how to use new tools. My interest mainly revolves around AI, but I continually try to expand my knowledge of other areas, focusing on the most cutting-edge technologies.",
-    "languages": ["Python", "C++", "C", "Java", "TypeScript", "JavaScript", "SQL", "Matlab", "PHP", "Erlang"],
-    "tools": ["PyTorch", "CUDA", "Docker", "Kubernetes", "AWS CDK", "Git", "MySQL", "MongoDB", "Neo4j", "LevelDB", "GlassFish"]
+    "languages": [
+      "Python",
+      "C++",
+      "C",
+      "Java",
+      "TypeScript",
+      "JavaScript",
+      "SQL",
+      "Matlab",
+      "PHP",
+      "Erlang"
+    ],
+    "tools": [
+      "PyTorch",
+      "CUDA",
+      "Docker",
+      "Kubernetes",
+      "AWS CDK",
+      "Git",
+      "MySQL",
+      "MongoDB",
+      "Neo4j",
+      "LevelDB",
+      "GlassFish"
+    ]
   },
   "projects": [
     {
@@ -59,7 +121,11 @@
       "lastActivity": "2026-09-12",
       "link": "https://github.com/ValeGian/liteinfer",
       "package": "https://pypi.org/project/liteinfer/",
-      "languages": ["Python", "PyTorch", "CUDA"]
+      "languages": [
+        "Python",
+        "PyTorch",
+        "CUDA"
+      ]
     },
     {
       "slug": "variantgpt",
@@ -70,7 +136,10 @@
       "date": "2025-08-19",
       "lastActivity": "2026-05-03",
       "link": "https://github.com/ValeGian/variantGPT",
-      "languages": ["Python", "PyTorch"]
+      "languages": [
+        "Python",
+        "PyTorch"
+      ]
     },
     {
       "slug": "specforge",
@@ -82,7 +151,9 @@
       "lastActivity": "2025-10-07",
       "link": "https://github.com/ValeGian/SpecForge",
       "upstream": "https://github.com/sgl-project/SpecForge",
-      "languages": ["Python"]
+      "languages": [
+        "Python"
+      ]
     },
     {
       "slug": "music-classifier",
@@ -92,7 +163,11 @@
       "featured": false,
       "date": "2021-10-24",
       "link": "https://github.com/ValeGian/MusicClassifier",
-      "languages": ["Python", "Scikit-learn", "Pandas"]
+      "languages": [
+        "Python",
+        "Scikit-learn",
+        "Pandas"
+      ]
     },
     {
       "slug": "federated-dbscan",
@@ -103,7 +178,13 @@
       "featured": false,
       "date": "2021-02-05",
       "link": "https://github.com/ValeGian/DataMining-MachineLearning_FederatedDBSCAN",
-      "languages": ["Python", "SciPy", "NumPy", "Scikit-learn", "Pandas"]
+      "languages": [
+        "Python",
+        "SciPy",
+        "NumPy",
+        "Scikit-learn",
+        "Pandas"
+      ]
     },
     {
       "slug": "smartpool",
@@ -114,7 +195,10 @@
       "featured": false,
       "date": "2021-07-16",
       "link": "https://github.com/ValeGian/InternetOfThings_SmartPool",
-      "languages": ["C", "Java"]
+      "languages": [
+        "C",
+        "Java"
+      ]
     },
     {
       "slug": "ceph-file-manager",
@@ -125,7 +209,10 @@
       "featured": false,
       "date": "2021-05-31",
       "link": "https://github.com/ValeGian/CloudComputing_Ceph_File_Manager",
-      "languages": ["Python", "Docker"]
+      "languages": [
+        "Python",
+        "Docker"
+      ]
     },
     {
       "slug": "pagerank",
@@ -136,7 +223,12 @@
       "featured": false,
       "date": "2021-05-14",
       "link": "https://github.com/ValeGian/CloudComputing_PageRank",
-      "languages": ["Java", "Python", "Hadoop", "Spark"]
+      "languages": [
+        "Java",
+        "Python",
+        "Hadoop",
+        "Spark"
+      ]
     },
     {
       "slug": "covid-tracker",
@@ -147,7 +239,10 @@
       "featured": false,
       "date": "2020-12-24",
       "link": "https://github.com/ValeGian/DistributedSystems-MiddlewareTechnologies_CovidTracker",
-      "languages": ["Java", "Erlang"]
+      "languages": [
+        "Java",
+        "Erlang"
+      ]
     },
     {
       "slug": "unimusic",
@@ -158,7 +253,12 @@
       "featured": false,
       "date": "2020-12-02",
       "link": "https://github.com/ValeGian/LargeScale-MultiStructuredDatabase_UniMusic",
-      "languages": ["Java", "JavaFX", "MongoDB", "Neo4j"]
+      "languages": [
+        "Java",
+        "JavaFX",
+        "MongoDB",
+        "Neo4j"
+      ]
     },
     {
       "slug": "frogger",
@@ -168,7 +268,10 @@
       "featured": false,
       "date": "2020-04-18",
       "link": "https://github.com/ValeGian/Frogger-Game",
-      "languages": ["Java", "JavaFX"]
+      "languages": [
+        "Java",
+        "JavaFX"
+      ]
     },
     {
       "slug": "pacman",
@@ -178,7 +281,10 @@
       "featured": false,
       "date": "2019-12-04",
       "link": "https://github.com/ValeGian/JavaFX_PacMan",
-      "languages": ["Java", "JavaFX"]
+      "languages": [
+        "Java",
+        "JavaFX"
+      ]
     },
     {
       "slug": "hardware-ecommerce",
@@ -189,7 +295,13 @@
       "featured": false,
       "date": "2018-02-20",
       "link": "https://github.com/ValeGian/Hardware-ECommerce-Website",
-      "languages": ["JavaScript", "Ajax", "PHP", "HTML5", "CSS3"]
+      "languages": [
+        "JavaScript",
+        "Ajax",
+        "PHP",
+        "HTML5",
+        "CSS3"
+      ]
     }
   ]
 }

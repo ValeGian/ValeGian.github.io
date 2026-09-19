@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phases 1–5 built; the vault is live. Next: Phase 6, the Personal area UI.
+**Status:** Phases 1–5 done, Phase 6 read side done. Next: the write path.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 15 — vault encrypted and published)
+**Last updated:** 2026-09-19 (rev 16 — collection and wishlist screens)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -600,13 +600,16 @@ static lookup, never fetched at runtime.
 - [ ] PAT unlock UI, offline queue, *N unsynced* badge, *Forget token* — these are
       interface, so they move to Phase 6 with the rest of the UI
 
-### Phase 6 — Personal area UI
-- [ ] Collection tab: list/table, filters, detail, charts, totals
-- [ ] Trip-spend date-range summary
-- [ ] Wishlists: per-list view, combined shopping view, both mark-bought behaviours
-- [ ] Friend read-only view + balance + settlements display
-- [ ] Add/delete/edit + TCGdex picker + pending path + photo upload
-- [ ] Mobile pass on a real 360 px viewport
+### Phase 6 — Personal area UI  ◐ **read side done, write side next**
+- [x] Collection tab: list, filters, sort, detail, totals
+- [x] Trip-spend date-range summary (the date filter drives the figures)
+- [x] Wishlists: per-list view, combined shopping view, target vs market
+- [x] Friend read-only view + balance + settlements
+- [x] Mobile verified at a true 360 px viewport
+- [ ] **Add / delete / edit, TCGdex picker, pending path, photo upload**
+- [ ] **PAT unlock, offline queue, batched commits, *N unsynced* badge, *Forget token***
+- [ ] Value-over-time charts — needs more than one day of history
+- [x] Staleness banner
 
 ### Phase 7 — Hardening
 - [ ] `scripts/audit.mjs` — decrypt-and-diff history (§7.4)
@@ -631,6 +634,41 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 16 (collection and wishlist screens) ◐
+- **No framework.** Preact was installed and removed within the hour: it broke the build
+  on Astro 5.18 with an unresolved `astro:preact:opts`. Written instead in plain
+  TypeScript with a ~50-line DOM helper and a store that rebuilds the view on change. At
+  a few hundred rows a full rebuild is imperceptible, and it removes every bug that comes
+  from patching the DOM by hand. **Deviation from nothing in the plan** — the plan never
+  named a framework — but worth recording as a decision rather than an accident.
+- **Collection**: search across English *and* Japanese names, filters for set, date
+  range, gainers, losers and cards awaiting the catalog, seven sort keys, detail panel.
+- **Unpriced cards are never counted as zero.** They are excluded from the value total
+  and reported separately — absent and worthless are different things, and averaging them
+  together would quietly understate the collection.
+- Every price shown carries its source and the timestamp it was read. Two of the sources
+  are different markets and a third was checked by hand, so a bare number is not enough.
+- **Wishlists**: combined shopping page or per-person blocks, target beside live `avg30`
+  with an under/over marker. Balances are computed from the purchases behind them, never
+  stored. Friends' cards never enter the collection totals.
+- **Found and fixed while building:** the watchlist covered only owned cards, so a wanted
+  card had no market price and the target comparison had nothing to compare against;
+  the footer printed `GitHub , LinkedIn ,` because JSX newlines became text nodes; the
+  heading read "Collection" while the Wishlists tab was open; the combine toggle showed
+  for friends, who have one list.
+- **The earlier mobile test method was wrong.** Constraining `documentElement` to 360 px
+  leaves `vw` units and media queries resolving against the real viewport, so it reported
+  overflow that did not exist and would have hidden overflow that did. Re-tested in a
+  360 px **iframe**, which has its own viewport: all four pages clean, zero overflow.
+  The Phase 2 result was re-verified the same way.
+- Thumbnails degrade quietly — TCGdex lists `M6-113` with no artwork today, so a missing
+  image and a failed one both end as the same empty frame.
+
+  **What is left of Phase 6**, and it is the part that matters before Japan: add, delete
+  and edit cards, the TCGdex picker, the pending path, photo upload, and the write path
+  itself — PAT unlock, offline queue, batched commits, *N unsynced* badge. Charts wait
+  on more than one day of history.
 
 ### 2026-09-19 — rev 15 (vault encrypted and published) ✅
 - **The collection is now ciphertext in a public repository**, and opening it needs a

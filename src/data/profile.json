@@ -5,7 +5,7 @@
     "headline": "AI Tech Lead / AI Inference Engineer",
     "nationality": "Italian",
     "birthday": "1998-12-30",
-    "portrait": "/images/portrait.jpg",
+    "portrait": null,
     "bio": "I'm an AI Tech Lead at Translated, working on LLM inference. Before that I was a software development engineer intern at Amazon in Luxembourg. I studied Computer Engineering and then Artificial Intelligence and Data Engineering at the University of Pisa.\n\nMost of what I build in my own time is inference infrastructure: liteinfer, an engine written from scratch to make paged KV caches and continuous batching readable, and variantGPT, a testbed for comparing attention mechanisms under identical conditions.",
     "bioStatus": "draft",
     "pronouns": "he/him",
@@ -47,7 +47,8 @@
       "endYear": 2023,
       "grade": null,
       "syllabus": "https://computer.ing.unipi.it/aide-lm/study-plan-20-21",
-      "transcript": "/resources/master-transcript.pdf"
+      "transcript": "/resources/master-transcript.pdf",
+      "shortName": "M.Sc. Artificial Intelligence and Data Engineering"
     },
     {
       "degree": "B.Sc. Ingegneria Informatica (Computer Engineering)",
@@ -59,7 +60,8 @@
       "grade": "110/110 cum laude",
       "gradeNote": "Full marks with honours, the maximum mark in the Italian system",
       "syllabus": "https://computer.ing.unipi.it/inginf-l/piano-di-studi-19-20",
-      "transcript": "/resources/bachelor-transcript.pdf"
+      "transcript": "/resources/bachelor-transcript.pdf",
+      "shortName": "B.Sc. Computer Engineering"
     }
   ],
   "experience": [

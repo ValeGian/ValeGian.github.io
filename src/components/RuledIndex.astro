@@ -1,0 +1,40 @@
+---
+interface Props {
+  heading: string;
+  blurb?: string;
+  id?: string;
+}
+
+const { heading, blurb, id } = Astro.props;
+---
+
+<section class="index" id={id}>
+  <h2>{heading}</h2>
+  {blurb && <p class="blurb">{blurb}</p>}
+  <ul>
+    <slot />
+  </ul>
+</section>
+
+<style>
+  .index {
+    margin-top: var(--space-16);
+  }
+
+  h2 {
+    font-size: var(--size-xl);
+    margin-bottom: var(--space-2);
+  }
+
+  .blurb {
+    color: var(--muted);
+    margin-bottom: var(--space-4);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+</style>

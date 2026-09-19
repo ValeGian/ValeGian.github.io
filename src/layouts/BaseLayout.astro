@@ -1,14 +1,22 @@
 ---
-/**
- * Minimal document shell. Phase 2 replaces this with the real design system;
- * until then it only guarantees a valid, responsive, theme-aware document.
- */
+import '@fontsource/spectral/latin-400.css';
+import '@fontsource/spectral/latin-400-italic.css';
+import '@fontsource/spectral/latin-600.css';
+import '@fontsource-variable/ibm-plex-sans';
+
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+import SiteHeader from '@components/SiteHeader.astro';
+import SiteFooter from '@components/SiteFooter.astro';
+
 interface Props {
   title: string;
-  description?: string;
+  description: string;
 }
 
-const { title, description = 'Personal site of Valerio Giannini.' } = Astro.props;
+const { title, description } = Astro.props;
+const fullTitle = title === 'Valerio Giannini' ? title : `${title} — Valerio Giannini`;
 ---
 
 <!doctype html>
@@ -16,39 +24,20 @@ const { title, description = 'Personal site of Valerio Giannini.' } = Astro.prop
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <meta name="description" content={description} />
-    <title>{title}</title>
-    <style is:global>
-      :root {
-        color-scheme: light dark;
-        --bg: #fbfbfa;
-        --fg: #1b1b1a;
-        --muted: #6b6b68;
-        --rule: #e3e3e0;
-      }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg: #141414;
-          --fg: #ececea;
-          --muted: #9a9a96;
-          --rule: #2b2b2a;
-        }
-      }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        padding: 3rem 1rem calc(3rem + env(safe-area-inset-bottom, 0px));
-        background: var(--bg);
-        color: var(--fg);
-        font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
-      }
-      main { max-width: 42rem; margin-inline: auto; }
-      a { color: inherit; }
-    </style>
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <title>{fullTitle}</title>
   </head>
   <body>
-    <main>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main id="main">
       <slot />
     </main>
+    <SiteFooter />
   </body>
 </html>

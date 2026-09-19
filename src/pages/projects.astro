@@ -1,0 +1,77 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import RuledIndex from '@components/RuledIndex.astro';
+import IndexRow from '@components/IndexRow.astro';
+import profile from '@data/profile.json';
+
+/** Sort on the same value the row displays, so the column never looks out of order. */
+const shownYear = (project: { lastActivity?: string; date: string }) =>
+  project.lastActivity ?? project.date;
+const projects = [...profile.projects].sort((a, b) => shownYear(b).localeCompare(shownYear(a)));
+
+const groups = [
+  {
+    heading: 'Inference and model work',
+    blurb: 'What I build outside work, and the upstream project I contribute to.',
+    items: projects.filter((project) => project.featured),
+  },
+  {
+    heading: 'Earlier personal projects',
+    blurb: 'Things I wrote for myself before the current run.',
+    items: projects.filter((project) => !project.featured && project.type === 'personal'),
+  },
+  {
+    heading: 'University coursework',
+    blurb: 'Built for specific courses at the University of Pisa.',
+    items: projects.filter((project) => project.type === 'university'),
+  },
+];
+
+const formatYear = (project: { lastActivity?: string; date: string }) =>
+  shownYear(project).slice(0, 4);
+---
+
+<BaseLayout
+  title="Projects"
+  description="Inference engines, model research and university coursework by Valerio Giannini."
+>
+  <div class="page">
+    <section class="intro">
+      <h1>Projects</h1>
+      <p>
+        Thirteen repositories, oldest from a first-year programming course, newest an
+        inference engine on PyPI. Every one of them is public.
+      </p>
+    </section>
+
+    {groups.map((group) => (
+      <RuledIndex heading={group.heading} blurb={group.blurb}>
+        {group.items.map((project) => (
+          <IndexRow
+            title={project.title}
+            href={project.link}
+            description={project.description}
+            meta={[...project.languages, ...(project.course ? [project.course] : [])]}
+            aside={formatYear(project)}
+          />
+        ))}
+      </RuledIndex>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--space-16) 0;
+  }
+
+  h1 {
+    font-size: var(--size-2xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .intro p {
+    font-size: var(--size-lg);
+    color: var(--muted);
+  }
+</style>

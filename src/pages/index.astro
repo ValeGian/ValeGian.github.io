@@ -1,33 +1,87 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import RuledIndex from '@components/RuledIndex.astro';
+import IndexRow from '@components/IndexRow.astro';
+import Particulars from '@components/Particulars.astro';
 import profile from '@data/profile.json';
 
-const { identity, links, projects } = profile;
-const fullName = `${identity.firstName} ${identity.lastName}`;
+const { identity, experience, projects } = profile;
+const current = experience.find((role) => role.isCurrent);
 const featured = projects.filter((project) => project.featured);
+const paragraphs = identity.bio.split('\n\n');
 ---
 
-<BaseLayout title={fullName}>
-  <h1>{fullName}</h1>
-  <p>{identity.headline}</p>
+<BaseLayout
+  title="Valerio Giannini"
+  description="Valerio Giannini — AI Tech Lead at Translated, working on LLM inference."
+>
+  <div class="page">
+    <section class="intro">
+      <h1>Valerio Giannini</h1>
+      <p class="role ui">
+        {current ? `${current.role} at ${current.organisation}` : identity.headline}
+      </p>
+      <div class="intro-body">
+        <div class="intro-prose">
+          {paragraphs.map((paragraph) => <p class="lede">{paragraph}</p>)}
+        </div>
+        <Particulars />
+      </div>
+    </section>
 
-  <h2>Recent work</h2>
-  <ul>
-    {featured.map((project) => (
-      <li>
-        <a href={project.link}>{project.title}</a> — {project.description}
-      </li>
-    ))}
-  </ul>
+    <RuledIndex heading="What I'm building">
+      {featured.map((project) => (
+        <IndexRow
+          title={project.title}
+          href={project.link}
+          description={project.description}
+          meta={project.languages}
+          aside={project.lastActivity?.slice(0, 4) ?? project.date.slice(0, 4)}
+        />
+      ))}
+    </RuledIndex>
 
-  <h2>Elsewhere</h2>
-  <ul>
-    {links.profiles.map((profileLink) => (
-      <li><a href={profileLink.url}>{profileLink.platform}</a></li>
-    ))}
-  </ul>
-
-  <p style="color: var(--muted)">
-    Placeholder shell — the design system and the remaining sections land in Phase 2.
-  </p>
+  </div>
 </BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--space-16) 0;
+  }
+
+  h1 {
+    font-size: var(--size-display);
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-3);
+  }
+
+  .role {
+    font-size: var(--size-lg);
+    color: var(--muted);
+    margin-bottom: var(--space-8);
+    max-width: none;
+  }
+
+  .intro-body {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .intro-prose > :last-child {
+    margin-bottom: 0;
+  }
+
+  .lede {
+    font-size: var(--size-lg);
+    max-width: 56ch;
+  }
+
+  @media (min-width: 60rem) {
+    .intro-body {
+      grid-template-columns: minmax(0, 1fr) 17rem;
+      gap: var(--space-12);
+      align-items: start;
+    }
+  }
+
+</style>

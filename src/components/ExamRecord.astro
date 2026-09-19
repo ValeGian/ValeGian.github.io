@@ -1,0 +1,237 @@
+---
+/**
+ * One degree: its summary figures, then every exam on record.
+ *
+ * Averages are computed here from the exam rows rather than stored, so a figure can
+ * never disagree with the table printed under it. The final exam is excluded from the
+ * average because the Italian system scores it separately from coursework.
+ */
+interface Exam {
+  code: string;
+  title: string;
+  credits: number;
+  date?: string;
+  mark?: number;
+  cumLaude?: boolean;
+  isFinalExam?: boolean;
+}
+
+interface Record {
+  isComplete: boolean;
+  creditsRecorded: number;
+  creditsExpected: number;
+  creditsNote?: string;
+  incompleteNote?: string;
+  snapshotDate?: string;
+  exams: Exam[];
+  unrecorded?: Exam[];
+}
+
+interface Degree {
+  degree: string;
+  institution: string;
+  startYear: number;
+  endYear: number | null;
+  grade: string | null;
+  gradeNote?: string;
+  transcript: string;
+  syllabus: string;
+}
+
+interface Props {
+  degree: Degree;
+  record: Record;
+}
+
+const { degree, record } = Astro.props;
+
+const graded = record.exams.filter((exam) => !exam.isFinalExam && exam.mark !== undefined);
+const creditsGraded = graded.reduce((total, exam) => total + exam.credits, 0);
+const weightedAverage =
+  graded.reduce((total, exam) => total + (exam.mark ?? 0) * exam.credits, 0) / creditsGraded;
+
+const monthYear = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' });
+const asMonthYear = (iso?: string) => (iso ? monthYear.format(new Date(iso)) : '');
+
+const figures = [
+  { label: 'Exams recorded', value: String(record.exams.length) },
+  { label: 'ECTS credits', value: `${record.creditsRecorded} of ${record.creditsExpected}` },
+  { label: 'Weighted average', value: `${weightedAverage.toFixed(2)} / 30` },
+  { label: 'Final grade', value: degree.grade ?? 'Not in this record' },
+];
+---
+
+<section class="record">
+  <header>
+    <h2>{degree.degree}</h2>
+    <p class="meta ui">
+      {degree.institution}, {degree.startYear}–{degree.endYear ?? 'present'}
+      {degree.gradeNote && <span class="muted"> · {degree.gradeNote}</span>}
+    </p>
+  </header>
+
+  <dl class="figures">
+    {figures.map((figure) => (
+      <div>
+        <dt class="ui">{figure.label}</dt>
+        <dd class="numeric">{figure.value}</dd>
+      </div>
+    ))}
+  </dl>
+
+  {!record.isComplete && record.incompleteNote && (
+    <p class="caveat">{record.incompleteNote}</p>
+  )}
+  {record.creditsNote && <p class="caveat quiet">{record.creditsNote}</p>}
+
+  <ol class="exams">
+    {record.exams.map((exam) => (
+      <li class:list={['exam', { final: exam.isFinalExam }]}>
+        <span class="exam-title">{exam.title}</span>
+        <span class="exam-mark numeric">
+          {exam.mark}
+          {exam.cumLaude && <span class="laude"> cum laude</span>}
+        </span>
+        <span class="exam-meta numeric">
+          {exam.credits} ECTS
+          {exam.date && <span class="when">{asMonthYear(exam.date)}</span>}
+        </span>
+      </li>
+    ))}
+  </ol>
+
+  {record.unrecorded && record.unrecorded.length > 0 && (
+    <div class="pending">
+      <h3>Passed later, marks not in this export</h3>
+      <ol class="exams">
+        {record.unrecorded.map((exam) => (
+          <li class="exam">
+            <span class="exam-title">{exam.title}</span>
+            <span class="exam-mark muted ui">—</span>
+            <span class="exam-meta numeric">{exam.credits} ECTS</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )}
+
+  <p class="source ui">
+    <a href={degree.transcript}>Original transcript (PDF)</a>
+    <a href={degree.syllabus}>Study plan</a>
+  </p>
+</section>
+
+<style>
+  .record {
+    margin-top: var(--space-24);
+  }
+
+  h2 {
+    font-size: var(--size-xl);
+  }
+
+  .meta {
+    font-size: var(--size-sm);
+    color: var(--muted);
+    margin-bottom: var(--space-8);
+    max-width: none;
+  }
+
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: var(--space-6);
+    margin: 0 0 var(--space-8);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .figures dt {
+    font-size: var(--size-xs);
+    color: var(--muted);
+  }
+
+  .figures dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--size-lg);
+  }
+
+  .caveat {
+    border-left: 2px solid var(--accent);
+    padding-left: var(--space-4);
+    margin-bottom: var(--space-8);
+    color: var(--ink);
+  }
+
+  .caveat.quiet {
+    border-left-color: var(--rule-strong);
+    color: var(--muted);
+    font-size: var(--size-sm);
+  }
+
+  .exams {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .exam {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: var(--space-6);
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--rule);
+  }
+
+  .exam:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .exam.final .exam-title {
+    font-style: italic;
+  }
+
+  .exam-title {
+    grid-column: 1;
+  }
+
+  .exam-mark {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: right;
+    font-size: var(--size-lg);
+  }
+
+  .laude {
+    display: block;
+    font-size: var(--size-xs);
+    color: var(--accent);
+    letter-spacing: 0.01em;
+  }
+
+  .exam-meta {
+    grid-column: 1;
+    font-size: var(--size-xs);
+    color: var(--muted);
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .pending {
+    margin-top: var(--space-12);
+  }
+
+  .pending h3 {
+    font-size: var(--size-md);
+    color: var(--muted);
+    margin-bottom: var(--space-3);
+  }
+
+  .source {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+    font-size: var(--size-sm);
+  }
+</style>

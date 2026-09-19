@@ -1,0 +1,76 @@
+/*
+ * Design tokens.
+ *
+ * One accent for the whole public site; sections are told apart by density and
+ * structure, not by hue. The gated Personal area gets its own accent later, which
+ * is why the accent is a single token rather than a per-section set.
+ */
+
+:root {
+  /* Colour — light is the default definition, so no colour is only defined inside a
+     media query. Dark redefines the same names below. */
+  --paper: #f5f4f0;
+  --paper-sunk: #eceae4;
+  --ink: #14161a;
+  --muted: #5b5f66;
+  --rule: #dcdbd4;
+  --rule-strong: #b9b8b0;
+  --accent: #2d3a8c;
+  --accent-soft: #e4e6f5;
+
+  /* Type */
+  --font-prose: "Spectral", Georgia, "Times New Roman", serif;
+  --font-ui: "IBM Plex Sans Variable", "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+
+  --size-xs: 0.8125rem;
+  --size-sm: 0.9375rem;
+  --size-md: 1.0625rem;
+  --size-lg: 1.25rem;
+  --size-xl: 1.5rem;
+  --size-2xl: 2rem;
+  --size-display: clamp(2.5rem, 1.4rem + 5vw, 5rem);
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-prose: 1.65;
+
+  /* Spacing — a single 4px-based scale used everywhere */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Measure and page width */
+  --measure: 64ch;
+  --page: 68rem;
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121316;
+    --paper-sunk: #191b1f;
+    --ink: #e9e9e4;
+    --muted: #9a9da4;
+    --rule: #2a2c31;
+    --rule-strong: #43464d;
+    --accent: #8b97e8;
+    --accent-soft: #1d2040;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #121316;
+  --paper-sunk: #191b1f;
+  --ink: #e9e9e4;
+  --muted: #9a9da4;
+  --rule: #2a2c31;
+  --rule-strong: #43464d;
+  --accent: #8b97e8;
+  --accent-soft: #1d2040;
+}

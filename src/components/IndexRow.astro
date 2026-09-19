@@ -1,0 +1,73 @@
+---
+/**
+ * One row of a ruled index — the site's single repeating structure. Used for
+ * projects and coursework. Rules delimit rows; they are not decoration, so nothing
+ * else on the site draws one.
+ */
+interface Props {
+  title: string;
+  href?: string;
+  description: string;
+  meta?: string[];
+  aside?: string;
+}
+
+const { title, href, description, meta = [], aside } = Astro.props;
+---
+
+<li class="row">
+  <h3 class="row-title">
+    {href ? <a href={href}>{title}</a> : title}
+  </h3>
+  {aside && <span class="row-aside numeric">{aside}</span>}
+  <p class="row-description">{description}</p>
+  {meta.length > 0 && (
+    <p class="row-meta ui">
+      {meta.map((item) => <span>{item}</span>)}
+    </p>
+  )}
+</li>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-1) var(--space-6);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--rule);
+  }
+
+  .row-title {
+    font-size: var(--size-lg);
+    grid-column: 1;
+  }
+
+  .row-title a {
+    text-decoration-color: var(--rule-strong);
+  }
+
+  .row-aside {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: baseline;
+    font-size: var(--size-sm);
+    color: var(--muted);
+  }
+
+  .row-description {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .row-meta {
+    grid-column: 1 / -1;
+    margin: var(--space-2) 0 0;
+    max-width: none;
+    font-size: var(--size-xs);
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+  }
+</style>

@@ -1,0 +1,45 @@
+---
+import profile from '@data/profile.json';
+
+const { links, identity } = profile;
+const year = new Date().getFullYear();
+const reachable = links.profiles;
+---
+
+<footer class="colophon">
+  <div class="page colophon-inner">
+    <p class="ui">
+      <span>{identity.location}.</span>{' '}
+      <span>Reach me on{' '}
+        {reachable.map((profileLink, index) => (
+          <>
+            <a href={profileLink.url} rel="me">{profileLink.platform}</a>
+            {index < reachable.length - 2 ? ', ' : index === reachable.length - 2 ? ' or ' : '.'}
+          </>
+        ))}
+      </span>
+    </p>
+    <p class="ui muted">© {year} Valerio Giannini</p>
+  </div>
+</footer>
+
+<style>
+  .colophon {
+    margin-top: var(--space-24);
+    border-top: 1px solid var(--rule);
+  }
+
+  .colophon-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-8);
+    justify-content: space-between;
+    padding-block: var(--space-6) calc(var(--space-8) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .colophon p {
+    margin: 0;
+    font-size: var(--size-sm);
+    max-width: none;
+  }
+</style>

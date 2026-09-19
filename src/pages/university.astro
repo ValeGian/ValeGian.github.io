@@ -1,0 +1,70 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import ExamRecord from '@components/ExamRecord.astro';
+import profile from '@data/profile.json';
+import transcripts from '@data/transcripts.json';
+
+const bySlug = { msc: transcripts.master, bsc: transcripts.bachelor };
+
+const degrees = profile.education.map((entry) => ({
+  ...entry,
+  record: entry.degree.startsWith('M.Sc.') ? bySlug.msc : bySlug.bsc,
+  coursework: profile.projects.filter((project) => project.type === 'university'),
+}));
+---
+
+<BaseLayout
+  title="University"
+  description="Degrees, exam records and coursework from the University of Pisa."
+>
+  <div class="page">
+    <section class="intro">
+      <h1>University of Pisa</h1>
+      <p>
+        Six years, two degrees, and the coursework that came out of them. The exam records
+        below are read from the study-plan exports the university issues; each degree links
+        to the original PDF.
+      </p>
+    </section>
+
+    {degrees.map((degree) => <ExamRecord degree={degree} record={degree.record} />)}
+
+    <section class="coursework">
+      <h2>Coursework</h2>
+      <p>
+        Nine of these courses produced something I still have the code for. They are listed
+        with the rest of my work on the <a href="/projects">projects</a> page.
+      </p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .intro {
+    padding-block: var(--space-16) 0;
+  }
+
+  h1 {
+    font-size: var(--size-2xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .intro p {
+    font-size: var(--size-lg);
+    color: var(--muted);
+  }
+
+  .coursework {
+    margin-top: var(--space-16);
+  }
+
+  .coursework h2 {
+    font-size: var(--size-xl);
+    margin-bottom: var(--space-2);
+  }
+
+  .coursework p {
+    color: var(--muted);
+    margin: 0;
+  }
+</style>

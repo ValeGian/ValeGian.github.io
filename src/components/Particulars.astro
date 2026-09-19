@@ -1,0 +1,75 @@
+---
+/**
+ * The facts a visitor scans for before reading anything: where I am, what I do now,
+ * what I did before, what I studied. Sits beside the introduction on wide screens and
+ * underneath it on narrow ones.
+ */
+import profile from '@data/profile.json';
+
+const { identity, links, experience, education } = profile;
+
+const entries = [
+  { label: 'Now', lines: experience.filter((role) => role.isCurrent).map((role) => `${role.role}, ${role.organisation}`) },
+  { label: 'Before', lines: experience.filter((role) => !role.isCurrent).map((role) => `${role.role}, ${role.organisation}, ${role.location}`) },
+  { label: 'Studied', lines: education.map((entry) => `${entry.shortName}, ${entry.endYear}`) },
+  { label: 'Based in', lines: [identity.location] },
+].filter((entry) => entry.lines.length > 0);
+
+const shown = new Set(['GitHub', 'LinkedIn']);
+const profiles = links.profiles.filter((profileLink) => shown.has(profileLink.platform));
+---
+
+<aside class="particulars">
+  <dl>
+    {entries.map((entry) => (
+      <div class="entry">
+        <dt>{entry.label}</dt>
+        {entry.lines.map((line) => <dd>{line}</dd>)}
+      </div>
+    ))}
+  </dl>
+  <p class="elsewhere">
+    {profiles.map((profileLink) => <a href={profileLink.url} rel="me">{profileLink.platform}</a>)}
+  </p>
+</aside>
+
+<style>
+  .particulars {
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+    border-top: 1px solid var(--rule);
+    padding-top: var(--space-4);
+  }
+
+  dl {
+    margin: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  dt {
+    color: var(--muted);
+    font-size: var(--size-xs);
+  }
+
+  dd {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  .elsewhere {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin: var(--space-6) 0 0;
+    max-width: none;
+  }
+
+  @media (min-width: 60rem) {
+    .particulars {
+      border-top: 0;
+      border-left: 1px solid var(--rule);
+      padding: var(--space-2) 0 var(--space-2) var(--space-8);
+    }
+  }
+</style>

@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phases 1–3 complete. Next: Phase 4, the price pipeline.
+**Status:** Phases 1–4 built; the price series is running. Next: Phase 5, crypto and the write path.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 13 — Phase 3 complete)
+**Last updated:** 2026-09-19 (rev 14 — price pipeline live)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -577,14 +577,18 @@ static lookup, never fetched at runtime.
 - [x] Totals reconcile to €1218,97
 - [ ] Friend-list schema — deferred to Phase 6, when the wishlist UI defines its shape
 
-### Phase 4 — Price pipeline
-- [ ] `snapshot-prices.mjs` — TCGdex, variant-aware → `latest.json` + `daily/<date>.json`
-- [ ] `resolve-pending.mjs` — retry, promote, open issue
-- [ ] `prices.yml` daily cron, commit only on change
-- [ ] **Calibration week**: daily snapshots vs 3 manual Cardmarket spot-checks; confirm
-      `avg7`/`avg1` semantics before either is surfaced
-- [ ] Frankfurter FX for new purchases
-- [ ] Liveness + staleness alerting
+### Phase 4 — Price pipeline  ✅ **built**
+- [x] `snapshot-prices.mjs` — TCGdex, variant-aware → `latest.json` + `daily/<date>.json`
+- [x] `resolve-pending.mjs` — retry, publish the answer, open an issue
+- [x] `prices.yml` daily cron at 06:20 UTC, commit only on change; verified end to end
+- [x] Liveness alerting: one reusable issue on failure, not one per day
+- [x] `build-watchlist.mjs` also emits `pending.json`
+- [ ] **Calibration week** — runs 2026-09-20 → 26. `npm run data:spot-check` each day,
+      record readings in §13. Decides whether `avg7`/`avg1` are ever shown.
+- [ ] Staleness banner in the UI — needs the UI; moved to Phase 6
+- [x] ~~Frankfurter FX cache~~ — **dropped.** The rate is looked up once when a card is
+      added and frozen into the purchase record, so there is nothing to cache. A daily
+      rates file would have been a rewritten file earning its keep for nobody.
 
 ### Phase 5 — Crypto + write path
 - [ ] WebCrypto module: PBKDF2 → AES-GCM wrap/unwrap, keyring
@@ -626,6 +630,36 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 14 (price pipeline live) ✅
+- **First reading taken.** 46 cards priced — 43 from TCGdex, 3 from the manual overrides.
+  Sum of `avg30` **€2657,71** against **€1218,97** paid, **+118 %**. The series starts
+  here and grows one reading a day.
+- **History is stored only in immutable files.** `prices/daily/<date>.json` is written
+  once and never touched; `latest.json` is a small rewritten pointer. Measured the
+  alternative before choosing: one rolling history file costs roughly a hundred times
+  more, because git keeps a version per commit — **~1,2 GB a year at 500 cards against
+  20 MB** for daily files. Longer ranges will be served by monthly rollups.
+- **A partial day is refused, not written.** If more than a fifth of watched cards lose
+  their price the job exits non-zero. A partial day looks exactly like a market crash in
+  a chart and cannot be told apart from one afterwards.
+- **`resolve-pending.mjs` verified against both sides of the Japan case**: `M6-113`
+  resolves, `M6a-045` (30th Celebration JP) does not, because TCGdex still has not
+  published that set. The job cannot promote a card itself — it holds no key — so it
+  publishes the answer and opens an issue.
+- **Chained the deploy.** A push made with `GITHUB_TOKEN` does not trigger other
+  workflows, so the nightly commit would never have reached the site. `deploy.yml` now
+  also runs on `workflow_run` after Prices. Verified: dispatch → snapshot → commit as
+  `github-actions[bot]` → deploy → `/data/prices/latest.json` served live.
+- Every daily file is validated, not just the newest — a bad snapshot is permanent.
+- Fixed on the first real run: `resolutions.json` was being rewritten with only a fresh
+  timestamp on quiet days, producing a daily commit line that said nothing.
+- **Dropped the FX rates cache.** The rate is looked up once at purchase and frozen into
+  the record, so there was nothing for a cached file to do.
+- **Open: the calibration week (2026-09-20 → 26).** `npm run data:spot-check` prints
+  every field next to a Cardmarket link. `avg30` agreed within 2,3 % and `low` to the
+  cent, but `avg7` and `avg1` were out by up to 33 %. Neither appears anywhere in the
+  site until seven readings explain why.
 
 ### 2026-09-19 — rev 13 (Phase 3 complete) ✅
 - **Nothing personal is committed, and `.local/` is gitignored.** The repository is

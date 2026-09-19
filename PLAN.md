@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** planning complete, 1 open item (§12)
+**Status:** Phase 1 built locally, awaiting push approval (§13 rev 9)
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 8 — bulk importer dropped)
+**Last updated:** 2026-09-19 (rev 9 — Phase 1 built locally)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -226,26 +226,35 @@ valegian.github.io/
 │   │   ├── projects/  university/
 │   │   └── personal/               🔒 gated island
 │   └── components/ layouts/ styles/
-├── data/
-│   ├── public/                     ← plaintext, safe to be public
-│   │   ├── watchlist.json          cardIds to price. No owners, no prices, no targets.
-│   │   ├── prices/latest.json
-│   │   ├── prices/daily/2026-09-19.json
-│   │   └── fx/rates.json
-│   ├── personal/                   ← ciphertext. I write all of it.
-│   │   ├── keyring.enc             every list key, wrapped under `cvalgian`
-│   │   ├── collection.enc
-│   │   ├── valerio.enc             my wishlist
-│   │   ├── tommy.enc               Tommy's list + purchases + settlements
-│   │   └── lotad.enc
-│   ├── catalog-overrides.json
-│   └── profile.json
+├── public/                         ← copied verbatim into the build output
+│   ├── favicon.ico
+│   ├── resources/                  degree transcripts (PDF)
+│   └── data/                       ← everything fetched at runtime
+│       ├── watchlist.json          cardIds to price. No owners, no prices, no targets.
+│       ├── prices/latest.json
+│       ├── prices/daily/2026-09-19.json
+│       ├── fx/rates.json
+│       ├── catalog-overrides.json
+│       ├── photos/
+│       └── personal/               ← ciphertext. I write all of it.
+│           ├── keyring.enc         every file key, wrapped under `cvalgian`
+│           ├── collection.enc
+│           ├── valerio.enc         my wishlist
+│           ├── tommy.enc           Tommy's list + purchases + settlements
+│           └── lotad.enc
 ├── scripts/                        snapshot-prices · resolve-pending · build-watchlist
 │                                   migrate-sheet · audit · admin-commit
 └── .github/workflows/              deploy.yml · prices.yml
 ```
 
-**Why the `public/` vs `personal/` split matters.** The price pipeline only needs to know
+**Data lives under `public/`, split by when it is read.** Build-time content
+(`profile.json`) sits in `src/data/` and is imported; anything the browser or the daily
+Action fetches at runtime sits in `public/data/` and is served verbatim at `/data/…`.
+That means the price job writes straight to the path the site serves, with no copy step
+and no build indirection. *(Deviation from rev 7, which put these at the repo root;
+adopted in Phase 1 because Astro already serves `public/` unmodified.)*
+
+**Why the plaintext vs `personal/` split matters.** The price pipeline only needs to know
 *which cards to price*. `watchlist.json` is the union of every cardId across the
 collection and all wishlists, with no owner, no price paid and no target. So the daily
 Action never touches personal data and **never needs a decryption key**.
@@ -532,11 +541,13 @@ static lookup, never fetched at runtime.
 
 ## 11. Phases
 
-### Phase 1 — Repo reset
-- [ ] Archive Angular app on branch `legacy-angular`
-- [ ] Strip `src/`, `angular.json`, `karma.conf.js`, `package-lock.json`, `docs/`
-- [ ] Scaffold Astro, wire `deploy.yml` to Pages
-- [ ] Port `resources/me.json` → `data/profile.json`; keep transcript PDFs
+### Phase 1 — Repo reset  ✅ local, awaiting push
+- [x] Archive Angular app on branch `legacy-angular`
+- [x] Strip `src/`, `angular.json`, `karma.conf.js`, `package-lock.json`, `docs/`
+- [x] Scaffold Astro 5.18, wire `deploy.yml` to Pages
+- [x] Port `resources/me.json` → `src/data/profile.json`; transcripts to `public/resources/`
+- [ ] **Blocked on two approvals:** push to `master`, and switch the Pages source from
+      `legacy` (master `/docs`) to `workflow`. Both must happen together — see §13 rev 9.
 - [ ] Hello-world deploy green
 
 ### Phase 2 — Design system + public sections
@@ -603,6 +614,37 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 9 (Phase 1 built locally)
+- Angular app archived on branch `legacy-angular` at `cdc4519`, the last 2022 commit.
+- Stripped Angular: `src/app`, `angular.json`, `karma.conf.js`, the old lockfile,
+  `.browserslistrc`, the split tsconfigs, and the committed `docs/` build output.
+- Scaffolded **Astro 5.18.2** on Node 22: `package.json`, `astro.config.mjs` (site set,
+  no `base` since this is a user-level Pages site), strict tsconfig with `@layouts`,
+  `@components` and `@data` aliases, a minimal `BaseLayout.astro` and a placeholder
+  `index.astro`. `npm run build` and `npx astro check` both clean, 0 errors.
+- Ported `resources/me.json` → `src/data/profile.json`, restructured into
+  identity / links / education / experience / skills / projects. 13 projects, the three
+  current ones flagged `featured`. Transcripts moved to `public/resources/`, served at
+  the paths `profile.json` references. The old favicon was recovered from git into
+  `public/`.
+- **Left blank rather than invented:** `identity.bio` (flagged
+  `bioStatus: "placeholder"`), `education[0].endYear` for the master's, and `experience`
+  entirely. Also noted: `me.json` held **no exam or transcript data** — the university
+  material in the repo is only the two PDFs plus the university-tagged projects, so
+  "keep all university material" currently means exactly that. If you want a real exam
+  table in the CV section, that data has to come from you.
+- Adjusted the data layout (§6): runtime-fetched files go in `public/data/`, build-time
+  content in `src/data/`. Astro serves `public/` verbatim, so the price job writes
+  straight to the served path with no copy step.
+- Committed locally as `bd375c5`. **Not pushed.**
+
+  **Two approvals needed, and they must happen together.** Pages is currently
+  `build_type: legacy`, serving `master` `/docs` — the directory this commit deletes.
+  Pushing without switching Pages to `workflow` would take valegian.github.io down until
+  the setting changes. The switch is
+  `gh api -X PUT repos/ValeGian/ValeGian.github.io/pages -f build_type=workflow`, or the
+  Pages settings page.
 
 ### 2026-09-19 — rev 8 (bulk importer dropped)
 - **Removed the bulk-paste importer, its paste format, and the public card search page**

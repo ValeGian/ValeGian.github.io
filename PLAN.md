@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phase 1 built locally, awaiting push approval (§13 rev 9)
+**Status:** Phase 1 complete and deployed. Next: Phase 2.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 9 — Phase 1 built locally)
+**Last updated:** 2026-09-19 (rev 10 — Phase 1 deployed)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -541,14 +541,13 @@ static lookup, never fetched at runtime.
 
 ## 11. Phases
 
-### Phase 1 — Repo reset  ✅ local, awaiting push
+### Phase 1 — Repo reset  ✅ **complete**
 - [x] Archive Angular app on branch `legacy-angular`
 - [x] Strip `src/`, `angular.json`, `karma.conf.js`, `package-lock.json`, `docs/`
 - [x] Scaffold Astro 5.18, wire `deploy.yml` to Pages
 - [x] Port `resources/me.json` → `src/data/profile.json`; transcripts to `public/resources/`
-- [ ] **Blocked on two approvals:** push to `master`, and switch the Pages source from
-      `legacy` (master `/docs`) to `workflow`. Both must happen together — see §13 rev 9.
-- [ ] Hello-world deploy green
+- [x] Switch Pages `build_type` from `legacy` to `workflow`
+- [x] Hello-world deploy green — run 35459651204, https://valegian.github.io/ HTTP 200
 
 ### Phase 2 — Design system + public sections
 - [ ] Type/spacing/colour tokens, light + dark, 360 px-first
@@ -614,6 +613,20 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 10 (Phase 1 deployed) ✅
+- Switched Pages `build_type` from `legacy` to `workflow`, then pushed both branches.
+  Order mattered: the commit deletes `docs/`, which the legacy config was serving.
+- `legacy-angular` pushed as a new remote branch; `master` fast-forwarded
+  `cdc4519..1368826`.
+- Deploy run **35459651204 succeeded**. https://valegian.github.io/ returns HTTP 200 with
+  the new page, and `/resources/bachelor-transcript.pdf` still resolves — the transcript
+  URLs survived the move into `public/`.
+- Incidental fix: the clone was on an HTTPS remote with no credential helper, so pushes
+  failed with *"could not read Username"*. Switched `origin` to SSH, which matches the
+  `gh` config already on this machine.
+- **Phase 1 closed. Next: Phase 2** — design system and the real public sections. Needs
+  the bio copy (§12.1).
 
 ### 2026-09-19 — rev 9 (Phase 1 built locally)
 - Angular app archived on branch `legacy-angular` at `cdc4519`, the last 2022 commit.

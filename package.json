@@ -17,6 +17,8 @@
     "data:watchlist": "node scripts/build-watchlist.mjs",
     "data:migrate": "node scripts/migrate-sheet.mjs",
     "data:snapshot": "node scripts/snapshot-prices.mjs",
+    "price:todo": "node scripts/price-todo.mjs",
+    "price:record": "node scripts/record-manual-price.mjs",
     "data:resolve": "node scripts/resolve-pending.mjs",
     "data:spot-check": "node scripts/spot-check.mjs",
     "test:crypto": "node scripts/test-crypto.mjs --self",

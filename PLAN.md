@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-20 (rev 30 — the averages are frozen, low and trend are not)
+**Last updated:** 2026-09-20 (rev 31 — reading prices by hand, when TCGdex cannot)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -569,7 +569,19 @@ numbers, so it cannot be used to detect this.
 and reports when the averages are unchanged on 95% of shared cards while `low`/`trend` are
 not; the workflow opens one issue. The day is still recorded — a gap cannot be backfilled.
 
-**What is not decided:** whether to keep pricing on `avg30`. `trend` is live and matched
+**Decided:** keep pricing on `avg30`. `avg1` is not a substitute — it is a mean of one
+day's completed sales, so it is zero-sample on a quiet card, and it is frozen in exactly
+the same way, so switching would trade a stable wrong number for a noisy one. `trend` is
+live and would work, but it is a different measure and would change the meaning of every
+figure already recorded.
+
+**What fills the gap:** `PRICES-BY-HAND.md`, a procedure for reading the figure off
+Cardmarket in a browser on the days there is time for it. `npm run price:todo` says what
+is outstanding and, critically, what was already read today; `npm run price:record` files
+one reading into that day's snapshot as `cardmarket/manual`. It is not a schedule and
+missing days costs nothing.
+
+**Superseded note:** whether to keep pricing on `avg30`. `trend` is live and matched
 Cardmarket exactly, and is Cardmarket's own smoothed estimate, so it is the better headline
 while this lasts — but switching changes the meaning of every figure already recorded, so
 it is the owner's call, not a silent fix.
@@ -770,6 +782,21 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-20 — rev 31 (reading prices by hand, when TCGdex cannot) ✅
+- **`PRICES-BY-HAND.md`**, a procedure for a local session with a browser: what the
+  Cardmarket fields mean, how to be sure it is the right card before recording anything,
+  and the lines not to cross — no `curl`, no headless browser, no working around a
+  Cloudflare challenge, no guessing a Japanese number from its English twin.
+- **`npm run price:todo`** lists cards whose price is missing, frozen for three readings,
+  or a hand-checked figure gone stale, and separately the 36 cards that have no catalog
+  entry at all and need identifying on Cardmarket first. A card already read today is
+  never listed, which is the whole guard against doing it twice.
+- **`npm run price:record`** files one reading into that day's snapshot and into
+  `latest.json` as `cardmarket/manual`. Appending to a day already on file is allowed
+  here and nowhere else: the daily job refuses to rewrite a reading it took, but adding a
+  card it could not price destroys nothing.
+- A project **`CLAUDE.md`**, so a session finds all of this without being told.
 
 ### 2026-09-20 — rev 30 (the averages are frozen, low and trend are not) ⚠️
 - Ran the comparison properly and **the earlier "TCGdex is frozen" call was too broad**.

@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 22 — artwork and caret fixes)
+**Last updated:** 2026-09-19 (rev 23 — wishlist editing)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -610,7 +610,8 @@ static lookup, never fetched at runtime.
 - [x] PAT unlock, offline queue, batched commits, unpublished-count badge, Forget token
 - [x] Mark bought, both behaviours
 - [x] Staleness banner
-- [ ] Editing an existing card in place (delete-and-re-add works today)
+- [x] Editing a **wishlist** item in place
+- [ ] Editing a **collection** card in place (delete-and-re-add works today)
 - [ ] Photo upload for pending cards
 - [ ] Value-over-time charts — needs more than one day of history
 
@@ -640,6 +641,28 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 23 (wishlist editing, decrypt script) ✅
+- **Corrected the one piece of real damage the caret bug did**: a target price read €2
+  where €20 was meant, on both lists.
+- Doing it exposed a missing tool. `encrypt-personal.mjs` had **no counterpart**, so the
+  laptop path could only overwrite whatever the phone had published — the working copies
+  under `.local/` were still the empty lists from before anything was added from the
+  browser. **`decrypt-personal.mjs`** brings the published files back down to plaintext
+  so they can be edited without losing what was written elsewhere. The README had been
+  describing this path since Phase 7; it did not exist.
+- **A wishlist item can now be edited in place.** The typo could not be fixed from the
+  site at all — a card could be added and marked bought, never changed — which is why a
+  one-character mistake needed a script. Each wanted row has an Edit control opening it
+  prefilled with target, priority, notes and Remove.
+- Its fields use the silent update path, as the add form does. Rebuilding replaces the
+  element the caret is in, and on a number input the caret cannot be restored, so digits
+  arrive reversed — **the exact failure that produced the wrong target**, which this
+  editor would have reintroduced by default.
+- Editing one person's copy leaves the others alone: verified by setting Valerio's copy
+  to 185 and watching Lotad's stay at 20. That is the point of each list owning its item.
+- Fixed the owner badge in the combined view, which was handed the display name where
+  the list key was needed.
 
 ### 2026-09-19 — rev 22 (artwork, caret; token confirmed in production) ✅
 - **The token works.** Four cards published to two wishlists from the browser — the ref

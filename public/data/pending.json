@@ -1,5 +1,26 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-19T22:41:53.688Z",
-  "items": []
+  "generatedAt": "2026-09-19T23:06:28.112Z",
+  "items": [
+    {
+      "id": "lotad/wish_0002",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "130",
+        "nameEn": "Moltres"
+      },
+      "pendingSince": "2026-09-19"
+    },
+    {
+      "id": "valerio/wish_0002",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "130",
+        "nameEn": "Moltres"
+      },
+      "pendingSince": "2026-09-19"
+    }
+  ]
 }

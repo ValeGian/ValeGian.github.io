@@ -134,6 +134,18 @@ export async function decryptWithKey(key, envelope) {
   }
 }
 
+/**
+ * Replaces an envelope's contents, keeping its wrapping exactly as it was.
+ *
+ * Saving therefore needs the file key, which is held from the unlock, and never the
+ * password. Nothing has to keep a password in memory to write, and the keyring still
+ * opens the file because its key did not change.
+ */
+export async function resealPayload(envelope, key, payload) {
+  if (envelope?.v !== 1) throw new Error(`Unsupported envelope version: ${envelope?.v}`);
+  return { ...envelope, payload: await seal(key, payload) };
+}
+
 /** Re-wraps a file's key under a new password. The payload is untouched. */
 export async function changePassword(oldPassword, envelope, newPassword) {
   const opened = await decrypt(oldPassword, envelope);

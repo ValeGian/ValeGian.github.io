@@ -1,8 +1,9 @@
 /**
  * The personal area.
  *
- * Mounts into the page after unlocking, and rebuilds itself whenever state changes.
- * Nothing is cached anywhere, so closing the tab locks it.
+ * Mounts after unlocking and rebuilds itself whenever state changes. Nothing is cached
+ * in a readable form, so closing the tab locks it; only ciphertext and already-public
+ * JSON are ever written to the device.
  */
 import { el, frag, need } from './lib/dom';
 import { createStore } from './lib/store';
@@ -12,17 +13,21 @@ import { loadPublicData, stalenessDays, type PublicData } from './lib/data';
 import { renderCollection } from './views/collection';
 import { renderDetail } from './views/detail';
 import { renderWishlists } from './views/wishlists';
+import { renderAddCard, type AddCardState } from './views/add-card';
+import { renderPublishBar } from './views/publish-bar';
+import { addCard, deleteCard, markBought, newCardId, type Envelope, type Vault } from './lib/vault';
+import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync';
 import { unlock } from '../lib/unlock.mjs';
-import type { Collection, Wishlist } from './lib/types';
+import { decryptWithKey } from '../lib/crypto.mjs';
+import type { Collection, CollectionItem, Wishlist } from './lib/types';
 
-type Vault =
-  | { role: 'admin'; collection: Collection; wishlists: Record<string, Wishlist> }
-  | { role: 'friend'; owner: string; wishlist: Wishlist };
+type Friend = { role: 'friend'; owner: string; wishlist: Wishlist };
 
 interface AppState {
   phase: 'locked' | 'checking' | 'open';
   message: string;
   vault: Vault | null;
+  friend: Friend | null;
   data: PublicData | null;
   tab: 'collection' | 'wishlists';
   filters: Filters;
@@ -30,15 +35,34 @@ interface AppState {
   sortDescending: boolean;
   combined: boolean;
   openItemId: string | null;
+  adding: boolean;
+  add: Omit<AddCardState, 'names' | 'onChange' | 'onSave' | 'onCancel' | 'nextId'>;
+  pendingCount: number;
+  hasToken: boolean;
+  publishBusy: boolean;
+  publishMessage: string;
+  lastCommitUrl: string | null;
+  askingForToken: boolean;
 }
 
 /** Older than this and the figures are stale enough that showing them silently is wrong. */
 const STALE_AFTER_DAYS = 2;
 
+const blankAdd: AppState['add'] = {
+  query: '',
+  results: [],
+  searching: false,
+  picked: null,
+  manual: false,
+  error: '',
+  saving: false,
+};
+
 const store = createStore<AppState>({
   phase: 'locked',
   message: '',
   vault: null,
+  friend: null,
   data: null,
   tab: 'collection',
   filters: { ...emptyFilters },
@@ -46,37 +70,74 @@ const store = createStore<AppState>({
   sortDescending: true,
   combined: true,
   openItemId: null,
+  adding: false,
+  add: { ...blankAdd },
+  pendingCount: 0,
+  hasToken: false,
+  publishBusy: false,
+  publishMessage: '',
+  lastCommitUrl: null,
+  askingForToken: false,
 });
 
-/** The unlock step hands back whatever opened; name the two shapes it can be. */
-function toVault(session: unknown): Vault | null {
-  const result = session as
-    | { role: 'admin'; files: Record<string, unknown> }
-    | { role: 'friend'; owner: string; list: unknown }
-    | null;
-  if (!result) return null;
+const emptyNames = { species: {} };
 
-  if (result.role === 'admin') {
-    const { collection, ...rest } = result.files as Record<string, unknown>;
-    return {
-      role: 'admin',
-      collection: collection as Collection,
-      wishlists: rest as Record<string, Wishlist>,
-    };
+async function refreshPendingCount(): Promise<number> {
+  try {
+    const writes = await listPending();
+    store.update({ pendingCount: writes.length });
+    return writes.length;
+  } catch {
+    return 0;
   }
-  return { role: 'friend', owner: result.owner, wishlist: result.list as Wishlist };
+}
+
+/**
+ * Builds the vault, preferring any unpublished copy kept on this device.
+ *
+ * A queued file is newer than what GitHub is serving by definition — it has not been
+ * published yet — so it wins. Publishing from another device while changes are queued
+ * here would be a genuine conflict, which the count and the banner put in front of a
+ * human rather than resolving silently.
+ */
+async function buildVault(
+  files: Record<string, unknown>,
+  keys: Map<string, CryptoKey>,
+  envelopes: Map<string, Envelope>,
+  data: PublicData,
+): Promise<Vault> {
+  const queued = new Map((await listPending()).map((write) => [write.path, write.content]));
+
+  for (const [name, key] of keys) {
+    const local = queued.get(`public/data/personal/${name}.enc`);
+    if (!local) continue;
+    const envelope = JSON.parse(local) as Envelope;
+    const opened = await decryptWithKey(key, envelope);
+    if (opened) {
+      files[name] = opened;
+      envelopes.set(name, envelope);
+    }
+  }
+
+  const { collection, ...wishlists } = files as Record<string, unknown>;
+
+  return {
+    collection: collection as Collection,
+    wishlists: wishlists as Record<string, Wishlist>,
+    keys,
+    envelopes,
+    manualCardIds: [...data.overrides.keys()],
+  };
 }
 
 function valuedRows(state: AppState): Valued[] {
-  if (state.vault?.role !== 'admin') return [];
+  if (!state.vault) return [];
   return state.vault.collection.items.map((item) => value(item, state.data?.prices ?? null));
 }
 
 function stalenessBanner(state: AppState): HTMLElement | null {
   const days = stalenessDays(state.data?.prices ?? null);
-  if (days === null) {
-    return el('p', { class: 'banner', text: 'No price data has been published yet.' });
-  }
+  if (days === null) return el('p', { class: 'banner', text: 'No price data has been published yet.' });
   if (days < STALE_AFTER_DAYS) return null;
   return el('p', {
     class: 'banner',
@@ -97,13 +158,32 @@ function lockScreen(state: AppState): DocumentFragment {
         store.update({ phase: 'checking', message: 'Checking…' });
 
         try {
-          const vault = toVault(await unlock(password));
-          if (!vault) {
+          const opened = (await unlock(password)) as
+            | { role: 'admin'; files: Record<string, unknown>; keys: Map<string, CryptoKey>; envelopes: Map<string, Envelope> }
+            | { role: 'friend'; owner: string; list: Wishlist }
+            | null;
+
+          if (!opened) {
             // Says nothing about which file was tried or how close the guess was.
             store.update({ phase: 'locked', message: 'That password does not open anything here.' });
             return;
           }
-          store.update({ phase: 'open', message: '', vault, data: await loadPublicData() });
+
+          const data = await loadPublicData();
+
+          if (opened.role === 'friend') {
+            store.update({
+              phase: 'open',
+              message: '',
+              data,
+              friend: { role: 'friend', owner: opened.owner, wishlist: opened.list },
+            });
+            return;
+          }
+
+          const vault = await buildVault(opened.files, opened.keys, opened.envelopes, data);
+          store.update({ phase: 'open', message: '', data, vault, hasToken: Boolean(getToken()) });
+          await refreshPendingCount();
         } catch (error) {
           store.update({
             phase: 'locked',
@@ -135,9 +215,69 @@ function lockScreen(state: AppState): DocumentFragment {
   );
 }
 
-function adminView(state: AppState, vault: Extract<Vault, { role: 'admin' }>): DocumentFragment {
+async function saveCard(item: CollectionItem): Promise<void> {
+  const { vault } = store.get();
+  if (!vault) return;
+  await addCard(vault, item);
+  await refreshPendingCount();
+  store.update({ adding: false, add: { ...blankAdd } });
+}
+
+async function removeCard(itemId: string): Promise<void> {
+  const { vault } = store.get();
+  if (!vault) return;
+  await deleteCard(vault, itemId);
+  await refreshPendingCount();
+  store.update({ openItemId: null });
+}
+
+function publishBar(state: AppState): HTMLElement | null {
+  return renderPublishBar({
+    pendingCount: state.pendingCount,
+    hasToken: state.hasToken,
+    busy: state.publishBusy,
+    message: state.publishMessage,
+    lastCommitUrl: state.lastCommitUrl,
+    askingForToken: state.askingForToken,
+    onAskForToken: () => store.update({ askingForToken: true, publishMessage: '' }),
+    onDiscard: async () => {
+      await discardPending();
+      await refreshPendingCount();
+      // The screen still shows the discarded edits, so reload to read the published copy.
+      location.reload();
+    },
+    onForgetToken: () => {
+      forgetToken();
+      store.update({ hasToken: false, publishMessage: 'Token removed from this device.' });
+    },
+    onSaveToken: async (token) => {
+      store.update({ publishBusy: true, publishMessage: '' });
+      const result = await rememberToken(token);
+      store.update({
+        publishBusy: false,
+        hasToken: result.ok,
+        askingForToken: !result.ok,
+        publishMessage: result.ok ? '' : (result.reason ?? 'That token was not accepted.'),
+      });
+    },
+    onPublish: async () => {
+      store.update({ publishBusy: true, publishMessage: '' });
+      const result = await publish(`chore(personal): update from the browser`);
+      await refreshPendingCount();
+      store.update({
+        publishBusy: false,
+        lastCommitUrl: result.url ?? null,
+        // A failed publish leaves the queue alone, so the work is still here to retry.
+        publishMessage: result.ok ? '' : (result.reason ?? 'Publishing failed.'),
+      });
+    },
+  });
+}
+
+function adminView(state: AppState, vault: Vault): DocumentFragment {
   const rows = valuedRows(state);
   const open = state.openItemId ? rows.find((entry) => entry.item.id === state.openItemId) : undefined;
+  const names = state.data?.names ?? emptyNames;
 
   const tabs = el(
     'div',
@@ -149,16 +289,22 @@ function adminView(state: AppState, vault: Extract<Vault, { role: 'admin' }>): D
         'aria-selected': String(state.tab === tab),
         class: state.tab === tab ? 'tab on' : 'tab',
         text: tab === 'collection' ? 'Collection' : 'Wishlists',
-        onClick: () => store.update({ tab, openItemId: null }),
+        onClick: () => store.update({ tab, openItemId: null, adding: false }),
       }),
     ),
+    el('button', {
+      type: 'button',
+      class: 'chip add-button',
+      text: state.adding ? 'Close' : 'Add a card',
+      onClick: () => store.update({ adding: !state.adding, openItemId: null, add: { ...blankAdd } }),
+    }),
   );
 
   const body =
     state.tab === 'collection'
       ? renderCollection({
           rows,
-          names: state.data?.names ?? { species: {} },
+          names,
           filters: state.filters,
           sortKey: state.sortKey,
           sortDescending: state.sortDescending,
@@ -168,36 +314,59 @@ function adminView(state: AppState, vault: Extract<Vault, { role: 'admin' }>): D
               sortKey: key,
               sortDescending: current.sortKey === key ? !current.sortDescending : true,
             })),
-          onOpen: (itemId) => store.update({ openItemId: itemId }),
+          onOpen: (itemId) => store.update({ openItemId: itemId, adding: false }),
         })
       : renderWishlists({
           lists: vault.wishlists,
           prices: state.data?.prices ?? null,
-          names: state.data?.names ?? { species: {} },
+          names,
           combined: state.combined,
-          canEdit: false,
+          canEdit: true,
           onToggleCombined: () => store.update((current) => ({ combined: !current.combined })),
+          onMarkBought: async (owner, itemId) => {
+            const paid = prompt('What did it cost? Enter the amount, then the currency.', '');
+            if (paid === null) return;
+            const amount = Number(paid.replace(/[^0-9.]/g, ''));
+            if (!Number.isFinite(amount) || amount <= 0) return;
+            const currency = /eur|€/i.test(paid) ? 'EUR' : 'JPY';
+            const date = new Date().toISOString().slice(0, 10);
+            const { convert } = await import('./lib/fx');
+            const money = await convert(amount, currency, date);
+            await markBought(vault, owner, itemId, {
+              date,
+              amount,
+              currency,
+              amountEur: money.amountEur,
+              fxRate: money.fxRate,
+              fxSource: currency === 'EUR' ? 'identity' : 'frankfurter',
+            });
+            await refreshPendingCount();
+            store.update({});
+          },
         });
 
   return frag(
     tabs,
-    open
-      ? renderDetail(
-          open,
-          state.data?.names ?? { species: {} },
-          state.data?.overrides ?? new Map(),
-          () => store.update({ openItemId: null }),
-        )
+    state.adding
+      ? renderAddCard({
+          ...state.add,
+          names,
+          nextId: () => newCardId(vault),
+          onChange: (change) => store.update((current) => ({ add: { ...current.add, ...change } })),
+          onSave: saveCard,
+          onCancel: () => store.update({ adding: false, add: { ...blankAdd } }),
+        })
       : null,
+    open ? renderDetail(open, names, state.data?.overrides ?? new Map(), () => store.update({ openItemId: null }), removeCard) : null,
     body,
   );
 }
 
-function friendView(state: AppState, vault: Extract<Vault, { role: 'friend' }>): DocumentFragment {
+function friendView(state: AppState, friend: Friend): DocumentFragment {
   return renderWishlists({
-    lists: { [vault.owner]: vault.wishlist },
+    lists: { [friend.owner]: friend.wishlist },
     prices: state.data?.prices ?? null,
-    names: state.data?.names ?? { species: {} },
+    names: state.data?.names ?? emptyNames,
     combined: false,
     canEdit: false,
     onToggleCombined: () => undefined,
@@ -209,37 +378,30 @@ function render(state: AppState): void {
   const heading = need<HTMLElement>('#personal-heading');
   const actions = need<HTMLElement>('#personal-actions');
 
-  heading.textContent =
-    state.vault === null
-      ? 'Personal'
-      : state.vault.role === 'admin'
-        ? state.tab === 'collection'
-          ? 'Collection'
-          : 'Wishlists'
-        : `${state.vault.wishlist.owner}’s list`;
+  heading.textContent = state.friend
+    ? `${state.friend.wishlist.owner}’s list`
+    : state.vault
+      ? state.tab === 'collection'
+        ? 'Collection'
+        : 'Wishlists'
+      : 'Personal';
 
   actions.replaceChildren(
     state.phase === 'open'
-      ? el('button', {
-          type: 'button',
-          class: 'chip',
-          text: 'Lock',
-          // Nothing is stored anywhere, so reloading is a complete lock.
-          onClick: () => location.reload(),
-        })
+      ? // Nothing readable is stored anywhere, so reloading is a complete lock.
+        el('button', { type: 'button', class: 'chip', text: 'Lock', onClick: () => location.reload() })
       : frag(),
   );
 
-  const banner = state.phase === 'open' ? stalenessBanner(state) : null;
-
   root.replaceChildren(
     frag(
-      banner,
+      state.phase === 'open' ? publishBar(state) : null,
+      state.phase === 'open' ? stalenessBanner(state) : null,
       state.phase === 'open' && state.vault
-        ? state.vault.role === 'admin'
-          ? adminView(state, state.vault)
-          : friendView(state, state.vault)
-        : lockScreen(state),
+        ? adminView(state, state.vault)
+        : state.phase === 'open' && state.friend
+          ? friendView(state, state.friend)
+          : lockScreen(state),
     ),
   );
 }

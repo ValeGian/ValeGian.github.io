@@ -8,7 +8,7 @@ import { thumbnail } from '../lib/data';
  * days ago — so a missing image and a failed one both end as the same empty frame rather
  * than a broken-image icon.
  */
-export function cardThumb(item: { imageBase?: string }): HTMLElement {
+export function cardThumb(item: { imageBase?: string }, size = { width: 40, height: 56 }): HTMLElement {
   const source = thumbnail(item);
   if (!source) return el('span', { class: 'thumb thumb-empty', 'aria-hidden': 'true' });
 
@@ -17,8 +17,7 @@ export function cardThumb(item: { imageBase?: string }): HTMLElement {
     src: source,
     alt: '',
     loading: 'lazy',
-    width: 40,
-    height: 56,
+    ...size,
     onError: () => image.replaceWith(el('span', { class: 'thumb thumb-empty', 'aria-hidden': 'true' })),
   });
 

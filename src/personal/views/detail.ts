@@ -26,6 +26,7 @@ export function renderDetail(
   names: NameTable,
   overrides: Map<string, CatalogOverride>,
   onClose: () => void,
+  onDelete?: (itemId: string) => void,
 ): HTMLElement {
   const { item, price } = entry;
   const image = fullImage(item);
@@ -38,7 +39,22 @@ export function renderDetail(
   return el(
     'div',
     { class: 'detail' },
-    el('button', { type: 'button', class: 'detail-close', text: 'Close', onClick: onClose }),
+    el(
+      'div',
+      { class: 'detail-actions' },
+      onDelete
+        ? el('button', {
+            type: 'button',
+            class: 'detail-delete',
+            text: 'Remove',
+            // Git history is the undo, so a single confirmation is enough friction.
+            onClick: () => {
+              if (confirm(`Remove ${displayName(item, names)} from the collection?`)) onDelete(item.id);
+            },
+          })
+        : null,
+      el('button', { type: 'button', class: 'detail-close', text: 'Close', onClick: onClose }),
+    ),
     el(
       'div',
       { class: 'detail-body' },

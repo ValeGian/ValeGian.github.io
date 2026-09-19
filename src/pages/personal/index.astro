@@ -388,6 +388,29 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     gap: var(--space-6);
   }
 
+  /* The chart is a third column beside the card on a wide screen. On a phone it is
+     behind the chart button, because the card itself is what you came to look at. */
+  .personal .detail-chart {
+    display: none;
+  }
+
+  .personal .detail.chart-open .detail-chart {
+    display: block;
+    grid-column: 1 / -1;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--rule);
+  }
+
+  .personal .detail-image-button {
+    display: block;
+    width: 100%;
+    max-width: 14rem;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: zoom-in;
+  }
+
   .personal .detail-image {
     width: 100%;
     max-width: 14rem;
@@ -455,6 +478,31 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 
     .personal .detail-body {
       grid-template-columns: 14rem minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 72rem) {
+    .personal .detail-body {
+      grid-template-columns: 13rem minmax(0, 1fr) minmax(20rem, 1.05fr);
+      align-items: start;
+    }
+
+    /* Wide enough for all three, so the chart is simply there and the button is not. */
+    .personal .detail-chart,
+    .personal .detail.chart-open .detail-chart {
+      display: block;
+      grid-column: auto;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .personal .chart-toggle {
+      display: none;
+    }
+
+    .personal .detail-chart .chart-inline {
+      margin-top: 0;
+      border-top: 0;
     }
   }
 
@@ -619,10 +667,36 @@ import BaseLayout from '@layouts/BaseLayout.astro';
   }
 
   .personal .chart-empty {
+    display: grid;
+    align-content: center;
+    gap: var(--space-1);
+    min-height: 200px;
+    padding: var(--space-4);
+    border: 1px dashed var(--rule);
+    border-radius: 2px;
     color: var(--muted);
     font-size: var(--size-sm);
+    text-align: center;
+  }
+
+  .personal .chart-empty p {
     margin: 0;
-    padding-block: var(--space-6);
+    max-width: none;
+  }
+
+  .personal .chart-empty-note {
+    font-size: var(--size-xs);
+  }
+
+  .personal .chart-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: var(--space-3);
+  }
+
+  .personal .chart-toggle svg {
+    display: block;
   }
 
   /* Grid view */
@@ -676,6 +750,8 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     margin-left: auto;
   }
 
+  /* Lightbox — appended to the body, so it is styled globally rather than under
+     .personal like everything else here. */
   .personal .photo-field {
     display: grid;
     gap: var(--space-2);
@@ -1064,5 +1140,39 @@ import BaseLayout from '@layouts/BaseLayout.astro';
   .personal .empty {
     color: var(--muted);
     padding-block: var(--space-6);
+  }
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    padding: clamp(1rem, 4vw, 3rem);
+    padding-top: calc(env(safe-area-inset-top, 0px) + clamp(1rem, 4vw, 3rem));
+    background: color-mix(in srgb, var(--paper) 12%, #000 88%);
+    cursor: zoom-out;
+  }
+
+  .lightbox-image {
+    max-width: min(100%, 34rem);
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    cursor: default;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + var(--space-4));
+    right: var(--space-4);
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+    background: var(--paper);
+    color: var(--ink);
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
   }
 </style>

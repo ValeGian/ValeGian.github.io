@@ -11,6 +11,8 @@ import { el, frag } from '../lib/dom.ts';
 import { money, quote } from '../lib/money.ts';
 import { displayName, subtitle, fullImage, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
+import { chartIcon } from './icons.ts';
+import { openLightbox } from './lightbox.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
 export interface WishlistEdit {
@@ -43,6 +45,8 @@ export interface WishlistViewState {
   onOpenCard?(cardId: string | null): void;
   /** Built by the caller for whichever card is open. */
   chartFor?(cardId: string): HTMLElement | null;
+  chartOpen?: boolean;
+  onToggleChart?(): void;
 }
 
 const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | undefined =>
@@ -98,17 +102,36 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
 
   return el(
     'div',
-    { class: 'detail' },
+    { class: state.chartOpen ? 'detail chart-open' : 'detail' },
     el(
       'div',
       { class: 'detail-actions' },
+      state.onToggleChart
+        ? el('button', {
+            type: 'button',
+            class: state.chartOpen ? 'chip chart-toggle on' : 'chip chart-toggle',
+            'aria-pressed': String(Boolean(state.chartOpen)),
+            'aria-label': state.chartOpen ? 'Hide the price history' : 'Show the price history',
+            title: 'Price history',
+            onClick: () => state.onToggleChart?.(),
+          }, chartIcon())
+        : null,
       el('button', { type: 'button', class: 'detail-close', text: 'Close', onClick: () => state.onOpenCard?.(null) }),
     ),
     el(
       'div',
       { class: 'detail-body' },
       image
-        ? el('img', { class: 'detail-image', src: image, alt: displayName(sample, state.names), loading: 'eager' })
+        ? el(
+            'button',
+            {
+              type: 'button',
+              class: 'detail-image-button',
+              'aria-label': `See ${displayName(sample, state.names)} larger`,
+              onClick: () => openLightbox(image, displayName(sample, state.names)),
+            },
+            el('img', { class: 'detail-image', src: image, alt: displayName(sample, state.names), loading: 'eager' }),
+          )
         : el('div', { class: 'detail-image detail-image-empty ui', text: 'No artwork in the catalog yet' }),
       el(
         'div',
@@ -135,8 +158,8 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
         ),
         el('p', { class: 'wanters-heading ui', text: wanters.length === 1 ? 'Wanted by' : `Wanted by ${wanters.length} people` }),
         el('div', { class: 'wanters' }, ...wanters.map(({ owner, list, item }) => row(owner, list, item))),
-        state.chartFor?.(cardId) ?? null,
       ),
+      el('div', { class: 'detail-chart' }, state.chartFor?.(cardId) ?? frag()),
     ),
   );
 }

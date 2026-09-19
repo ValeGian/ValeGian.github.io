@@ -48,13 +48,20 @@ export function renderChart({ points, range, label }: ChartOptions): HTMLElement
   if (points.length < 2) {
     // One reading is a figure, not a trend. Drawing a line through it would imply a
     // shape that has not been measured.
-    return el('p', {
-      class: 'chart-empty ui',
-      text:
-        points.length === 0
-          ? 'No readings in this range yet.'
-          : 'One reading so far. The line starts once there are two — the series began the day tracking did.',
-    });
+    // Sits where the chart will, so the box keeps its shape and the chart appears in
+    // the space the message was holding rather than pushing the panel around.
+    return el(
+      'div',
+      { class: 'chart-empty ui' },
+      el('p', { text: 'Not enough data yet to draw a price chart.' }),
+      el('p', {
+        class: 'chart-empty-note',
+        text:
+          points.length === 0
+            ? 'Nothing recorded in this range.'
+            : 'One reading so far. A second one makes a line.',
+      }),
+    );
   }
 
   const values = points.map((point) => point.value);

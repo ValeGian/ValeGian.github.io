@@ -10,6 +10,8 @@ import { money, signedMoney, percent, type Valued } from '../lib/money.ts';
 import { displayName, fullImage, type CatalogOverride, type NameTable } from '../lib/data.ts';
 import type { Condition, Currency } from '../lib/types.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
+import { chartIcon } from './icons.ts';
+import { openLightbox } from './lightbox.ts';
 
 export interface CardEdit {
   itemId: string;
@@ -172,8 +174,11 @@ function editForm(
 }
 
 export interface DetailHandlers {
-  /** Rendered under the card's figures; the caller owns the range and the data. */
+  /** Rendered in its own column beside the figures; the caller owns the range and data. */
   chart?: HTMLElement | null;
+  /** Whether the chart column is revealed on a narrow screen. */
+  chartOpen?: boolean;
+  onToggleChart?: () => void;
   onClose: () => void;
   onDelete?: (itemId: string) => void;
   onStartEdit?: (edit: CardEdit) => void;
@@ -189,7 +194,7 @@ export function renderDetail(
   handlers: DetailHandlers,
   editing: CardEdit | null = null,
 ): HTMLElement {
-  const { onClose, onDelete, onStartEdit, onEditField, onSaveEdit, onCancelEdit, chart } = handlers;
+  const { onClose, onDelete, onStartEdit, onEditField, onSaveEdit, onCancelEdit, chart, chartOpen, onToggleChart } = handlers;
   const { item, price } = entry;
   const image = fullImage(item);
   const override = item.cardId ? overrides.get(item.cardId) : undefined;
@@ -200,10 +205,21 @@ export function renderDetail(
 
   return el(
     'div',
-    { class: 'detail' },
+    { class: chartOpen ? 'detail chart-open' : 'detail' },
     el(
       'div',
       { class: 'detail-actions' },
+      // Only on a narrow screen, where the chart cannot sit beside the card.
+      chart && onToggleChart
+        ? el('button', {
+            type: 'button',
+            class: chartOpen ? 'chip chart-toggle on' : 'chip chart-toggle',
+            'aria-pressed': String(Boolean(chartOpen)),
+            'aria-label': chartOpen ? 'Hide the price history' : 'Show the price history',
+            title: 'Price history',
+            onClick: onToggleChart,
+          }, chartIcon())
+        : null,
       onStartEdit && !editing
         ? el('button', {
             type: 'button',
@@ -239,7 +255,16 @@ export function renderDetail(
       'div',
       { class: 'detail-body' },
       image
-        ? el('img', { class: 'detail-image', src: image, alt: displayName(item, names), loading: 'lazy' })
+        ? el(
+            'button',
+            {
+              type: 'button',
+              class: 'detail-image-button',
+              'aria-label': `See ${displayName(item, names)} larger`,
+              onClick: () => openLightbox(image, displayName(item, names)),
+            },
+            el('img', { class: 'detail-image', src: image, alt: displayName(item, names), loading: 'lazy' }),
+          )
         : el('div', { class: 'detail-image detail-image-empty ui', text: 'No image in the catalog' }),
       el(
         'div',
@@ -282,8 +307,8 @@ export function renderDetail(
             ? line('Cardmarket', el('a', { href: override.cardmarketUrl, target: '_blank', rel: 'noreferrer', text: 'Open product page' }))
             : null,
         ),
-        chart ?? frag(),
       ),
+      el('div', { class: 'detail-chart' }, chart ?? frag()),
     ),
   );
 }

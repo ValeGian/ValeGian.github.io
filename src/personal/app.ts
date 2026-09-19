@@ -53,6 +53,7 @@ interface AppState {
   editingCard: CardEdit | null;
   openWishCardId: string | null;
   history: HistorySource | null;
+  chartOpen: boolean;
   range: Range;
   view: 'list' | 'grid';
   /** Bumped to force a rebuild when the change was to the vault, not to this object. */
@@ -107,6 +108,7 @@ const store = createStore<AppState>({
   editingCard: null,
   openWishCardId: null,
   history: null,
+  chartOpen: false,
   range: RANGES[0],
   view: 'list',
   tick: 0,
@@ -593,6 +595,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           openCardId: state.openWishCardId,
           onOpenCard: (cardId) => store.update({ openWishCardId: cardId }),
           chartFor: (cardId) => cardHistory(state, cardId),
+          chartOpen: state.chartOpen,
+          onToggleChart: () => store.update({ chartOpen: !state.chartOpen }),
           onToggleCombined: () => store.update((current) => ({ combined: !current.combined })),
           onStartEdit: (edit) => store.update({ editingWish: edit }),
           // Silent, for the same reason the add form's fields are: rebuilding replaces
@@ -673,6 +677,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           state.data?.overrides ?? new Map(),
           {
             chart: open.item.cardId ? cardHistory(state, open.item.cardId) : null,
+            chartOpen: state.chartOpen,
+            onToggleChart: () => store.update({ chartOpen: !state.chartOpen }),
             onClose: () => store.update({ openItemId: null, editingCard: null }),
             onDelete: removeCard,
             onStartEdit: (edit) => store.update({ editingCard: edit }),

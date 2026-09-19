@@ -17,6 +17,9 @@
   --rule-strong: #b9b8b0;
   --accent: #2d3a8c;
   --accent-soft: #e4e6f5;
+  /* Gain and loss. The sign is always printed too, so colour is never the only signal. */
+  --up: #1a6b45;
+  --down: #9e3324;
 
   /* Type */
   --font-prose: "Spectral", Georgia, "Times New Roman", serif;
@@ -61,6 +64,8 @@
     --rule-strong: #43464d;
     --accent: #8b97e8;
     --accent-soft: #1d2040;
+    --up: #62c193;
+    --down: #ec8e80;
   }
 }
 
@@ -73,4 +78,6 @@
   --rule-strong: #43464d;
   --accent: #8b97e8;
   --accent-soft: #1d2040;
+  --up: #62c193;
+  --down: #ec8e80;
 }

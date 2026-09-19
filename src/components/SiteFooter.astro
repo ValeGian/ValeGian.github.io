@@ -8,17 +8,7 @@ const reachable = links.profiles;
 
 <footer class="colophon">
   <div class="page colophon-inner">
-    <p class="ui">
-      <span>{identity.location}.</span>{' '}
-      <span>Reach me on{' '}
-        {reachable.map((profileLink, index) => (
-          <>
-            <a href={profileLink.url} rel="me">{profileLink.platform}</a>
-            {index < reachable.length - 2 ? ', ' : index === reachable.length - 2 ? ' or ' : '.'}
-          </>
-        ))}
-      </span>
-    </p>
+    <p class="ui">{identity.location}. Reach me on {reachable.map((profileLink, index) => (<Fragment>{index === 0 ? '' : index === reachable.length - 1 ? ' or ' : ', '}<a href={profileLink.url} rel="me">{profileLink.platform}</a></Fragment>))}.</p>
     <p class="ui muted">© {year} Valerio Giannini</p>
   </div>
 </footer>

@@ -10,12 +10,14 @@
  *
  *   node scripts/build-watchlist.mjs [--collection path]
  */
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, readdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 
 const { values: options } = parseArgs({
   options: {
     collection: { type: 'string', default: '.local/collection.json' },
+    wishlists: { type: 'string', default: '.local/wishlists' },
     out: { type: 'string', default: 'public/data/watchlist.json' },
     pending: { type: 'string', default: 'public/data/pending.json' },
   },
@@ -30,6 +32,21 @@ const manual = new Set(overrides.cards.map((card) => card.cardId));
 const cards = new Map();
 const waiting = [];
 const skipped = [];
+
+/** Wanted cards need a price too: a target with nothing to compare against is useless. */
+const wishlistItems = [];
+if (existsSync(options.wishlists)) {
+  for (const name of (await readdir(options.wishlists)).filter((file) => file.endsWith('.json'))) {
+    const list = await readJson(`${options.wishlists}/${name}`);
+    wishlistItems.push(...list.items.filter((item) => item.status !== 'bought'));
+  }
+}
+
+for (const item of wishlistItems) {
+  if (!item.cardId || manual.has(item.cardId)) continue;
+  // A wishlist entry has no variant, so the snapshot resolves the priced one itself.
+  if (!cards.has(item.cardId)) cards.set(item.cardId, { cardId: item.cardId });
+}
 
 for (const item of collection.items) {
   if (item.status === 'pending') {
@@ -51,7 +68,7 @@ for (const item of collection.items) {
     continue;
   }
 
-  cards.set(`${item.cardId}|${item.variantId}`, { cardId: item.cardId, variantId: item.variantId });
+  cards.set(item.cardId, { cardId: item.cardId, variantId: item.variantId });
 }
 
 const watchlist = {
@@ -69,7 +86,7 @@ const pendingFile = {
 await writeFile(options.out, `${JSON.stringify(watchlist, null, 2)}\n`);
 await writeFile(options.pending, `${JSON.stringify(pendingFile, null, 2)}\n`);
 
-console.log(`cards to price      ${watchlist.cards.length}`);
+console.log(`cards to price      ${watchlist.cards.length} (${wishlistItems.length} wanted)`);
 console.log(`awaiting catalog    ${pendingFile.items.length}`);
 for (const reason of skipped) console.log(`  skipped: ${reason}`);
 console.log(`written to          ${options.out}, ${options.pending}`);

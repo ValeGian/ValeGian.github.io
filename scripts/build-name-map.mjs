@@ -12,7 +12,9 @@
 import { writeFile } from 'node:fs/promises';
 
 const ENDPOINT = 'https://graphql.pokeapi.co/v1beta2';
-const OUT = 'src/data/card-names.json';
+// Fetched by the browser at runtime, so it belongs in the served directory and
+// nowhere else. One copy, one source of truth.
+const OUT = 'public/data/card-names.json';
 
 const QUERY = `{
   pokemonspeciesname(where: {language: {name: {_in: ["en", "ja-hrkt"]}}}) {

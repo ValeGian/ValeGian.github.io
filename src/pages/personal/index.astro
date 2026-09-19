@@ -3,141 +3,76 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Personal" description="Private area.">
-  <div class="page gate">
-    <h1>Personal</h1>
-    <p class="intro">Enter your password to open your list.</p>
-
-    <form id="unlock-form">
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required />
-      <button type="submit">Unlock</button>
-      <p id="status" class="status ui" role="status" aria-live="polite"></p>
-    </form>
-
-    <section id="vault" hidden>
-      <p id="whoami" class="ui"></p>
-      <dl id="summary" class="summary"></dl>
-      <button id="lock" type="button">Lock</button>
-    </section>
+  <div class="page personal">
+    <header class="personal-head">
+      <h1 id="personal-heading">Personal</h1>
+      <div id="personal-actions"></div>
+    </header>
+    <div id="personal-app"></div>
   </div>
 </BaseLayout>
 
 <script>
-  import { unlock } from '../../lib/unlock.mjs';
-
-  /** The markup above is fixed, so a missing element is a bug, not a runtime condition. */
-  function need<T extends Element>(selector: string): T {
-    const element = document.querySelector<T>(selector);
-    if (!element) throw new Error(`Missing element: ${selector}`);
-    return element;
-  }
-
-  const form = need<HTMLFormElement>('#unlock-form');
-  const submit = need<HTMLButtonElement>('#unlock-form button');
-  const passwordField = need<HTMLInputElement>('#password');
-  const status = need<HTMLParagraphElement>('#status');
-  const vault = need<HTMLElement>('#vault');
-  const whoami = need<HTMLParagraphElement>('#whoami');
-  const summary = need<HTMLDListElement>('#summary');
-
-  type Item = { status?: string };
-  type List = { items?: Item[] };
-  type Session =
-    | { role: 'admin'; files: Record<string, List | undefined> }
-    | { role: 'friend'; owner: string; list: List };
-
-  function describe(session: Session): [string, string][] {
-    if (session.role === 'admin') {
-      return [
-        ['Cards owned', String(session.files.collection?.items?.length ?? 0)],
-        ...(['valerio', 'tommy', 'lotad'] as const).map(
-          (owner): [string, string] => [`${owner} wants`, String(session.files[owner]?.items?.length ?? 0)],
-        ),
-      ];
-    }
-    const items = session.list.items ?? [];
-    return [
-      ['Cards on your list', String(items.filter((item) => item.status !== 'bought').length)],
-      ['Bought for you', String(items.filter((item) => item.status === 'bought').length)],
-    ];
-  }
-
-  function show(session: Session): void {
-    form.hidden = true;
-    vault.hidden = false;
-    whoami.textContent =
-      session.role === 'admin' ? 'Unlocked everything.' : `Unlocked ${session.owner}'s list.`;
-    summary.replaceChildren(
-      ...describe(session).flatMap(([label, value]) => {
-        const term = document.createElement('dt');
-        term.textContent = label;
-        const detail = document.createElement('dd');
-        detail.className = 'numeric';
-        detail.textContent = value;
-        return [term, detail];
-      }),
-    );
-  }
-
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    status.textContent = 'Checking…';
-    submit.disabled = true;
-
-    try {
-      const session = (await unlock(passwordField.value)) as Session | null;
-      if (!session) {
-        // Deliberately silent about which file was tried or how close the guess was.
-        status.textContent = 'That password does not open anything here.';
-        return;
-      }
-      passwordField.value = '';
-      status.textContent = '';
-      show(session);
-    } catch (error) {
-      status.textContent = `Could not read the vault: ${error instanceof Error ? error.message : String(error)}`;
-    } finally {
-      submit.disabled = false;
-    }
-  });
-
-  // Nothing is cached anywhere, so a reload is a complete lock.
-  need<HTMLButtonElement>('#lock').addEventListener('click', () => location.reload());
+  import { start } from '../../personal/app';
+  start();
 </script>
 
-<style>
-  .gate {
-    padding-block: var(--space-16) 0;
-    max-width: 34rem;
+<style is:global>
+  /* Scoped by .personal rather than component styles, because the app builds its own
+     DOM and Astro's scoping only reaches markup written in the template. */
+
+  .personal {
+    padding-block: var(--space-12) 0;
   }
 
-  h1 {
-    font-size: var(--size-2xl);
-    margin-bottom: var(--space-3);
-  }
-
-  .intro {
-    color: var(--muted);
+  .personal-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
     margin-bottom: var(--space-8);
   }
 
-  form {
+  .personal h1 {
+    font-size: var(--size-2xl);
+  }
+
+  .personal .intro {
+    color: var(--muted);
+    margin-bottom: var(--space-6);
+  }
+
+  .personal .banner {
+    border-left: 2px solid var(--accent);
+    padding: var(--space-2) var(--space-4);
+    margin-bottom: var(--space-6);
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+    max-width: none;
+  }
+
+  /* Unlock */
+
+  .personal .unlock {
     display: grid;
     gap: var(--space-3);
     justify-items: start;
+    max-width: 22rem;
   }
 
-  label {
+  .personal label {
     font-family: var(--font-ui);
     font-size: var(--size-sm);
     color: var(--muted);
   }
 
-  input {
+  .personal input,
+  .personal select {
     font: inherit;
     font-family: var(--font-ui);
+    font-size: var(--size-sm);
     width: 100%;
-    max-width: 20rem;
     padding: var(--space-2) var(--space-3);
     background: var(--paper);
     color: var(--ink);
@@ -145,7 +80,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     border-radius: 2px;
   }
 
-  button {
+  .personal button[type='submit'] {
     font-family: var(--font-ui);
     font-size: var(--size-sm);
     padding: var(--space-2) var(--space-6);
@@ -156,35 +91,435 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     cursor: pointer;
   }
 
-  button:disabled {
-    opacity: 0.5;
+  .personal button:disabled {
+    opacity: 0.55;
     cursor: progress;
   }
 
-  .status {
+  .personal .status {
     font-size: var(--size-sm);
     color: var(--muted);
     min-height: 1.5em;
-    margin: 0;
+    margin: var(--space-2) 0 0;
   }
 
-  .summary {
+  /* Tabs, chips */
+
+  .personal .tabs {
+    display: flex;
+    gap: var(--space-6);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: var(--space-6);
+  }
+
+  .personal .tab {
+    font-family: var(--font-ui);
+    font-size: var(--size-md);
+    background: none;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    padding: 0 0 var(--space-2);
+    cursor: pointer;
+  }
+
+  .personal .tab.on {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .personal .chips,
+  .personal .sorts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .personal .chip {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    padding: var(--space-1) var(--space-3);
+    min-height: 2rem;
+    background: var(--paper);
+    color: var(--muted);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .personal .chip.on {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  /* Filters */
+
+  .personal .filters {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: var(--space-2) var(--space-6);
-    margin: var(--space-6) 0;
-    padding-block: var(--space-4);
-    border-block: 1px solid var(--rule);
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+
+  .personal .dates {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .personal .dates input {
+    flex: 1 1 8rem;
+    /* Without this a flex item refuses to shrink below its intrinsic width, which for a
+       date input is wider than a phone. */
+    min-width: 0;
+  }
+
+  @media (min-width: 46rem) {
+    .personal .filters {
+      grid-template-columns: 2fr 1fr auto;
+      align-items: center;
+    }
+
+    .personal .filters .chips {
+      grid-column: 1 / -1;
+      margin-bottom: 0;
+    }
+  }
+
+  /* Summary figures */
+
+  .personal .summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    gap: var(--space-4);
+    margin: 0 0 var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .personal .summary dt {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    color: var(--muted);
+  }
+
+  .personal .summary dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--size-lg);
+  }
+
+  .personal .summary-note {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    color: var(--muted);
+  }
+
+  /* Card rows */
+
+  .personal .card-list,
+  .personal .wish-rows,
+  .personal .settlements {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .personal .card-row {
+    border-top: 1px solid var(--rule);
+  }
+
+  .personal .card-row:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .personal .card-open {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-2) var(--space-4);
+    width: 100%;
+    padding: var(--space-3) 0;
+    background: none;
+    border: 0;
+    text-align: left;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .personal .thumb {
+    grid-row: span 2;
+    width: 40px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 2px;
+    background: var(--paper-sunk);
+  }
+
+  .personal .thumb-empty {
+    display: block;
+  }
+
+  .personal .card-name {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .personal .card-title {
+    font-size: var(--size-md);
+    overflow-wrap: anywhere;
+  }
+
+  .personal .card-meta {
+    font-size: var(--size-xs);
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .personal .flag,
+  .personal .owner {
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    padding: 0 var(--space-2);
+  }
+
+  .personal .card-figures {
+    grid-column: 2;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-3);
+    font-size: var(--size-sm);
+  }
+
+  .personal .paid {
+    color: var(--muted);
+  }
+
+  .personal .gain-ratio {
+    margin-left: var(--space-2);
+    color: var(--muted);
+  }
+
+  .personal .gain.up {
+    color: var(--up);
+  }
+
+  .personal .gain.down {
+    color: var(--down);
+  }
+
+  .personal .target.under {
+    color: var(--up);
+  }
+
+  .personal .target.over {
+    color: var(--muted);
+  }
+
+  @media (min-width: 46rem) {
+    .personal .card-open {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    .personal .thumb {
+      grid-row: 1;
+    }
+
+    .personal .card-figures {
+      grid-column: 3;
+      grid-row: 1;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+      min-width: 22rem;
+    }
+
+    .personal .card-figures > * {
+      text-align: right;
+      min-width: 6rem;
+    }
+  }
+
+  /* Detail */
+
+  .personal .detail {
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    background: var(--paper-sunk);
+  }
+
+  .personal .detail-close {
+    float: right;
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    background: none;
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    padding: var(--space-1) var(--space-3);
+    cursor: pointer;
+    color: inherit;
+  }
+
+  .personal .detail-body {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .personal .detail-image {
+    width: 100%;
+    max-width: 14rem;
+    border-radius: 4px;
+  }
+
+  .personal .detail-image-empty {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 5 / 7;
+    border: 1px dashed var(--rule-strong);
+    color: var(--muted);
+    font-size: var(--size-xs);
+    text-align: center;
+    padding: var(--space-4);
+  }
+
+  .personal .detail h3 {
+    font-size: var(--size-xl);
+  }
+
+  .personal .detail-ja {
+    color: var(--muted);
+    margin: var(--space-1) 0 var(--space-4);
+  }
+
+  .personal .detail-lines {
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .personal .detail-line {
+    display: grid;
+    gap: var(--space-1);
     font-family: var(--font-ui);
     font-size: var(--size-sm);
   }
 
-  .summary dt {
+  @media (min-width: 30rem) {
+    .personal .detail-line {
+      grid-template-columns: 7rem minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+  }
+
+  .personal .detail-line dt {
     color: var(--muted);
   }
 
-  .summary dd {
+  .personal .detail-line dd {
     margin: 0;
-    text-align: right;
+  }
+
+  .personal .detail-note {
+    display: block;
+    color: var(--muted);
+    font-size: var(--size-xs);
+  }
+
+  @media (min-width: 46rem) {
+    .personal .detail {
+      padding: var(--space-6);
+    }
+
+    .personal .detail-body {
+      grid-template-columns: 14rem minmax(0, 1fr);
+    }
+  }
+
+  /* Wishlists */
+
+  .personal .wish-list {
+    margin-bottom: var(--space-12);
+  }
+
+  .personal .wish-list h3 {
+    font-size: var(--size-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  .personal .wish-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .personal .wish-row:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .personal .wish-row.bought {
+    opacity: 0.6;
+  }
+
+  .personal .wish-note {
+    font-size: var(--size-xs);
+    color: var(--muted);
+  }
+
+  .personal .wish-figures {
+    grid-column: 2;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-3);
+    font-size: var(--size-sm);
+  }
+
+  .personal .target-price {
+    color: var(--muted);
+  }
+
+  .personal .target {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    padding: 0 var(--space-2);
+    border-radius: 999px;
+    border: 1px solid currentColor;
+  }
+
+  .personal .mark-bought {
+    grid-column: 2;
+    justify-self: start;
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  .personal .settlements {
+    font-size: var(--size-xs);
+    color: var(--muted);
+    margin-top: var(--space-3);
+  }
+
+  .personal .empty {
+    color: var(--muted);
+    padding-block: var(--space-6);
   }
 </style>

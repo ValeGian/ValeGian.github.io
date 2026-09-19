@@ -5,19 +5,34 @@
   "description": "Every card the daily job should snapshot. Deliberately carries no owner, no price paid and no target, so the pipeline never needs a decryption key and this file can be public.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "generatedAt", "cards"],
+  "required": [
+    "version",
+    "generatedAt",
+    "cards"
+  ],
   "properties": {
-    "version": { "const": 1 },
-    "generatedAt": { "type": "string", "format": "date-time" },
+    "version": {
+      "const": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
     "cards": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["cardId", "variantId"],
+        "required": [
+          "cardId"
+        ],
         "properties": {
-          "cardId": { "$ref": "common.schema.json#/$defs/cardId" },
-          "variantId": { "type": "string" }
+          "cardId": {
+            "$ref": "common.schema.json#/$defs/cardId"
+          },
+          "variantId": {
+            "type": "string"
+          }
         }
       }
     }

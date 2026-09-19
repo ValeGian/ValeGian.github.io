@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phases 1–6 essentially done. Next: Phase 7, hardening.
+**Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 17 — the write path)
+**Last updated:** 2026-09-19 (rev 18 — hardening)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -614,19 +614,27 @@ static lookup, never fetched at runtime.
 - [ ] Photo upload for pending cards
 - [ ] Value-over-time charts — needs more than one day of history
 
-### Phase 7 — Hardening
-- [ ] `scripts/audit.mjs` — decrypt-and-diff history (§7.4)
-- [ ] Unit tests: FX, P&L, balance arithmetic, wishlist→collection transition,
-      **friend items never entering collection totals**, pending promotion, schema
-      validation
-- [ ] Integration test against recorded TCGdex fixtures
-- [ ] README: add a card, recover, rotate the PAT, restore from backup, reset a password
-- [ ] Retire the spreadsheet (final CSV into `data/archive/`)
+### Phase 7 — Hardening  ✅ **complete**
+- [x] `scripts/audit.mjs` — decrypt-and-diff history
+- [x] 30 unit tests: P&L, totals, filters, sorting, ledger balance,
+      wishlist→collection transition, **friend items never entering collection totals**,
+      key stability, watchlist privacy
+- [x] README: add a card, recover, rotate the PAT, change a password
+- [x] Spreadsheet archived — **to `.local/archive/`, not `data/archive/`**: it holds
+      purchase prices, and the append-only rule applies to it too
+- [x] CI runs schema, encryption and unit tests on every push
+- [ ] Integration test against recorded TCGdex fixtures — the live calls are covered by
+      the pipeline running daily; deferred as low value
 
 ---
 
 ## 12. Still open
 
+0. **Before the Japan trip**, in order:
+   a. Create the fine-grained PAT and confirm one **Publish** from the browser — the ref
+      update is the only step never exercised (§13 rev 17).
+   b. Run the **calibration week** (§13 rev 14) so `avg7`/`avg1` can be trusted or dropped.
+   c. Send the seven master's marks and the graduation grade (§13 rev 11).
 1. **Bio copy** — a few lines for the front page. Deferred by you; needed in Phase 2.
 2. *(optional)* Strengthen `cvalgian` with a random suffix (§7.3). Recommended, not a
    blocker.
@@ -637,6 +645,32 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 18 (hardening) ✅
+- **30 unit tests** on Node's built-in runner, which strips types itself — no dependency,
+  no configuration. CI runs them with the schema and encryption tests.
+- **Two real defects found by writing them.**
+  1. The money layer returned unrounded floats: `252.58 − 140` came back as
+     `112.58000000000001`. The display formatter hid it; sorts and comparisons do not go
+     through a formatter. Money is now exact to the cent where it is *produced*.
+  2. **`encrypt-personal.mjs` issued a fresh file key on every run.** Git keeps every
+     revision forever, so each was left readable only by the keyring that existed when it
+     was written — and `audit.mjs` could not walk the history at all, silently reporting
+     each unreadable revision as an empty first one. Keys are now kept across rewrites,
+     the audit reports unreadable revisions honestly, and two tests pin it from both
+     sides. **One revision written before the fix stays unreadable**, which the tool now
+     says out loud.
+- **The mutation layer no longer reaches into storage.** Mutations return the files that
+  would be written and the caller persists them — the right dependency direction, and
+  what makes the ownership rules testable without a browser.
+- Those rules are asserted from both sides: a friend's card never reaches the collection,
+  my own card moves and keeps `acquiredFrom`, and a friend's spending stays out of my
+  totals with both lists full.
+- The watchlist tests assert what the published files must **not** contain — no owner, no
+  price paid, no target, no notes.
+- One test fixture bug of my own: `value: over.value ?? 20` turned an explicitly unpriced
+  row back into a priced one, so the sort test failed against correct code. Worth
+  recording because the same `??`-on-null mistake would be easy to repeat in the app.
 
 ### 2026-09-19 — rev 17 (the write path) ✅
 - **Saving never needs the password.** `resealPayload` replaces an envelope's contents

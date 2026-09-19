@@ -26,10 +26,12 @@ export interface WishlistViewState {
   prices: PriceSnapshot | null;
   names: NameTable;
   combined: boolean;
+  view: 'list' | 'grid';
   canEdit: boolean;
   /** The row currently open for editing, if any. */
   editing: WishlistEdit | null;
   onToggleCombined(): void;
+  onView?(view: 'list' | 'grid'): void;
   onMarkBought?(owner: string, itemId: string): void;
   onStartEdit?(edit: WishlistEdit): void;
   onEditField?(change: Partial<WishlistEdit>): void;
@@ -325,6 +327,60 @@ function wishRow(
   );
 }
 
+/**
+ * A wanted card as a picture.
+ *
+ * Grid is the faster read when walking a shop: the art is what matches the card in the
+ * rack. The target and the market price stay on the tile, because the decision is
+ * whether this one is worth buying, not merely whether it is the right card.
+ */
+function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, showOwner: boolean): HTMLElement {
+  const market = quote(priceFor(item, state.prices))?.value ?? null;
+  const bought = item.status === 'bought';
+  const under = market !== null && item.targetPriceEur !== null && market <= item.targetPriceEur;
+
+  return el(
+    'li',
+    { class: bought ? 'tile bought' : 'tile' },
+    el(
+      'button',
+      {
+        type: 'button',
+        class: 'tile-open',
+        disabled: !item.cardId || !state.onOpenCard,
+        onClick: () => item.cardId && state.onOpenCard?.(item.cardId),
+      },
+      cardThumb(item, { width: 160, height: 224 }, 'lazy'),
+      el('span', { class: 'tile-name', text: displayName(item, state.names) }),
+      el(
+        'span',
+        { class: 'tile-figures ui' },
+        el('span', {
+          class: 'target-price numeric',
+          text: item.targetPriceEur === null ? 'any price' : money(item.targetPriceEur),
+        }),
+        el('span', { class: 'numeric', text: market === null ? '—' : money(market) }),
+      ),
+      el(
+        'span',
+        { class: 'tile-figures ui' },
+        showOwner ? el('span', { class: 'owner', text: state.lists[owner]?.owner ?? owner }) : null,
+        bought
+          ? el('span', { class: 'bought-badge ui', text: 'bought' })
+          : market === null
+            ? null
+            : el('span', { class: under ? 'target under' : 'target over', text: under ? 'under target' : 'over target' }),
+      ),
+    ),
+  );
+}
+
+function rows(items: WishlistItem[], owner: string, state: WishlistViewState, showOwner: boolean): HTMLElement {
+  return state.view === 'grid'
+    ? el('ul', { class: 'card-grid' }, ...items.map((item) => gridTile(item, owner, state, showOwner)))
+    : el('ul', { class: 'wish-rows' }, ...items.map((item) => wishRow(item, owner, state, showOwner)));
+}
+
 function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTMLElement {
   const wanted = list.items.filter((item) => item.status !== 'bought');
   const purchased = list.items.filter((item) => item.status === 'bought');
@@ -346,7 +402,7 @@ function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTM
       : null,
     list.items.length === 0
       ? el('p', { class: 'empty', text: 'Nothing on this list yet.' })
-      : el('ul', { class: 'wish-rows' }, ...[...wanted, ...purchased].map((item) => wishRow(item, owner, state, false))),
+      : rows([...wanted, ...purchased], owner, state, false),
     list.settlements.length === 0
       ? null
       : el(
@@ -375,11 +431,9 @@ function combinedView(state: WishlistViewState): HTMLElement {
     return el('p', { class: 'empty', text: 'Nothing on anyone’s list yet.' });
   }
 
-  return el(
-    'ul',
-    { class: 'wish-rows' },
-    ...wanted.map(({ owner, item }) => wishRow(item, owner, state, true)),
-  );
+  return state.view === 'grid'
+    ? el('ul', { class: 'card-grid' }, ...wanted.map(({ owner, item }) => gridTile(item, owner, state, true)))
+    : el('ul', { class: 'wish-rows' }, ...wanted.map(({ owner, item }) => wishRow(item, owner, state, true)));
 }
 
 export function renderWishlists(state: WishlistViewState): DocumentFragment {
@@ -391,24 +445,44 @@ export function renderWishlists(state: WishlistViewState): DocumentFragment {
 
   return frag(
     detail,
-    showToggle
-      ? el(
-          'div',
-          { class: 'chips' },
-          el('button', {
-            type: 'button',
-            class: state.combined ? 'chip on' : 'chip',
-            text: 'One shopping list',
-            onClick: state.onToggleCombined,
-          }),
-          el('button', {
-            type: 'button',
-            class: state.combined ? 'chip' : 'chip on',
-            text: 'By person',
-            onClick: state.onToggleCombined,
-          }),
-        )
-      : null,
+    el(
+      'div',
+      { class: 'chips' },
+      ...(showToggle
+        ? [
+            el('button', {
+              type: 'button',
+              class: state.combined ? 'chip on' : 'chip',
+              text: 'One shopping list',
+              onClick: state.onToggleCombined,
+            }),
+            el('button', {
+              type: 'button',
+              class: state.combined ? 'chip' : 'chip on',
+              text: 'By person',
+              onClick: state.onToggleCombined,
+            }),
+          ]
+        : []),
+      state.onView
+        ? el(
+            'span',
+            { class: 'view-toggle' },
+            ...([
+              ['list', 'List'],
+              ['grid', 'Grid'],
+            ] as const).map(([view, label]) =>
+              el('button', {
+                type: 'button',
+                'aria-pressed': String(state.view === view),
+                class: state.view === view ? 'chip on' : 'chip',
+                text: label,
+                onClick: () => state.onView?.(view),
+              }),
+            ),
+          )
+        : null,
+    ),
     state.combined && showToggle
       ? combinedView(state)
       : frag(...owners.map((owner) => listBlock(owner, state.lists[owner], state))),

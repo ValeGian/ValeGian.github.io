@@ -66,6 +66,9 @@ export function displayName(item: CollectionItem | WishlistItem, names: NameTabl
 export const subtitle = (item: CollectionItem | WishlistItem): string => {
   if (item.setId && item.number) return `${item.setId} ${item.number}`;
   if ('hint' in item && item.hint) return `${item.hint.setCode} ${item.hint.number}`;
+  // A card whose catalog entry is a hand-written override carries no set fields of its
+  // own; its id still says which printing it is.
+  if (item.cardId) return item.cardId.replace('-', ' ');
   return '';
 };
 
@@ -89,20 +92,31 @@ function derivedBase(item: { cardId?: string; setId?: string; number?: string })
   return `https://assets.tcgdex.net/ja/${series}/${setId}/${number}`;
 }
 
-type Illustrated = { imageBase?: string; cardId?: string; setId?: string; number?: string };
-
-const base = (item: Illustrated): string | null => item.imageBase || derivedBase(item);
-
-/** TCGdex serves several sizes from one base; `low` is right for a list thumbnail. */
-export const thumbnail = (item: Illustrated): string | null => {
-  const found = base(item);
-  return found ? `${found}/low.webp` : null;
+type Illustrated = {
+  imageBase?: string;
+  photoUrl?: string;
+  cardId?: string;
+  setId?: string;
+  number?: string;
 };
 
-export const fullImage = (item: Illustrated): string | null => {
-  const found = base(item);
-  return found ? `${found}/high.webp` : null;
-};
+/**
+ * Which picture to show, in order of how much it can be trusted.
+ *
+ * The catalog's own path first. Then a photograph, which only exists because someone
+ * looked and found nothing — TCGdex has never digitised the 1996 Japanese base set and
+ * carries no Pokémon Card Game Classic at all, so for those cards a photo is the only
+ * picture there will ever be. A guessed path comes last, because it is a guess.
+ */
+export function picture(item: Illustrated, size: 'low' | 'high'): string | null {
+  if (item.imageBase) return `${item.imageBase}/${size}.webp`;
+  if (item.photoUrl) return item.photoUrl;
+  const derived = derivedBase(item);
+  return derived ? `${derived}/${size}.webp` : null;
+}
+
+export const thumbnail = (item: Illustrated): string | null => picture(item, 'low');
+export const fullImage = (item: Illustrated): string | null => picture(item, 'high');
 
 /** How old the price data is, in whole days, or null when there is none. */
 export function stalenessDays(snapshot: PriceSnapshot | null): number | null {

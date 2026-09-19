@@ -9,6 +9,7 @@ import { el, frag } from '../lib/dom.ts';
 import { money, signedMoney, percent, type Valued } from '../lib/money.ts';
 import { displayName, fullImage, type CatalogOverride, type NameTable } from '../lib/data.ts';
 import type { Condition, Currency } from '../lib/types.ts';
+import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 
 export interface CardEdit {
   itemId: string;
@@ -18,6 +19,8 @@ export interface CardEdit {
   currency: Currency;
   date: string;
   notes: string;
+  /** A picture supplied by hand, for a card the catalog has no artwork for. */
+  photo: PreparedPhoto | null;
 }
 
 const CONDITIONS: Condition[] = ['M', 'NM', 'EX', 'GD', 'LP', 'PL', 'PO'];
@@ -38,6 +41,61 @@ const dateLabel = (iso: string | null | undefined): string =>
 
 function line(label: string, ...content: (Node | string | null)[]): HTMLElement {
   return el('div', { class: 'detail-line' }, el('dt', { text: label }), el('dd', {}, ...content));
+}
+
+/**
+ * Somewhere to put a picture the catalog does not have.
+ *
+ * TCGdex has never digitised the 1996 Japanese base set and carries no Pokémon Card Game
+ * Classic at all, so for those cards a photograph is not a stopgap — it is the only
+ * picture there is ever going to be.
+ */
+function photoField(
+  entry: Valued,
+  edit: CardEdit,
+  onField: (change: Partial<CardEdit>) => void,
+): HTMLElement {
+  const hasCatalogArt = Boolean(entry.item.imageBase);
+
+  return el(
+    'div',
+    { class: 'photo-field' },
+    el(
+      'label',
+      { class: 'field', for: 'edit-photo' },
+      el('span', {
+        text: hasCatalogArt ? 'Replace the picture (optional)' : 'Picture of the card (optional)',
+      }),
+      el('input', {
+        id: 'edit-photo',
+        type: 'file',
+        accept: 'image/*',
+        capture: 'environment',
+        onChange: async (event: Event) => {
+          const file = (event.target as HTMLInputElement).files?.[0];
+          if (!file) return;
+          try {
+            onField({ photo: await preparePhoto(file) });
+          } catch (error) {
+            // Surfaced through the form rather than swallowed: an oversized photo would
+            // otherwise look accepted and silently never appear.
+            alert(error instanceof Error ? error.message : String(error));
+          }
+        },
+      }),
+    ),
+    edit.photo
+      ? el(
+          'div',
+          { class: 'photo-preview' },
+          el('img', { src: edit.photo.dataUrl, alt: 'The picture you chose', width: 60 }),
+          el('span', {
+            class: 'ui muted',
+            text: `${edit.photo.width}×${edit.photo.height}, ${Math.round(edit.photo.bytes / 1024)} KB — saved when you press Save`,
+          }),
+        )
+      : null,
+  );
 }
 
 /** The card's own fields, editable in place. Catalog facts are not: they come from TCGdex. */
@@ -96,6 +154,7 @@ function editForm(
       ),
     ),
     labelled('edit-card-notes', 'Notes', text('edit-card-notes', edit.notes, 'notes', { type: 'text' })),
+    photoField(entry, edit, onField),
     // States the rule rather than the current state: these fields update without
     // rebuilding the view, so anything derived from them would show the previous answer.
     el('p', {
@@ -132,8 +191,7 @@ export function renderDetail(
 ): HTMLElement {
   const { onClose, onDelete, onStartEdit, onEditField, onSaveEdit, onCancelEdit, chart } = handlers;
   const { item, price } = entry;
-  // A photograph taken in a shop stands in until the catalog publishes artwork.
-  const image = fullImage(item) ?? item.photoUrl ?? null;
+  const image = fullImage(item);
   const override = item.cardId ? overrides.get(item.cardId) : undefined;
   const paidNative =
     item.purchase.currency === 'EUR'
@@ -160,6 +218,7 @@ export function renderDetail(
                 currency: item.purchase.currency,
                 date: item.purchase.date,
                 notes: item.notes ?? '',
+                photo: null,
               }),
           })
         : null,

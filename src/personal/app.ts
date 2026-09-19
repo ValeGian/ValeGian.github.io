@@ -456,14 +456,24 @@ async function saveCardEdit(): Promise<void> {
     };
   }
 
-  await savePending(
-    await updateCard(vault, editingCard.itemId, {
-      condition: editingCard.condition,
-      quantity,
-      notes: editingCard.notes,
-      purchase,
-    }),
-  );
+  const writes = await updateCard(vault, editingCard.itemId, {
+    condition: editingCard.condition,
+    quantity,
+    notes: editingCard.notes,
+    purchase,
+    ...(editingCard.photo ? { photoUrl: `/data/photos/${editingCard.itemId}.jpg` } : {}),
+  });
+
+  if (editingCard.photo) {
+    writes.push({
+      path: `public/data/photos/${editingCard.itemId}.jpg`,
+      content: editingCard.photo.base64,
+      encoding: 'base64',
+      savedAt: new Date().toISOString(),
+    });
+  }
+
+  await savePending(writes);
   await refreshPendingCount();
   store.update({ editingCard: null });
   schedulePublish();
@@ -576,6 +586,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           prices: state.data?.prices ?? null,
           names,
           combined: state.combined,
+          view: state.view,
+          onView: (view) => store.update({ view }),
           canEdit: true,
           editing: state.editingWish,
           openCardId: state.openWishCardId,
@@ -685,6 +697,8 @@ function friendView(state: AppState, friend: Friend): DocumentFragment {
     prices: state.data?.prices ?? null,
     names: state.data?.names ?? emptyNames,
     combined: false,
+    view: state.view,
+    onView: (view) => store.update({ view }),
     canEdit: false,
     editing: null,
     openCardId: state.openWishCardId,

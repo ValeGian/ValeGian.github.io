@@ -113,6 +113,8 @@ function editForm(
 }
 
 export interface DetailHandlers {
+  /** Rendered under the card's figures; the caller owns the range and the data. */
+  chart?: HTMLElement | null;
   onClose: () => void;
   onDelete?: (itemId: string) => void;
   onStartEdit?: (edit: CardEdit) => void;
@@ -128,7 +130,7 @@ export function renderDetail(
   handlers: DetailHandlers,
   editing: CardEdit | null = null,
 ): HTMLElement {
-  const { onClose, onDelete, onStartEdit, onEditField, onSaveEdit, onCancelEdit } = handlers;
+  const { onClose, onDelete, onStartEdit, onEditField, onSaveEdit, onCancelEdit, chart } = handlers;
   const { item, price } = entry;
   // A photograph taken in a shop stands in until the catalog publishes artwork.
   const image = fullImage(item) ?? item.photoUrl ?? null;
@@ -221,7 +223,7 @@ export function renderDetail(
             ? line('Cardmarket', el('a', { href: override.cardmarketUrl, target: '_blank', rel: 'noreferrer', text: 'Open product page' }))
             : null,
         ),
-        frag(),
+        chart ?? frag(),
       ),
     ),
   );

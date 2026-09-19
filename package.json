@@ -26,7 +26,8 @@
     "test": "node --test \"tests/*.test.ts\"",
     "audit": "node scripts/audit.mjs",
     "data:calibrate": "node scripts/calibrate.mjs",
-    "data:decrypt": "node scripts/decrypt-personal.mjs"
+    "data:decrypt": "node scripts/decrypt-personal.mjs",
+    "data:history": "node scripts/build-history.mjs"
   },
   "dependencies": {
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",

@@ -10,6 +10,8 @@ import { createStore } from './lib/store.ts';
 import { emptyFilters, type Filters, type SortKey } from './lib/filters.ts';
 import { value, type Valued } from './lib/money.ts';
 import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
+import { RANGES, cardSeries, daysNeeded, ensureDays, holdingsSeries, loadHistory, type HistorySource, type Range } from './lib/history.ts';
+import { renderChart, renderRangeTabs } from './views/chart.ts';
 import { renderCollection } from './views/collection.ts';
 import { renderDetail, type CardEdit } from './views/detail.ts';
 import { renderWishlists, type WishlistEdit } from './views/wishlists.ts';
@@ -50,6 +52,9 @@ interface AppState {
   editingWish: WishlistEdit | null;
   editingCard: CardEdit | null;
   openWishCardId: string | null;
+  history: HistorySource | null;
+  range: Range;
+  view: 'list' | 'grid';
   /** Bumped to force a rebuild when the change was to the vault, not to this object. */
   tick: number;
 }
@@ -101,6 +106,9 @@ const store = createStore<AppState>({
   editingWish: null,
   editingCard: null,
   openWishCardId: null,
+  history: null,
+  range: RANGES[0],
+  view: 'list',
   tick: 0,
 });
 
@@ -179,6 +187,70 @@ async function catchUpOnResolutions(vault: Vault): Promise<void> {
   }
 }
 
+/**
+ * Loads whatever the chosen range needs and redraws.
+ *
+ * A daily range fetches the days it covers; anything coarser is already in the rollup
+ * file. Days are immutable once written, so each is fetched at most once per session.
+ */
+async function loadRange(range: Range): Promise<void> {
+  const current = store.get();
+  const history = current.history ?? (await loadHistory());
+  store.update({ history, range });
+  await ensureDays(history, daysNeeded(history, range));
+  rerender();
+}
+
+/** What is owned, flattened for the history sum. Kept out of anything published. */
+function holdings(vault: Vault) {
+  return vault.collection.items
+    .filter((item) => item.cardId)
+    .map((item) => ({
+      cardId: item.cardId as string,
+      quantity: item.quantity,
+      boughtOn: item.purchase.date,
+      dateIsBootstrap: item.purchase.dateIsBootstrap,
+    }));
+}
+
+function valueOverTime(state: AppState, vault: Vault): HTMLElement {
+  const points = state.history ? holdingsSeries(state.history, holdings(vault), state.range) : [];
+
+  return el(
+    'section',
+    { class: 'chart-card' },
+    el(
+      'div',
+      { class: 'chart-head' },
+      el('h2', { text: 'What the collection has been worth' }),
+      renderRangeTabs(state.range, RANGES, (range) => void loadRange(range)),
+    ),
+    renderChart({ points, range: state.range, label: 'Collection value over time' }),
+    vault.collection.items.some((item) => item.purchase.dateIsBootstrap)
+      ? el('p', {
+          class: 'chart-note ui',
+          text: 'Cards imported without a purchase date count for the whole period, because the date on record is a placeholder rather than the day they were bought.',
+        })
+      : null,
+  );
+}
+
+function cardHistory(state: AppState, cardId: string): HTMLElement {
+  const points = state.history ? cardSeries(state.history, cardId, state.range) : [];
+
+  return el(
+    'section',
+    { class: 'chart-card chart-inline' },
+    el(
+      'div',
+      { class: 'chart-head' },
+      el('h4', { text: 'What this card has been worth' }),
+      renderRangeTabs(state.range, RANGES, (range) => void loadRange(range)),
+    ),
+    renderChart({ points, range: state.range, label: 'Card value over time' }),
+  );
+}
+
 function valuedRows(state: AppState): Valued[] {
   if (!state.vault) return [];
   return state.vault.collection.items.map((item) => value(item, state.data?.prices ?? null));
@@ -234,6 +306,7 @@ function lockScreen(state: AppState): DocumentFragment {
           store.update({ phase: 'open', message: '', data, vault, hasToken: Boolean(getToken()) });
           await catchUpOnResolutions(vault);
           await refreshPendingCount();
+          void loadRange(RANGES[0]);
         } catch (error) {
           store.update({
             phase: 'locked',
@@ -488,6 +561,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           filters: state.filters,
           sortKey: state.sortKey,
           sortDescending: state.sortDescending,
+          view: state.view,
+          onView: (view) => store.update({ view }),
           onFilters: (change) => store.update((current) => ({ filters: { ...current.filters, ...change } })),
           onSort: (key) =>
             store.update((current) => ({
@@ -505,6 +580,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           editing: state.editingWish,
           openCardId: state.openWishCardId,
           onOpenCard: (cardId) => store.update({ openWishCardId: cardId }),
+          chartFor: (cardId) => cardHistory(state, cardId),
           onToggleCombined: () => store.update((current) => ({ combined: !current.combined })),
           onStartEdit: (edit) => store.update({ editingWish: edit }),
           // Silent, for the same reason the add form's fields are: rebuilding replaces
@@ -562,6 +638,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
 
   return frag(
     tabs,
+    state.tab === 'collection' && !state.adding ? valueOverTime(state, vault) : null,
     state.adding
       ? renderAddCard({
           ...state.add,
@@ -583,6 +660,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           names,
           state.data?.overrides ?? new Map(),
           {
+            chart: open.item.cardId ? cardHistory(state, open.item.cardId) : null,
             onClose: () => store.update({ openItemId: null, editingCard: null }),
             onDelete: removeCard,
             onStartEdit: (edit) => store.update({ editingCard: edit }),

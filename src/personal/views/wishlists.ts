@@ -39,6 +39,8 @@ export interface WishlistViewState {
   /** The card whose detail panel is open, by card id. */
   openCardId?: string | null;
   onOpenCard?(cardId: string | null): void;
+  /** Built by the caller for whichever card is open. */
+  chartFor?(cardId: string): HTMLElement | null;
 }
 
 const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | undefined =>
@@ -131,6 +133,7 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
         ),
         el('p', { class: 'wanters-heading ui', text: wanters.length === 1 ? 'Wanted by' : `Wanted by ${wanters.length} people` }),
         el('div', { class: 'wanters' }, ...wanters.map(({ owner, list, item }) => row(owner, list, item))),
+        state.chartFor?.(cardId) ?? null,
       ),
     ),
   );

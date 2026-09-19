@@ -7,14 +7,18 @@ import { apply, sort, type Filters, type SortKey } from '../lib/filters.ts';
 import { displayName, subtitle, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
 
+export type CollectionView = 'list' | 'grid';
+
 export interface CollectionViewState {
   rows: Valued[];
   names: NameTable;
   filters: Filters;
   sortKey: SortKey;
   sortDescending: boolean;
+  view: CollectionView;
   onFilters(change: Partial<Filters>): void;
   onSort(key: SortKey): void;
+  onView(view: CollectionView): void;
   onOpen(itemId: string): void;
 }
 
@@ -180,6 +184,48 @@ function sortBar(state: CollectionViewState): HTMLElement {
         onClick: () => state.onSort(option.key),
       }),
     ),
+    el(
+      'span',
+      { class: 'view-toggle' },
+      ...([
+        ['list', 'List'],
+        ['grid', 'Grid'],
+      ] as const).map(([view, label]) =>
+        el('button', {
+          type: 'button',
+          'aria-pressed': String(state.view === view),
+          class: state.view === view ? 'chip on' : 'chip',
+          text: label,
+          onClick: () => state.onView(view),
+        }),
+      ),
+    ),
+  );
+}
+
+/**
+ * The same rows as pictures.
+ *
+ * Cards are recognised by their art long before their name, so on a wide screen the
+ * grid is the faster way to find one. The figures stay: a picture that hides what a
+ * card cost is decoration.
+ */
+function gridTile(entry: Valued, names: NameTable, onOpen: (id: string) => void): HTMLElement {
+  return el(
+    'li',
+    { class: 'tile' },
+    el(
+      'button',
+      { type: 'button', class: 'tile-open', onClick: () => onOpen(entry.item.id) },
+      cardThumb(entry.item, { width: 160, height: 224 }, 'lazy'),
+      el('span', { class: 'tile-name', text: displayName(entry.item, names) }),
+      el(
+        'span',
+        { class: 'tile-figures ui' },
+        el('span', { class: 'numeric', text: money0(entry.value) }),
+        gainCell(entry),
+      ),
+    ),
   );
 }
 
@@ -224,6 +270,8 @@ export function renderCollection(state: CollectionViewState): DocumentFragment {
     sortBar(state),
     visible.length === 0
       ? el('p', { class: 'empty', text: 'No cards match these filters.' })
-      : el('ul', { class: 'card-list' }, ...visible.map((entry) => cardRow(entry, state.names, state.onOpen))),
+      : state.view === 'grid'
+        ? el('ul', { class: 'card-grid' }, ...visible.map((entry) => gridTile(entry, state.names, state.onOpen)))
+        : el('ul', { class: 'card-list' }, ...visible.map((entry) => cardRow(entry, state.names, state.onOpen))),
   );
 }

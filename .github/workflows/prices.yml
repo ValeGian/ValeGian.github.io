@@ -34,6 +34,9 @@ jobs:
 
       # Answers the avg7/avg1 question from the snapshots themselves rather than from a
       # site that refuses automated clients. Quiet until there is enough history.
+      - name: Roll the snapshots up for charting
+        run: npm run data:history
+
       - name: Check the price fields against each other
         run: npm run data:calibrate
 

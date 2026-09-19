@@ -107,8 +107,33 @@ export async function deleteCard(vault: Vault, id: string): Promise<Write[]> {
 }
 
 export async function addWish(vault: Vault, owner: string, item: WishlistItem): Promise<Write[]> {
-  vault.wishlists[owner].items.push(item);
-  return buildWrites(vault, [owner]);
+  return addWishToMany(vault, [owner], item);
+}
+
+/**
+ * Puts the same card on several lists at once.
+ *
+ * Two people wanting the same card is normal, and walking a shop with it listed twice is
+ * the point — each of them has their own target price and their own answer about whether
+ * it was worth buying. Each list gets its own item with its own id; nothing is shared
+ * between them.
+ */
+export async function addWishToMany(
+  vault: Vault,
+  owners: string[],
+  item: Omit<WishlistItem, 'id'>,
+): Promise<Write[]> {
+  const touched: string[] = [];
+
+  for (const owner of owners) {
+    const list = vault.wishlists[owner];
+    if (!list) throw new Error(`No wishlist for ${owner}`);
+    list.items.push({ ...item, id: newWishId(list) });
+    touched.push(owner);
+  }
+
+  if (touched.length === 0) throw new Error('Choose at least one list');
+  return buildWrites(vault, touched);
 }
 
 export async function deleteWish(vault: Vault, owner: string, id: string): Promise<Write[]> {

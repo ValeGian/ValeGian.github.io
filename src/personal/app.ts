@@ -13,14 +13,14 @@ import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
 import { renderCollection } from './views/collection.ts';
 import { renderDetail } from './views/detail.ts';
 import { renderWishlists } from './views/wishlists.ts';
-import { blankFields, renderAddCard, searchCards, type AddCardState } from './views/add-card.ts';
+import { blankFields, renderAddCard, searchCards, type AddCardState, type AddMode } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
-import { addCard, deleteCard, markBought, newCardId, type Envelope, type Vault } from './lib/vault.ts';
+import { addCard, addWishToMany, deleteCard, markBought, newCardId, type Envelope, type Vault } from './lib/vault.ts';
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
 import { unlock } from '../lib/unlock.mjs';
 import { decryptWithKey } from '../lib/crypto.mjs';
-import type { Collection, CollectionItem, Wishlist } from './lib/types.ts';
+import type { Collection, CollectionItem, Wishlist, WishlistItem } from './lib/types.ts';
 
 type Friend = { role: 'friend'; owner: string; wishlist: Wishlist };
 
@@ -37,7 +37,7 @@ interface AppState {
   combined: boolean;
   openItemId: string | null;
   adding: boolean;
-  add: Omit<AddCardState, 'names' | 'onChange' | 'onSearch' | 'onSave' | 'onCancel' | 'nextId'>;
+  add: Omit<AddCardState, 'names' | 'lists' | 'onChange' | 'onSearch' | 'onSave' | 'onSaveWish' | 'onCancel' | 'nextId'>;
   pendingCount: number;
   hasToken: boolean;
   publishBusy: boolean;
@@ -51,8 +51,9 @@ interface AppState {
 /** Older than this and the figures are stale enough that showing them silently is wrong. */
 const STALE_AFTER_DAYS = 2;
 
-const blankAdd = (): AppState['add'] => ({
+const blankAdd = (mode: AddMode = 'collection'): AppState['add'] => ({
   ...blankFields(),
+  mode,
   results: [],
   searching: false,
   picked: null,
@@ -299,6 +300,15 @@ async function saveCard(item: CollectionItem): Promise<void> {
   schedulePublish();
 }
 
+async function saveWish(owners: string[], item: Omit<WishlistItem, 'id'>): Promise<void> {
+  const { vault } = store.get();
+  if (!vault) return;
+  await savePending(await addWishToMany(vault, owners, item));
+  await refreshPendingCount();
+  store.update({ adding: false, add: blankAdd('wishlist') });
+  schedulePublish();
+}
+
 async function removeCard(itemId: string): Promise<void> {
   const { vault } = store.get();
   if (!vault) return;
@@ -367,14 +377,19 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
         'aria-selected': String(state.tab === tab),
         class: state.tab === tab ? 'tab on' : 'tab',
         text: tab === 'collection' ? 'Collection' : 'Wishlists',
-        onClick: () => store.update({ tab, openItemId: null, adding: false }),
+        onClick: () => store.update({ tab, openItemId: null, adding: false, add: blankAdd(tab === 'collection' ? 'collection' : 'wishlist') }),
       }),
     ),
     el('button', {
       type: 'button',
       class: 'chip add-button',
-      text: state.adding ? 'Close' : 'Add a card',
-      onClick: () => store.update({ adding: !state.adding, openItemId: null, add: blankAdd() }),
+      text: state.adding ? 'Close' : state.tab === 'collection' ? 'Add a card' : 'Add a wanted card',
+      onClick: () =>
+        store.update({
+          adding: !state.adding,
+          openItemId: null,
+          add: blankAdd(state.tab === 'collection' ? 'collection' : 'wishlist'),
+        }),
     }),
   );
 
@@ -431,11 +446,13 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
       ? renderAddCard({
           ...state.add,
           names,
+          lists: Object.entries(vault.wishlists).map(([id, list]) => ({ id, label: list.owner })),
           nextId: () => newCardId(vault),
           onChange: (change) => store.update((current) => ({ add: { ...current.add, ...change } })),
           onSearch: runCatalogSearch,
           onSave: saveCard,
-          onCancel: () => store.update({ adding: false, add: blankAdd() }),
+          onSaveWish: saveWish,
+          onCancel: () => store.update({ adding: false, add: blankAdd(state.add.mode) }),
         })
       : null,
     open ? renderDetail(open, names, state.data?.overrides ?? new Map(), () => store.update({ openItemId: null }), removeCard) : null,

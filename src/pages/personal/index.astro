@@ -659,6 +659,55 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     gap: var(--space-1);
   }
 
+  .personal .owners {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .personal .owners legend {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    color: var(--muted);
+    padding: 0;
+    margin-bottom: var(--space-2);
+  }
+
+  .personal .owner-choice {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .personal .owner-choice.on {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--ink);
+  }
+
+  .personal .owner-choice input {
+    width: auto;
+    min-height: 1rem;
+  }
+
+  .personal .search-status {
+    font-size: var(--size-sm);
+    color: var(--muted);
+    margin: 0;
+  }
+
   .personal .check {
     display: flex;
     align-items: center;

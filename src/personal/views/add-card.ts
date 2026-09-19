@@ -1,9 +1,14 @@
 /**
- * Adding a card.
+ * Adding a card, to the collection or to a wishlist.
  *
  * One search box, the way Cardmarket's works: type and results appear. It accepts an
  * English name, a Japanese name, or a card id pasted straight in, because in a shop the
  * thing in front of you is usually the code printed on the card.
+ *
+ * The two destinations ask for different things and the form says so. A card you own has
+ * a price you paid, in the currency you paid it, on a date. A card you are still looking
+ * for has only a price you would be willing to pay — asking what it cost would be asking
+ * about something that has not happened.
  *
  * Every field is driven from state rather than read off the DOM at submit time. The view
  * is rebuilt whenever anything changes, and an uncontrolled field would be wiped each
@@ -15,7 +20,9 @@ import { searchCards, cardDetail, pricedVariantId, looksLikeCardId, type CardHit
 import { toEnglish } from '../../lib/card-name.mjs';
 import { cardThumb } from './thumb.ts';
 import type { NameTable } from '../lib/data.ts';
-import type { CollectionItem, Currency } from '../lib/types.ts';
+import type { CollectionItem, Currency, WishlistItem } from '../lib/types.ts';
+
+export type AddMode = 'collection' | 'wishlist';
 
 export interface AddCardFields {
   query: string;
@@ -27,10 +34,17 @@ export interface AddCardFields {
   manualSet: string;
   manualNumber: string;
   manualName: string;
+  /** Wishlist only: what I would pay, in euro, decided by the person who wants it. */
+  target: string;
+  priority: WishlistItem['priority'];
+  owners: string[];
 }
 
 export interface AddCardState extends AddCardFields {
+  mode: AddMode;
   names: NameTable;
+  /** Lists that can be added to, in display order. Admin sees all of them. */
+  lists: { id: string; label: string }[];
   results: CardHit[];
   searching: boolean;
   picked: CardHit | null;
@@ -40,6 +54,7 @@ export interface AddCardState extends AddCardFields {
   onChange(change: Partial<AddCardState>): void;
   onSearch(query: string): void;
   onSave(item: CollectionItem): Promise<void>;
+  onSaveWish(owners: string[], item: Omit<WishlistItem, 'id'>): Promise<void>;
   onCancel(): void;
   nextId(): string;
 }
@@ -56,7 +71,62 @@ export const blankFields = (): AddCardFields => ({
   manualSet: '',
   manualNumber: '',
   manualName: '',
+  target: '',
+  priority: 'normal',
+  owners: [],
 });
+
+/**
+ * A wanted card carries no purchase: it has not been bought. Only a target, whose
+ * absence is meaningful too — "I want this at any price" is a real answer.
+ */
+async function submitWish(state: AddCardState): Promise<void> {
+  if (state.owners.length === 0) {
+    state.onChange({ error: 'Choose whose list this goes on.' });
+    return;
+  }
+
+  const target = state.target.trim() === '' ? null : Number(state.target);
+  if (target !== null && (!Number.isFinite(target) || target <= 0)) {
+    state.onChange({ error: 'A target price has to be a number, or left empty.' });
+    return;
+  }
+
+  state.onChange({ saving: true, error: '' });
+
+  try {
+    const shared = {
+      status: 'wanted' as const,
+      targetPriceEur: target,
+      priority: state.priority,
+      notes: state.notes,
+      addedAt: today(),
+    };
+
+    if (state.manual || !state.picked) {
+      await state.onSaveWish(state.owners, {
+        ...shared,
+        setId: state.manualSet.trim(),
+        number: state.manualNumber.trim(),
+        nameJa: state.manualName.trim(),
+      });
+      return;
+    }
+
+    const detail = await cardDetail(state.picked.id);
+    await state.onSaveWish(state.owners, {
+      ...shared,
+      cardId: detail.id,
+      setId: detail.set.id,
+      number: detail.localId,
+      nameJa: detail.name,
+      nameEn: toEnglish(detail.name, state.names),
+      imageBase: detail.image ?? '',
+    });
+  } catch (error) {
+    state.onChange({ saving: false, error: error instanceof Error ? error.message : String(error) });
+  }
+}
 
 function field(id: string, label: string, input: HTMLElement): HTMLElement {
   return el('label', { class: 'field', for: id }, el('span', { text: label }), input);
@@ -84,7 +154,7 @@ function resultTile(hit: CardHit, state: AddCardState): HTMLElement {
       class: state.picked?.id === hit.id ? 'result on' : 'result',
       onClick: () => state.onChange({ picked: hit, manual: false, error: '' }),
     },
-    cardThumb({ imageBase: hit.image }, { width: 48, height: 67 }),
+    cardThumb({ imageBase: hit.image }, { width: 48, height: 67 }, 'eager'),
     el(
       'span',
       { class: 'result-text' },
@@ -105,6 +175,95 @@ function searchStatus(state: AddCardState): HTMLElement | null {
   return null;
 }
 
+function purchaseFields(state: AddCardState): HTMLElement {
+  return el(
+    'div',
+    { class: 'grid-fields' },
+    field('add-amount', 'Paid', textField('add-amount', state.amount, (amount) => state.onChange({ amount }), { type: 'number', min: '0', step: '0.01', inputmode: 'decimal', required: true })),
+    field(
+      'add-currency',
+      'Currency',
+      el(
+        'select',
+        {
+          id: 'add-currency',
+          onChange: (event: Event) => state.onChange({ currency: (event.target as HTMLSelectElement).value as Currency }),
+        },
+        el('option', { value: 'JPY', text: 'JPY ¥', selected: state.currency === 'JPY' }),
+        el('option', { value: 'EUR', text: 'EUR €', selected: state.currency === 'EUR' }),
+      ),
+    ),
+    field('add-date', 'Date', textField('add-date', state.date, (date) => state.onChange({ date }), { type: 'date', required: true })),
+    field('add-quantity', 'Copies', textField('add-quantity', state.quantity, (quantity) => state.onChange({ quantity }), { type: 'number', min: '1', step: '1' })),
+  );
+}
+
+function wishFields(state: AddCardState): DocumentFragment {
+  const toggle = (id: string) =>
+    state.owners.includes(id)
+      ? state.owners.filter((owner) => owner !== id)
+      : [...state.owners, id];
+
+  return frag(
+    el(
+      'fieldset',
+      { class: 'owners' },
+      el('legend', { text: 'Whose list' }),
+      ...state.lists.map((list) =>
+        el(
+          'label',
+          { class: state.owners.includes(list.id) ? 'owner-choice on' : 'owner-choice', for: `add-owner-${list.id}` },
+          el('input', {
+            id: `add-owner-${list.id}`,
+            type: 'checkbox',
+            checked: state.owners.includes(list.id),
+            onChange: () => state.onChange({ owners: toggle(list.id), error: '' }),
+          }),
+          el('span', { text: list.label }),
+        ),
+      ),
+    ),
+    el(
+      'div',
+      { class: 'grid-fields' },
+      field(
+        'add-target',
+        'Target price (€)',
+        textField('add-target', state.target, (target) => state.onChange({ target }), {
+          type: 'number',
+          min: '0',
+          step: '0.01',
+          inputmode: 'decimal',
+          placeholder: 'leave empty for any price',
+        }),
+      ),
+      field(
+        'add-priority',
+        'Priority',
+        el(
+          'select',
+          {
+            id: 'add-priority',
+            onChange: (event: Event) =>
+              state.onChange({ priority: (event.target as HTMLSelectElement).value as WishlistItem['priority'] }),
+          },
+          ...(['high', 'normal', 'low'] as const).map((level) =>
+            el('option', { value: level, text: level, selected: state.priority === level }),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+function addToLabel(state: AddCardState): string {
+  if (state.owners.length === 0) return 'Add to wishlist';
+  if (state.owners.length === 1) {
+    return `Add to ${state.lists.find((list) => list.id === state.owners[0])?.label ?? 'list'}`;
+  }
+  return `Add to ${state.owners.length} lists`;
+}
+
 export function renderAddCard(state: AddCardState): HTMLElement {
   const form = el('form', { class: 'add-form' });
 
@@ -113,6 +272,11 @@ export function renderAddCard(state: AddCardState): HTMLElement {
 
     if (!state.picked && !state.manual) {
       state.onChange({ error: 'Pick a card from the results, or tick the box to add it by hand.' });
+      return;
+    }
+
+    if (state.mode === 'wishlist') {
+      await submitWish(state);
       return;
     }
 
@@ -177,7 +341,7 @@ export function renderAddCard(state: AddCardState): HTMLElement {
 
   form.append(
     frag(
-      el('h3', { text: 'Add a card' }),
+      el('h3', { text: state.mode === 'collection' ? 'Add a card you bought' : 'Add a card to look for' }),
       textField(
         'add-search',
         state.query,
@@ -215,32 +379,24 @@ export function renderAddCard(state: AddCardState): HTMLElement {
             field('add-name', 'Name as printed', textField('add-name', state.manualName, (manualName) => state.onChange({ manualName }), { type: 'text', placeholder: 'ピカチュウ' })),
           )
         : null,
-      el(
-        'div',
-        { class: 'grid-fields' },
-        field('add-amount', 'Paid', textField('add-amount', state.amount, (amount) => state.onChange({ amount }), { type: 'number', min: '0', step: '0.01', inputmode: 'decimal', required: true })),
-        field(
-          'add-currency',
-          'Currency',
-          el(
-            'select',
-            {
-              id: 'add-currency',
-              onChange: (event: Event) => state.onChange({ currency: (event.target as HTMLSelectElement).value as Currency }),
-            },
-            el('option', { value: 'JPY', text: 'JPY ¥', selected: state.currency === 'JPY' }),
-            el('option', { value: 'EUR', text: 'EUR €', selected: state.currency === 'EUR' }),
-          ),
-        ),
-        field('add-date', 'Date', textField('add-date', state.date, (date) => state.onChange({ date }), { type: 'date', required: true })),
-        field('add-quantity', 'Copies', textField('add-quantity', state.quantity, (quantity) => state.onChange({ quantity }), { type: 'number', min: '1', step: '1' })),
+      state.mode === 'collection' ? purchaseFields(state) : wishFields(state),
+      field(
+        'add-notes',
+        'Notes',
+        textField('add-notes', state.notes, (notes) => state.onChange({ notes }), {
+          type: 'text',
+          placeholder: state.mode === 'collection' ? 'Shop, condition remarks…' : 'Only if well centred, no whitening…',
+        }),
       ),
-      field('add-notes', 'Notes', textField('add-notes', state.notes, (notes) => state.onChange({ notes }), { type: 'text', placeholder: 'Shop, condition remarks…' })),
       state.error ? el('p', { class: 'form-error ui', text: state.error }) : null,
       el(
         'div',
         { class: 'form-actions' },
-        el('button', { type: 'submit', text: state.saving ? 'Saving…' : 'Add card', disabled: state.saving }),
+        el('button', {
+          type: 'submit',
+          text: state.saving ? 'Saving…' : state.mode === 'collection' ? 'Add to collection' : addToLabel(state),
+          disabled: state.saving,
+        }),
         el('button', { type: 'button', class: 'chip', text: 'Cancel', onClick: state.onCancel }),
       ),
     ),

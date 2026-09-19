@@ -102,7 +102,14 @@ export async function searchCards(text: string, names: NameTable): Promise<CardH
   const results = await Promise.all(terms.map((term) => query(term).catch(() => [])));
   const unique = new Map<string, CardHit>();
   for (const hit of results.flat()) unique.set(hit.id, hit);
-  return [...unique.values()].sort((a, b) => a.id.localeCompare(b.id));
+
+  // Cards TCGdex has no artwork for sort last. Ordering by id put the 1996 sets first,
+  // so the first screenful of any search was blank frames — the cards least likely to
+  // be the one in your hand.
+  return [...unique.values()].sort((a, b) => {
+    const art = Number(Boolean(b.image)) - Number(Boolean(a.image));
+    return art !== 0 ? art : a.id.localeCompare(b.id);
+  });
 }
 
 export async function cardDetail(cardId: string): Promise<CardDetail> {

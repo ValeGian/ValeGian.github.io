@@ -78,7 +78,13 @@ const newlyResolved = resolved.filter(
   (entry) => !previous?.resolved?.some((earlier) => earlier.id === entry.id),
 );
 
-if (!options['dry-run']) {
+// Only the timestamp changes on a quiet day, and a daily commit that says nothing is
+// noise in a history that has to stay readable for years.
+const unchanged =
+  previous &&
+  JSON.stringify({ ...previous, generatedAt: null }) === JSON.stringify({ ...output, generatedAt: null });
+
+if (!options['dry-run'] && !unchanged) {
   await writeFile(`${DATA}/resolutions.json`, `${JSON.stringify(output, null, 2)}\n`);
 }
 

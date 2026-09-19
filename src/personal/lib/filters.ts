@@ -30,17 +30,39 @@ export const emptyFilters: Filters = {
 
 export type SortKey = 'value' | 'paid' | 'gain' | 'ratio' | 'name' | 'date' | 'set';
 
-const searchable = (row: Valued): string =>
-  [row.item.nameEn, row.item.nameJa, row.item.setId, row.item.number, row.item.notes, row.item.hint?.setName]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
+/**
+ * Everything one box should match: both names, the set, the number, the card id and any
+ * note. Separators are flattened so `S12a-261`, `S12a 261` and `s12a261` all find the
+ * same card, which is what anyone who has used Cardmarket's search will expect.
+ */
+const flatten = (text: string): string => text.toLowerCase().replace(/[\s\-_/]+/g, '');
+
+const searchable = (row: Valued): string => {
+  const parts = [
+    row.item.nameEn,
+    row.item.nameJa,
+    row.item.setId,
+    row.item.number,
+    row.item.cardId,
+    row.item.rarity,
+    row.item.notes,
+    row.item.hint?.setName,
+    row.item.hint?.setCode,
+  ].filter(Boolean);
+
+  // Both forms, so a query with spaces and a query without both work.
+  return `${parts.join(' ').toLowerCase()} ${flatten(parts.join(''))}`;
+};
 
 export function apply(rows: Valued[], filters: Filters): Valued[] {
-  const text = filters.text.trim().toLowerCase();
+  const query = filters.text.trim().toLowerCase();
+  const flat = flatten(filters.text);
 
   return rows.filter((row) => {
-    if (text && !searchable(row).includes(text)) return false;
+    if (query) {
+      const haystack = searchable(row);
+      if (!haystack.includes(query) && !haystack.includes(flat)) return false;
+    }
     if (filters.setId && row.item.setId !== filters.setId) return false;
     if (filters.condition && row.item.condition !== filters.condition) return false;
     if (filters.onlyPending && row.item.status !== 'pending') return false;

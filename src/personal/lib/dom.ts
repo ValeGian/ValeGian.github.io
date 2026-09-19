@@ -58,6 +58,39 @@ export const frag = (...children: Child[]): DocumentFragment => {
   return fragment;
 };
 
+/**
+ * Rebuilds the view without throwing away what the person was doing.
+ *
+ * Views are rebuilt wholesale, which is simple and fast but replaces the element the
+ * caret is sitting in — so a search box lost focus on every keystroke and only ever
+ * received one character. The focused control is identified by its id, which is why
+ * every input the app renders carries a stable one, and its caret position is put back
+ * where it was.
+ */
+export function rebuildPreservingFocus(rebuild: () => void): void {
+  const active = document.activeElement;
+  const id = active instanceof HTMLElement ? active.id : '';
+  const text = active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement ? active : null;
+  const start = text?.selectionStart ?? null;
+  const end = text?.selectionEnd ?? null;
+
+  rebuild();
+
+  if (!id) return;
+  const restored = document.getElementById(id);
+  if (!(restored instanceof HTMLElement)) return;
+
+  restored.focus({ preventScroll: true });
+
+  if (start !== null && (restored instanceof HTMLInputElement || restored instanceof HTMLTextAreaElement)) {
+    try {
+      restored.setSelectionRange(start, end);
+    } catch {
+      // Date, number and colour inputs refuse a selection range; focus alone is enough.
+    }
+  }
+}
+
 export function need<T extends Element>(selector: string, within: ParentNode = document): T {
   const found = within.querySelector<T>(selector);
   if (!found) throw new Error(`Missing element: ${selector}`);

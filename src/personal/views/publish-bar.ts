@@ -37,7 +37,9 @@ export function renderPublishBar(state: PublishBarState): HTMLElement | null {
       { class: 'publish token-form' },
       el('p', {
         class: 'ui',
-        text: 'Paste a fine-grained token scoped to this repository with contents: write and nothing else. It is kept on this device only.',
+        text:
+          'Paste a fine-grained token scoped to this repository with contents: write and nothing else. ' +
+          'Asked for once per device and kept here only; after this, changes publish by themselves.',
       }),
       el(
         'div',
@@ -54,21 +56,25 @@ export function renderPublishBar(state: PublishBarState): HTMLElement | null {
     );
   }
 
+  const status = state.busy
+    ? 'Publishing…'
+    : state.pendingCount === 0
+      ? 'Everything is published.'
+      : state.hasToken
+        ? `${state.pendingCount} change${state.pendingCount === 1 ? '' : 's'} waiting to publish.`
+        : `${state.pendingCount} change${state.pendingCount === 1 ? '' : 's'} saved on this device.`;
+
   return el(
     'section',
     { class: 'publish' },
-    el('span', {
-      class: 'ui',
-      text:
-        state.pendingCount === 0
-          ? 'Everything is published.'
-          : `${state.pendingCount} unpublished change${state.pendingCount === 1 ? '' : 's'} on this device.`,
-    }),
+    el('span', { class: 'ui', text: status }),
     frag(
+      // Publishing happens by itself after a change; this is for a retry, or for the
+      // first time a token is needed.
       state.pendingCount > 0
         ? el('button', {
             type: 'button',
-            text: state.busy ? 'Publishing…' : state.hasToken ? 'Publish' : 'Add a token to publish',
+            text: state.busy ? 'Publishing…' : state.hasToken ? 'Publish now' : 'Add a token to publish',
             disabled: state.busy,
             onClick: state.hasToken ? state.onPublish : state.onAskForToken,
           })

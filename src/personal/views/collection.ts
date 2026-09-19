@@ -83,16 +83,20 @@ function filterBar(state: CollectionViewState): HTMLElement {
     'div',
     { class: 'filters' },
     el('input', {
+      // The id is what lets the caret survive the rebuild this keystroke causes.
+      id: 'filter-text',
       type: 'search',
       class: 'search',
-      placeholder: 'Search by name, set or note',
+      placeholder: 'Name, set, number or card id',
       'aria-label': 'Search cards',
+      autocomplete: 'off',
       value: filters.text,
       onInput: (event: Event) => onFilters({ text: (event.target as HTMLInputElement).value }),
     }),
     el(
       'select',
       {
+        id: 'filter-set',
         'aria-label': 'Set',
         onChange: (event: Event) => onFilters({ setId: (event.target as HTMLSelectElement).value }),
       },
@@ -103,6 +107,7 @@ function filterBar(state: CollectionViewState): HTMLElement {
       'div',
       { class: 'dates' },
       el('input', {
+        id: 'filter-from',
         type: 'date',
         'aria-label': 'Bought from',
         value: filters.from,
@@ -110,6 +115,7 @@ function filterBar(state: CollectionViewState): HTMLElement {
       }),
       el('span', { class: 'muted ui', text: 'to' }),
       el('input', {
+        id: 'filter-to',
         type: 'date',
         'aria-label': 'Bought until',
         value: filters.to,

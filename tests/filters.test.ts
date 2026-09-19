@@ -3,13 +3,15 @@ import assert from 'node:assert/strict';
 import { apply, sort, emptyFilters } from '../src/personal/lib/filters.ts';
 import type { Valued } from '../src/personal/lib/money.ts';
 
-const row = (over: { id: string; nameEn?: string; nameJa?: string; setId?: string; date?: string; gain?: number | null; value?: number | null; status?: 'resolved' | 'pending' }): Valued =>
+const row = (over: { id: string; nameEn?: string; nameJa?: string; setId?: string; cardId?: string; rarity?: string; date?: string; gain?: number | null; value?: number | null; status?: 'resolved' | 'pending' }): Valued =>
   ({
     item: {
       id: over.id,
       status: over.status ?? 'resolved',
       nameEn: over.nameEn,
       nameJa: over.nameJa,
+      cardId: over.cardId ?? 'S12a-261',
+      rarity: over.rarity,
       setId: over.setId ?? 'S12a',
       number: '261',
       condition: 'NM',
@@ -67,4 +69,21 @@ test('unpriced cards sort last whichever way the column is pointing', () => {
     ['cheap', 'dear', 'unpriced'],
     'ascending: unknown is still last, because absent is not cheap',
   );
+});
+
+test('one box finds a card by its id, however the separator is written', () => {
+  const rows = [row({ id: 'a', nameEn: 'Giratina VSTAR', cardId: 'S12a-261' })];
+
+  for (const query of ['S12a-261', 's12a-261', 'S12a 261', 's12a261', '261']) {
+    assert.equal(apply(rows, { ...emptyFilters, text: query }).length, 1, `"${query}" should find it`);
+  }
+  assert.equal(apply(rows, { ...emptyFilters, text: 'S12a-262' }).length, 0, 'a different card is not a match');
+});
+
+test('rarity is searchable, because it is how a shelf gets browsed', () => {
+  const rows = [
+    row({ id: 'a', nameEn: 'Giratina VSTAR', rarity: 'Secret Rare' }),
+    row({ id: 'b', nameEn: 'Ralts', rarity: 'Common' }),
+  ];
+  assert.deepEqual(apply(rows, { ...emptyFilters, text: 'secret' }).map((e) => e.item.id), ['a']);
 });

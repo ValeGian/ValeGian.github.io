@@ -5,7 +5,7 @@
  * in a readable form, so closing the tab locks it; only ciphertext and already-public
  * JSON are ever written to the device.
  */
-import { el, frag, need } from './lib/dom.ts';
+import { el, frag, need, rebuildPreservingFocus } from './lib/dom.ts';
 import { createStore } from './lib/store.ts';
 import { emptyFilters, type Filters, type SortKey } from './lib/filters.ts';
 import { value, type Valued } from './lib/money.ts';
@@ -13,7 +13,7 @@ import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
 import { renderCollection } from './views/collection.ts';
 import { renderDetail } from './views/detail.ts';
 import { renderWishlists } from './views/wishlists.ts';
-import { renderAddCard, type AddCardState } from './views/add-card.ts';
+import { blankFields, renderAddCard, searchCards, type AddCardState } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
 import { addCard, deleteCard, markBought, newCardId, type Envelope, type Vault } from './lib/vault.ts';
 import { savePending } from './lib/local.ts';
@@ -37,27 +37,38 @@ interface AppState {
   combined: boolean;
   openItemId: string | null;
   adding: boolean;
-  add: Omit<AddCardState, 'names' | 'onChange' | 'onSave' | 'onCancel' | 'nextId'>;
+  add: Omit<AddCardState, 'names' | 'onChange' | 'onSearch' | 'onSave' | 'onCancel' | 'nextId'>;
   pendingCount: number;
   hasToken: boolean;
   publishBusy: boolean;
   publishMessage: string;
   lastCommitUrl: string | null;
   askingForToken: boolean;
+  /** Bumped to force a rebuild when the change was to the vault, not to this object. */
+  tick: number;
 }
 
 /** Older than this and the figures are stale enough that showing them silently is wrong. */
 const STALE_AFTER_DAYS = 2;
 
-const blankAdd: AppState['add'] = {
-  query: '',
+const blankAdd = (): AppState['add'] => ({
+  ...blankFields(),
   results: [],
   searching: false,
   picked: null,
   manual: false,
   error: '',
   saving: false,
-};
+});
+
+/** Long enough not to search on every keystroke, short enough to feel immediate. */
+const SEARCH_DELAY_MS = 300;
+
+/** Gives a burst of edits time to settle into one commit rather than one commit each. */
+const PUBLISH_DELAY_MS = 2500;
+
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+let publishTimer: ReturnType<typeof setTimeout> | undefined;
 
 const store = createStore<AppState>({
   phase: 'locked',
@@ -72,13 +83,14 @@ const store = createStore<AppState>({
   combined: true,
   openItemId: null,
   adding: false,
-  add: { ...blankAdd },
+  add: blankAdd(),
   pendingCount: 0,
   hasToken: false,
   publishBusy: false,
   publishMessage: '',
   lastCommitUrl: null,
   askingForToken: false,
+  tick: 0,
 });
 
 const emptyNames = { species: {} };
@@ -216,12 +228,75 @@ function lockScreen(state: AppState): DocumentFragment {
   );
 }
 
+/** Nudges a rebuild when something changed outside the store, such as the vault. */
+const rerender = (): void => store.update((current) => ({ tick: current.tick + 1 }) as Partial<AppState>);
+
+/**
+ * Searches the catalog as the person types.
+ *
+ * Debounced, because every keystroke would otherwise be a request, and the last one wins
+ * so a slow earlier reply cannot overwrite a newer result.
+ */
+let searchGeneration = 0;
+
+function runCatalogSearch(query: string): void {
+  store.update((current) => ({ add: { ...current.add, query } }));
+  clearTimeout(searchTimer);
+
+  if (query.trim().length < 2) {
+    store.update((current) => ({ add: { ...current.add, results: [], searching: false } }));
+    return;
+  }
+
+  const generation = ++searchGeneration;
+  store.update((current) => ({ add: { ...current.add, searching: true } }));
+
+  searchTimer = setTimeout(async () => {
+    const names = store.get().data?.names ?? emptyNames;
+    try {
+      const results = await searchCards(query, names);
+      if (generation !== searchGeneration) return;
+      store.update((current) => ({ add: { ...current.add, results, searching: false } }));
+    } catch (error) {
+      if (generation !== searchGeneration) return;
+      store.update((current) => ({
+        add: { ...current.add, searching: false, error: error instanceof Error ? error.message : String(error) },
+      }));
+    }
+  }, SEARCH_DELAY_MS);
+}
+
+/**
+ * Publishes on its own a moment after the last change.
+ *
+ * Adding a card should not need a second deliberate action. A burst of edits settles
+ * into one commit, and anything that fails stays queued with the count on screen, so a
+ * shop with no signal costs nothing and needs no decision.
+ */
+function schedulePublish(): void {
+  clearTimeout(publishTimer);
+  if (!getToken()) return;
+
+  publishTimer = setTimeout(async () => {
+    if (store.get().publishBusy) return;
+    store.update({ publishBusy: true, publishMessage: '' });
+    const result = await publish('chore(personal): update from the browser');
+    await refreshPendingCount();
+    store.update({
+      publishBusy: false,
+      lastCommitUrl: result.url ?? null,
+      publishMessage: result.ok ? '' : (result.reason ?? 'Publishing failed; the changes are still here.'),
+    });
+  }, PUBLISH_DELAY_MS);
+}
+
 async function saveCard(item: CollectionItem): Promise<void> {
   const { vault } = store.get();
   if (!vault) return;
   await savePending(await addCard(vault, item));
   await refreshPendingCount();
-  store.update({ adding: false, add: { ...blankAdd } });
+  store.update({ adding: false, add: blankAdd() });
+  schedulePublish();
 }
 
 async function removeCard(itemId: string): Promise<void> {
@@ -230,6 +305,7 @@ async function removeCard(itemId: string): Promise<void> {
   await savePending(await deleteCard(vault, itemId));
   await refreshPendingCount();
   store.update({ openItemId: null });
+  schedulePublish();
 }
 
 function publishBar(state: AppState): HTMLElement | null {
@@ -260,6 +336,7 @@ function publishBar(state: AppState): HTMLElement | null {
         askingForToken: !result.ok,
         publishMessage: result.ok ? '' : (result.reason ?? 'That token was not accepted.'),
       });
+      if (result.ok) schedulePublish();
     },
     onPublish: async () => {
       store.update({ publishBusy: true, publishMessage: '' });
@@ -297,7 +374,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
       type: 'button',
       class: 'chip add-button',
       text: state.adding ? 'Close' : 'Add a card',
-      onClick: () => store.update({ adding: !state.adding, openItemId: null, add: { ...blankAdd } }),
+      onClick: () => store.update({ adding: !state.adding, openItemId: null, add: blankAdd() }),
     }),
   );
 
@@ -343,7 +420,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
             });
             await savePending(writes);
             await refreshPendingCount();
-            store.update({});
+            rerender();
+            schedulePublish();
           },
         });
 
@@ -355,8 +433,9 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           names,
           nextId: () => newCardId(vault),
           onChange: (change) => store.update((current) => ({ add: { ...current.add, ...change } })),
+          onSearch: runCatalogSearch,
           onSave: saveCard,
-          onCancel: () => store.update({ adding: false, add: { ...blankAdd } }),
+          onCancel: () => store.update({ adding: false, add: blankAdd() }),
         })
       : null,
     open ? renderDetail(open, names, state.data?.overrides ?? new Map(), () => store.update({ openItemId: null }), removeCard) : null,
@@ -376,6 +455,10 @@ function friendView(state: AppState, friend: Friend): DocumentFragment {
 }
 
 function render(state: AppState): void {
+  rebuildPreservingFocus(() => paint(state));
+}
+
+function paint(state: AppState): void {
   const root = need<HTMLElement>('#personal-app');
   const heading = need<HTMLElement>('#personal-heading');
   const actions = need<HTMLElement>('#personal-actions');

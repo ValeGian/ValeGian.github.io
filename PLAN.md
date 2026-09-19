@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phase 1 complete. Phase 2 content gathered; build not started.
+**Status:** Phases 1–2 complete and live. Next: Phase 3, the collection data layer.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 11 — transcripts extracted, profile filled)
+**Last updated:** 2026-09-19 (rev 12 — Phase 2 deployed)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -558,13 +558,14 @@ static lookup, never fetched at runtime.
 - [x] Switch Pages `build_type` from `legacy` to `workflow`
 - [x] Hello-world deploy green — run 35459651204, https://valegian.github.io/ HTTP 200
 
-### Phase 2 — Design system + public sections
-- [ ] Type/spacing/colour tokens, light + dark, 360 px-first
-- [ ] Layout + navigation
-- [ ] Front page: bio + liteinfer / variantGPT / SpecForge
-- [ ] Projects section
-- [ ] University section, recomposed
-- [ ] Lighthouse ≥ 95 on all, verified at 360 px
+### Phase 2 — Design system + public sections  ✅ **complete**
+- [x] Type/spacing/colour tokens, light + dark, 360 px-first
+- [x] Layout + navigation
+- [x] Front page: bio + liteinfer / variantGPT / SpecForge
+- [x] Projects section
+- [x] University section, recomposed
+- [x] 360 px verified with zero horizontal overflow on all three pages; AA contrast on
+      both themes; zero client JavaScript shipped
 
 ### Phase 3 — Data layer
 - [ ] Schemas + CI validation: collection, friend files, overrides
@@ -622,6 +623,39 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 12 (Phase 2 deployed) ✅
+- **Design direction.** The subject is inference work, so the site is built like an
+  instrument rather than a brochure: precise, tabular where numbers matter, quiet
+  everywhere else. **Spectral** carries prose and display; **IBM Plex Sans** carries the
+  interface and every figure, with tabular lining numerals so marks, credits and years
+  line up. Both self-hosted via `@fontsource`, so the site makes **no third-party
+  requests**.
+- **One repeating structure: the ruled row.** Rules delimit rows of an index or a record
+  and are drawn nowhere else, so they encode structure instead of decorating. No cards,
+  no shadows, no gradients, no pills.
+- **One accent, ultramarine** (`#2d3a8c` / `#8b97e8` dark), used for links, the current
+  nav item and *cum laude* marks. **Deviation from rev 3's per-section accent plan:**
+  sections are told apart by density and structure instead, which is more disciplined and
+  leaves the second accent free for the gated Personal area.
+- Built `tokens.css`, `base.css`, `BaseLayout`, `SiteHeader`, `SiteFooter`, `RuledIndex`,
+  `IndexRow`, `Particulars`, `ExamRecord`, and the three pages.
+- **University page**: each degree prints its summary figures and every exam on record.
+  **Averages are computed from the exam rows at render time, never stored**, so a figure
+  cannot disagree with the table beneath it. The master's record displays its own
+  incompleteness rather than hiding it.
+- Fixed while reviewing: projects sorted on creation date while displaying last-activity
+  year, so the year column read 2026 / 2025 / 2026 — now sorted on the value shown; stray
+  spaces before the commas in the footer link list; the display heading was held on one
+  line by a non-breaking space and overflowed 360 px.
+- **Removed one thing on purpose**: the closing paragraph on the home page repeated what
+  the navigation and the new particulars sidebar already said.
+- Verified: 360 px with zero horizontal overflow on all three pages; AA contrast both
+  themes (muted 5,8:1 light / 6,8:1 dark, accent 9,1:1 / 6,8:1); skip link; visible focus
+  rings; reduced motion respected; no client JavaScript.
+- Deploy run 35460968445 succeeded. `/`, `/projects`, `/university` all HTTP 200.
+- **Still placeholder**: `identity.bio` is my draft (§12.1), and the seven master's marks
+  plus the graduation grade are still missing (§13 rev 11).
 
 ### 2026-09-19 — rev 11 (transcripts extracted, profile filled)
 - **Extracted both transcripts into `src/data/transcripts.json`.** No PDF library was

@@ -10,6 +10,8 @@
  *                              have been carried over from an earlier day. Every reading
  *                              carries the timestamp it was read at, so a carried value
  *                              is visible as an old one rather than a missing one.
+ *   artwork.json               where each card's picture is, for cards the catalog had
+ *                              none for when they were added. See below.
  *
  * The distinction matters: dropping a card from latest.json because one lookup failed
  * makes the site say a card has no price when it plainly does.
@@ -58,6 +60,19 @@ const prices = {};
 const lost = [];
 const failed = [];
 
+/**
+ * Where each card's picture is, as the catalog currently says.
+ *
+ * TCGdex lists a Japanese set weeks or months before it scans the cards: every card in
+ * M2a, M4, M5, M6 and SV11W has Cardmarket prices and no artwork at all. A card added
+ * then is stored with no picture, and nothing would ever go back and look again.
+ *
+ * This is that second look, and it costs nothing — the price job already fetches every
+ * watched card once a day. It is published as plain data, so the picture simply appears
+ * on the next visit, with no key, no write to the vault and nothing to remember.
+ */
+const artwork = {};
+
 for (const entry of watchlist.cards) {
   try {
     const detail = await card(entry.cardId);
@@ -65,6 +80,10 @@ for (const entry of watchlist.cards) {
       (detail.variants_detailed ?? []).find((candidate) => candidate.variantId === entry.variantId) ??
       chooseVariant(detail).variant;
     const cardmarket = cardmarketPrice(variant);
+
+    // Before the price check: a card can have a picture and no price, and the picture is
+    // still worth having.
+    if (detail.image) artwork[entry.cardId] = detail.image;
 
     if (!cardmarket || cardmarket.avg30 === null || cardmarket.avg30 === undefined) {
       if (previous.prices[entry.cardId]) lost.push(entry.cardId);
@@ -140,6 +159,38 @@ if (existsSync(dailyPath)) {
 }
 
 await writeFile(`${DATA}/prices/latest.json`, `${JSON.stringify(current, null, 2)}\n`);
+
+/**
+ * Merged over what was there, never replaced.
+ *
+ * A card that failed to fetch today must not lose the picture it had yesterday, for the
+ * same reason a failed price lookup does not erase a price. Entries are only ever added
+ * or updated here; a card leaving the watchlist leaves its entry behind, which costs one
+ * short line and means nothing breaks if it comes back.
+ */
+const previousArtwork = existsSync(`${DATA}/artwork.json`)
+  ? (await readJson(`${DATA}/artwork.json`)).cards
+  : {};
+
+const allArtwork = { ...previousArtwork, ...artwork };
+const newArtwork = Object.keys(artwork).filter((cardId) => !previousArtwork[cardId]);
+
+await writeFile(
+  `${DATA}/artwork.json`,
+  `${JSON.stringify(
+    {
+      version: 1,
+      generatedAt: new Date().toISOString(),
+      cards: Object.fromEntries(Object.entries(allArtwork).sort(([a], [b]) => a.localeCompare(b))),
+    },
+    null,
+    2,
+  )}\n`,
+);
+
+if (newArtwork.length > 0) {
+  console.log(`artwork appeared for ${newArtwork.length} card(s): ${newArtwork.slice(0, 8).join(', ')}`);
+}
 
 /**
  * Hand-checked prices go stale silently, because nothing fetches them. Cardmarket

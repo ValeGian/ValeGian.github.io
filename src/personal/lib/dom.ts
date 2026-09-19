@@ -74,7 +74,21 @@ export function rebuildPreservingFocus(rebuild: () => void): void {
   const start = text?.selectionStart ?? null;
   const end = text?.selectionEnd ?? null;
 
+  // Boxes that scroll on their own start again from the top when they are rebuilt, which
+  // makes appending to one impossible: reaching the end of the search results loads more
+  // and the rebuild puts you back at the first card, where reaching the end again is a
+  // whole scroll away. Marked with data-keep-scroll and restored by id, like the caret.
+  const scrolled = new Map<string, number>();
+  for (const box of document.querySelectorAll<HTMLElement>('[data-keep-scroll][id]')) {
+    scrolled.set(box.id, box.scrollTop);
+  }
+
   rebuild();
+
+  for (const [boxId, top] of scrolled) {
+    const box = document.getElementById(boxId);
+    if (box) box.scrollTop = top;
+  }
 
   if (!id) return;
   const restored = document.getElementById(id);

@@ -66,6 +66,9 @@ export interface WishlistItem {
   boughtAt?: string;
   purchase?: Purchase;
   movedToItemId?: string | null;
+  /** Present while the catalog has no entry for this card; see CollectionItem.hint. */
+  hint?: CatalogHint;
+  pendingSince?: string;
 }
 
 export interface Settlement {

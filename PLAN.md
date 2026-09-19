@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-20 (rev 27 — read-only account, scroll to what you opened, M6a)
+**Last updated:** 2026-09-20 (rev 28 — sessions survive a reload, set-scoped search, artwork discovery)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -501,7 +501,35 @@ leave a reader quietly looking at an older version of a file.
 | 11 | **Mark bought** | admin | One tap → price in ¥ or € → FX applied → *my* item moves to the collection; a *friend's* item flips to `bought` in place and lands in their balance. |
 | 12 | **Settlements** | admin | Record a repayment against a friend's balance. |
 
-### 8.3 Sets the catalog has not published yet
+### 8.3 A card the catalog is behind on
+
+TCGdex carries a Japanese set in two stages, and the gap between them is months. Four
+cases, and what each one does:
+
+| The catalog has | Picture | Prices |
+|---|---|---|
+| 1. Japanese entry, with artwork | its own | polled daily |
+| 2. Japanese entry, no artwork yet | English twin's, if the numbering matches; otherwise none until the daily job finds it | **polled daily** — the Japanese entry is what was found, so the price is the right one |
+| 3. No Japanese entry, English twin exists | English twin's | **not polled** — the English card is a different Cardmarket product, so a reading would be wrong. Starts when the Japanese set appears |
+| 4. Neither | a photograph | not polled |
+
+Case 2 is not the exception it sounds like: every card in M2a, M4, M5, M6 and SV11W has
+Cardmarket prices and no picture at all. Case 3 is what happens on release day.
+
+Both cases correct themselves without anyone doing anything. Case 3's card is pending, so
+`scripts/resolve-pending.mjs` promotes it and pricing begins. Case 2's card is already
+resolved and would never be revisited, so `public/data/artwork.json` handles it: the
+price job already fetches every watched card daily, and it now records where each card's
+picture is. `picture()` prefers that over whatever was stored, so artwork appears the day
+TCGdex uploads it — no vault write, nothing to remember.
+
+**Borrowing a picture is only safe where the numbering matches.** Japanese sets are
+smaller than English ones and are recombined for the worldwide release, so M6 card 113 and
+me01 card 113 are different cards. Only a simultaneous worldwide release like the 30th
+Anniversary set belongs in `MIRRORED_SETS`; anywhere else the stand-in would confidently
+show the wrong card, which is worse than showing none.
+
+### 8.4 Sets the catalog has not published yet
 
 TCGdex publishes the English side of a worldwide release first. Four days after the 30th
 Anniversary launch it carried the English `30th` set complete with artwork for all 158
@@ -522,7 +550,7 @@ and the set is fetched once per session rather than per keystroke.
 Other free catalogues were checked and rejected: `apitcg.com` needs an API key,
 `api.pokemontcg.io` was unreachable and is English-only regardless.
 
-### 8.4 What read-only friends cost
+### 8.5 What read-only friends cost
 
 Every wishlist change comes through me: they message me a card, I add it with the same
 picker I use for my own (feature 10). Accepted as a manual step — no importer, no paste
@@ -693,6 +721,32 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-20 — rev 28 (sessions survive a reload, set-scoped search, artwork) ✅
+- **Refreshing no longer asks for the password.** The unwrapped file keys are kept in
+  `sessionStorage`, never the password, so closing the tab still locks the vault and
+  reloading does not. Reopening skips PBKDF2 entirely. Lock clears the keys before it
+  reloads, and that is now the deliberate way out. The widening is real and worth stating:
+  an unlocked tab on an unattended phone survives a refresh.
+- **`m6a moltres` returns two cards instead of the whole set.** A query that opens with a
+  set code is answered from that one set — one request, filtered locally — rather than by
+  a catalog-wide name search. It works for published sets too: `M6 rayquaza` gives five
+  cards. Only a trailing number used to filter, so a name after the code matched
+  everything.
+- **Search results load as you scroll.** A scroll handler, not an IntersectionObserver:
+  the observer only reports while the tab is being rendered, and it reports *changes* —
+  once the end marker was inside the box it stayed there and said nothing more, so the
+  third page never came. Scroll positions of boxes marked `data-keep-scroll` now survive a
+  rebuild, without which appending to a list is impossible.
+- **Artwork appears by itself.** `public/data/artwork.json`, written by the price job
+  that already fetches every watched card, records where each picture is. §8.3 has the
+  four cases and which of them polls prices.
+- **A wanted card can await the catalog too.** Only owned cards could; a wished-for card
+  from an unpublished set was never retried and would have sat showing English artwork
+  and no price forever. It now carries the same hint, reaches `pending.json` under
+  `<owner>/<wish id>`, and `applyResolutions` promotes it — dropping the English name and
+  picture for the Japanese ones.
+- Removed the two unused parameters the type checker had been flagging.
 
 ### 2026-09-20 — rev 27 (read-only account, scroll to what you opened, M6a) ✅
 - **A read-only account.** `npm run data:viewer` wraps the existing keyring under a

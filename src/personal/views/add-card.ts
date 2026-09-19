@@ -16,7 +16,7 @@
  */
 import { el, frag } from '../lib/dom.ts';
 import { convert } from '../lib/fx.ts';
-import { searchCards, cardDetail, pricedVariantId, looksLikeCardId, type CardHit } from '../lib/tcgdex.ts';
+import { searchCards, cardDetail, pricedVariantId, looksLikeCardId, standInArtwork, type CardHit } from '../lib/tcgdex.ts';
 import { toEnglish } from '../../lib/card-name.mjs';
 import { cardThumb } from './thumb.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
@@ -48,6 +48,10 @@ export interface AddCardState extends AddCardFields {
   lists: { id: string; label: string }[];
   results: CardHit[];
   searching: boolean;
+  /** More catalog pages exist for this query. */
+  hasMore: boolean;
+  /** A page after the first is on its way. */
+  loadingMore: boolean;
   picked: CardHit | null;
   manual: boolean;
   /** A photo of a card the catalog cannot show, taken in the shop. */
@@ -66,6 +70,8 @@ export interface AddCardState extends AddCardFields {
    */
   latest(): AddCardFields;
   onSearch(query: string): void;
+  /** Called when the end of the results comes into view. */
+  onLoadMore(): void;
   onSave(item: CollectionItem, photo?: PreparedPhoto | null): Promise<void>;
   onSaveWish(owners: string[], item: Omit<WishlistItem, 'id'>): Promise<void>;
   onCancel(): void;
@@ -118,24 +124,37 @@ async function submitWish(state: AddCardState): Promise<void> {
       addedAt: today(),
     };
 
+    // Both of these are cards the catalog cannot identify yet, so both carry a hint:
+    // that is what puts them in pending.json and lets the daily job fill them in. Without
+    // it a wanted card would keep the English name and artwork it was found under, and
+    // never be priced, for as long as the list existed.
     if (state.manual || !state.picked) {
+      const setCode = fields.manualSet.trim();
+      const number = fields.manualNumber.trim();
+      const nameJa = fields.manualName.trim();
+
       await state.onSaveWish(state.owners, {
         ...shared,
-        setId: fields.manualSet.trim(),
-        number: fields.manualNumber.trim(),
-        nameJa: fields.manualName.trim(),
+        setId: setCode,
+        number,
+        nameJa,
+        ...(setCode && number
+          ? { hint: { setCode, number, ...(nameJa ? { nameJa } : {}) }, pendingSince: today() }
+          : {}),
       });
       return;
     }
 
     if (state.picked.mirrorOf) {
+      const { setCode, setName } = state.picked.mirrorOf;
       await state.onSaveWish(state.owners, {
         ...shared,
-        setId: state.picked.mirrorOf.setCode,
+        setId: setCode,
         number: state.picked.localId,
-        nameJa: state.picked.name,
         nameEn: state.picked.name,
         imageBase: state.picked.image ?? '',
+        hint: { setCode, setName, number: state.picked.localId, nameEn: state.picked.name },
+        pendingSince: today(),
       });
       return;
     }
@@ -148,11 +167,24 @@ async function submitWish(state: AddCardState): Promise<void> {
       number: detail.localId,
       nameJa: detail.name,
       nameEn: toEnglish(detail.name, state.names),
-      imageBase: detail.image ?? '',
+      imageBase: await artworkFor(detail),
     });
   } catch (error) {
     state.onChange({ saving: false, error: error instanceof Error ? error.message : String(error) });
   }
+}
+
+/**
+ * The picture to store for a card found in the Japanese catalog.
+ *
+ * Usually the catalog's own. When the set has been listed but not yet scanned, the
+ * English twin's picture stands in — the card is still priced from its Japanese entry,
+ * because it is the Japanese entry that was found. The daily job replaces the stand-in
+ * with the real artwork as soon as TCGdex has it; nothing has to be re-saved.
+ */
+async function artworkFor(detail: { image?: string; set: { id: string }; localId: string }): Promise<string> {
+  if (detail.image) return detail.image;
+  return (await standInArtwork(detail.set.id, detail.localId).catch(() => null)) ?? '';
 }
 
 function field(id: string, label: string, input: HTMLElement): HTMLElement {
@@ -194,6 +226,57 @@ function resultTile(hit: CardHit, state: AddCardState): HTMLElement {
       }),
     ),
   );
+}
+
+/** The id is stable so the list's scroll position survives a rebuild. See dom.ts. */
+const RESULTS_ID = 'add-results';
+
+/** Fetch the next page this far before the last row, so it is usually there in time. */
+const LOAD_AHEAD_PX = 140;
+
+/**
+ * The results, with the next page fetched as the end of the list comes near.
+ *
+ * A scroll handler rather than an IntersectionObserver. The observer is the fashionable
+ * answer and was tried first, but it only reports while the tab is actually being
+ * rendered, and it reports changes — once the end marker is inside the root it stays
+ * there and says nothing more, so the third page never arrived. A scroll handler on one
+ * box has neither problem and is less code.
+ */
+function resultList(state: AddCardState): HTMLElement {
+  const nearEnd = (list: HTMLElement): boolean =>
+    list.scrollTop + list.clientHeight >= list.scrollHeight - LOAD_AHEAD_PX;
+
+  const list = el(
+    'div',
+    {
+      class: 'results',
+      id: RESULTS_ID,
+      'data-keep-scroll': '',
+      onScroll: (event: Event) => {
+        if (state.hasMore && nearEnd(event.currentTarget as HTMLElement)) state.onLoadMore();
+      },
+    },
+    ...state.results.map((hit) => resultTile(hit, state)),
+    state.hasMore
+      ? el(
+          'div',
+          { class: 'results-end ui', role: 'status', 'aria-live': 'polite' },
+          state.loadingMore ? 'Loading more…' : '',
+        )
+      : null,
+  );
+
+  // A page that does not fill the box leaves nothing to scroll, and without this the
+  // rest of the results would be unreachable. Checked once the list has been laid out.
+  if (state.hasMore) {
+    setTimeout(() => {
+      const mounted = document.getElementById(RESULTS_ID);
+      if (mounted && mounted.scrollHeight <= mounted.clientHeight) state.onLoadMore();
+    }, 0);
+  }
+
+  return list;
 }
 
 function searchStatus(state: AddCardState): HTMLElement | null {
@@ -415,8 +498,9 @@ export function renderAddCard(state: AddCardState): HTMLElement {
           status: 'pending',
           hint: {
             setCode: state.picked.mirrorOf.setCode,
+            setName: state.picked.mirrorOf.setName,
             number: state.picked.localId,
-            nameJa: state.picked.name,
+            nameEn: state.picked.name,
           },
           nameEn: state.picked.name,
           number: state.picked.localId,
@@ -437,7 +521,7 @@ export function renderAddCard(state: AddCardState): HTMLElement {
         nameJa: detail.name,
         nameEn: toEnglish(detail.name, state.names),
         rarity: detail.rarity ?? null,
-        imageBase: detail.image ?? '',
+        imageBase: await artworkFor(detail),
         catalogSource: 'tcgdex',
       });
     } catch (error) {
@@ -461,9 +545,7 @@ export function renderAddCard(state: AddCardState): HTMLElement {
         },
       ),
       searchStatus(state),
-      state.results.length > 0
-        ? el('div', { class: 'results' }, ...state.results.map((hit) => resultTile(hit, state)))
-        : null,
+      state.results.length > 0 ? resultList(state) : null,
       el(
         'label',
         { class: 'check', for: 'add-manual' },

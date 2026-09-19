@@ -99,7 +99,7 @@ export function daysNeeded(source: HistorySource, range: Range): string[] {
   return range.days === null ? all : all.slice(-range.days);
 }
 
-function withinRange(period: string, at: number, range: Range): boolean {
+function withinRange(at: number, range: Range): boolean {
   if (range.days === null) return true;
   return at >= Date.now() - range.days * 86_400_000;
 }
@@ -126,7 +126,7 @@ export function cardSeries(source: HistorySource, cardId: string, range: Range):
 
   return entries
     .map((entry) => ({ period: entry.period, at: at(entry.period), value: entry.value }))
-    .filter((point) => withinRange(point.period, point.at, range));
+    .filter((point) => withinRange(point.at, range));
 }
 
 export interface Holding {

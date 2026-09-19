@@ -1007,6 +1007,17 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     overflow-y: auto;
   }
 
+  /* Spans the grid so it is a line at the end rather than a cell in the last row, and
+     keeps a height whether or not it has text — see resultList in add-card.ts. */
+  .personal .results-end {
+    grid-column: 1 / -1;
+    display: grid;
+    place-items: center;
+    min-height: 2.25rem;
+    color: var(--muted);
+    font-size: var(--size-xs);
+  }
+
   .personal .result {
     display: flex;
     align-items: center;

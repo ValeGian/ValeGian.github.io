@@ -77,7 +77,7 @@ export async function buildWrites(vault: Vault, touched: string[]): Promise<Writ
 
   const { watchlist, pending } = derivePublicFiles({
     collection: vault.collection,
-    wishlists: Object.values(vault.wishlists),
+    wishlists: vault.wishlists,
     manualCardIds: vault.manualCardIds,
     now: savedAt,
   });
@@ -112,7 +112,7 @@ export interface Resolution {
  */
 export async function applyResolutions(vault: Vault, resolutions: Resolution[]): Promise<Write[] | null> {
   const byId = new Map(resolutions.map((entry) => [entry.id, entry]));
-  let applied = 0;
+  const touched = new Set<string>();
 
   for (const item of vault.collection.items) {
     if (item.status !== 'pending') continue;
@@ -129,10 +129,30 @@ export async function applyResolutions(vault: Vault, resolutions: Resolution[]):
     item.imageBase = found.imageBase ?? '';
     item.catalogSource = 'tcgdex';
     delete item.pendingSince;
-    applied += 1;
+    touched.add('collection');
   }
 
-  return applied === 0 ? null : buildWrites(vault, ['collection']);
+  // Wanted cards resolve the same way. The English stand-in the card was found under is
+  // overwritten here — its name and its artwork — so once the Japanese set is published
+  // the list shows the Japanese printing and starts being priced as one.
+  for (const [owner, list] of Object.entries(vault.wishlists)) {
+    for (const item of list.items) {
+      if (item.cardId || !item.hint) continue;
+      const found = byId.get(`${owner}/${item.id}`);
+      if (!found) continue;
+
+      item.cardId = found.cardId;
+      item.setId = found.setId;
+      item.number = found.number;
+      item.nameJa = found.nameJa;
+      item.imageBase = found.imageBase ?? '';
+      delete item.nameEn;
+      delete item.pendingSince;
+      touched.add(owner);
+    }
+  }
+
+  return touched.size === 0 ? null : buildWrites(vault, [...touched]);
 }
 
 export async function addCard(

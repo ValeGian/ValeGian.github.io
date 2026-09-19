@@ -15,7 +15,8 @@
  *
  * The file keys and the original envelopes come back with the contents, because saving
  * reseals a payload under the key it already holds and must never need the password
- * again.
+ * again. That is also what lets `resume` reopen a vault from keys a reload kept, with no
+ * password and no PBKDF2 at all.
  */
 import { decrypt, decryptWithKey, importFileKey } from './crypto.mjs';
 
@@ -68,6 +69,41 @@ async function openKeyring(keyring) {
   return { files, keys, envelopes };
 }
 
+/**
+ * Reopens a vault from keys that survived a reload.
+ *
+ * Same result as `unlock`, minus the password and the derivation it pays for. The
+ * envelopes are fetched again rather than stored, so a file published from another
+ * device is picked up on the refresh instead of being served from a stale copy.
+ *
+ * Returns null on any failure — a key that no longer opens its file, a file that has
+ * gone — and the caller falls back to asking for the password.
+ */
+export async function resume(saved, keys) {
+  try {
+    if (saved.role === 'friend') {
+      const envelope = await load(saved.owner);
+      const list = await decryptWithKey(keys.get(saved.owner), envelope);
+      return list ? { role: 'friend', owner: saved.owner, list } : null;
+    }
+
+    const files = {};
+    const envelopes = new Map();
+
+    for (const [name, key] of keys) {
+      const envelope = await load(name);
+      const opened = await decryptWithKey(key, envelope);
+      if (!opened) return null;
+      files[name] = opened;
+      envelopes.set(name, envelope);
+    }
+
+    return { role: saved.role, files, keys, envelopes };
+  } catch {
+    return null;
+  }
+}
+
 export async function unlock(password) {
   for (const { file, role } of KEYRINGS) {
     const envelope = await loadIfPresent(file);
@@ -80,7 +116,7 @@ export async function unlock(password) {
   for (const owner of FRIEND_FILES) {
     const envelope = await load(owner);
     const opened = await decrypt(password, envelope);
-    if (opened) return { role: 'friend', owner, list: opened.payload };
+    if (opened) return { role: 'friend', owner, list: opened.payload, key: opened.key };
   }
 
   return null;

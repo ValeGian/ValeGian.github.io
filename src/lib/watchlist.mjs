@@ -12,7 +12,7 @@
 /**
  * @param {object} input
  * @param {{items: any[]}} input.collection
- * @param {{items: any[], owner?: string}[]} input.wishlists
+ * @param {Record<string, {items: any[], owner?: string}>} input.wishlists keyed by file id
  * @param {Iterable<string>} input.manualCardIds
  * @param {string} [input.now]
  */
@@ -43,9 +43,21 @@ export function derivePublicFiles({ collection, wishlists, manualCardIds, now })
   }
 
   // Wanted cards need a price too: a target with nothing to compare against is useless.
-  for (const list of wishlists) {
+  for (const [owner, list] of Object.entries(wishlists)) {
     for (const item of list.items) {
-      if (item.status === 'bought' || !item.cardId) continue;
+      if (item.status === 'bought') continue;
+
+      // A wanted card can be waiting on the catalog just as an owned one can — someone
+      // asks for a card from a set that has only been released in Japanese. Left out of
+      // here it would never be retried, and would sit showing English artwork and no
+      // price for as long as the list existed. The owner is part of the id because the
+      // same wish id occurs in every list.
+      if (!item.cardId && item.hint && item.pendingSince) {
+        waiting.push({ id: `${owner}/${item.id}`, hint: item.hint, pendingSince: item.pendingSince });
+        continue;
+      }
+
+      if (!item.cardId) continue;
       if (manual.has(item.cardId) || cards.has(item.cardId)) continue;
       cards.set(item.cardId, { cardId: item.cardId });
     }

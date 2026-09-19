@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://valegian.github.io/schemas/artwork.schema.json",
+  "title": "Where each card's picture is",
+  "description": "Published by the daily price job, which already fetches every watched card. Japanese sets are listed with prices long before they are scanned, so a card added then has no picture and nothing would otherwise look again. Carries card ids only: it says nothing about who owns what.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "generatedAt", "cards"],
+  "properties": {
+    "version": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "cards": {
+      "type": "object",
+      "description": "Card id to TCGdex asset base, with no extension; the renderer appends a size and format.",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    }
+  }
+}

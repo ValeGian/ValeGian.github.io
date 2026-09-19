@@ -8,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { encrypt } from '../src/lib/crypto.mjs';
-import { addCard, buildWrites, deleteCard, markBought, newCardId, type Vault } from '../src/personal/lib/vault.ts';
+import { addCard, applyResolutions, buildWrites, deleteCard, markBought, newCardId, type Vault } from '../src/personal/lib/vault.ts';
 import { totals, value } from '../src/personal/lib/money.ts';
 import { balance } from '../src/personal/views/wishlists.ts';
 import type { CollectionItem, Purchase, Wishlist } from '../src/personal/lib/types.ts';
@@ -143,4 +143,73 @@ test('a save rewrites the touched file and always the derived public files', asy
   for (const leak of ['amountEur', 'targetPriceEur', 'owner', 'purchase']) {
     assert.ok(!serialised.includes(leak), `the public watchlist must not carry ${leak}`);
   }
+});
+
+test('a wanted card the catalog has caught up with drops its English stand-in', async () => {
+  const vault = await makeVault();
+  vault.wishlists.tommy.items = [
+    wish('wish_0007', {
+      cardId: undefined,
+      setId: 'M6a',
+      number: '045',
+      nameJa: undefined,
+      nameEn: 'Pikachu',
+      imageBase: 'https://assets.tcgdex.net/en/me/30th/045',
+      hint: { setCode: 'M6a', setName: '30th Anniversary', number: '045', nameEn: 'Pikachu' },
+      pendingSince: '2026-09-20',
+    }),
+  ];
+
+  const writes = await applyResolutions(vault, [
+    {
+      id: 'tommy/wish_0007',
+      cardId: 'M6a-045',
+      setId: 'M6a',
+      number: '045',
+      nameJa: 'ピカチュウ',
+      imageBase: 'https://assets.tcgdex.net/ja/me/M6a/045',
+      resolvedOn: '2026-11-02',
+    },
+  ]);
+
+  const item = vault.wishlists.tommy.items[0];
+  assert.equal(item.cardId, 'M6a-045', 'without a card id it can never be priced');
+  assert.equal(item.nameJa, 'ピカチュウ');
+  assert.equal(item.imageBase, 'https://assets.tcgdex.net/ja/me/M6a/045', 'the English artwork must not survive');
+  assert.equal(item.nameEn, undefined, 'the English name was a stand-in, not a translation');
+  assert.equal(item.pendingSince, undefined);
+  assert.ok(item.hint, 'the hint is what was read off the card and is kept');
+
+  assert.ok(
+    writes?.some((write) => write.path.endsWith('personal/tommy.enc')),
+    "the resolved list has to be written, or the fix is lost on reload",
+  );
+});
+
+test('a resolution for one list leaves the other lists alone', async () => {
+  const vault = await makeVault();
+  const before = JSON.stringify(vault.wishlists.valerio);
+
+  vault.wishlists.tommy.items = [
+    wish('wish_0007', {
+      cardId: undefined,
+      hint: { setCode: 'M6a', number: '045' },
+      pendingSince: '2026-09-20',
+    }),
+  ];
+
+  const writes = await applyResolutions(vault, [
+    { id: 'tommy/wish_0007', cardId: 'M6a-045', setId: 'M6a', number: '045', nameJa: 'ピカチュウ', resolvedOn: '2026-11-02' },
+  ]);
+
+  assert.equal(JSON.stringify(vault.wishlists.valerio), before);
+  assert.ok(!writes?.some((write) => write.path.endsWith('personal/valerio.enc')));
+});
+
+test('a resolution for a card id that is not waiting changes nothing', async () => {
+  const vault = await makeVault();
+  const writes = await applyResolutions(vault, [
+    { id: 'tommy/wish_9999', cardId: 'M6a-045', setId: 'M6a', number: '045', nameJa: 'ピカチュウ', resolvedOn: '2026-11-02' },
+  ]);
+  assert.equal(writes, null, 'nothing to apply must not produce a commit');
 });

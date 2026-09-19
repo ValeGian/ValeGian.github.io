@@ -20,7 +20,8 @@ import { renderPublishBar } from './views/publish-bar.ts';
 import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markBought, newCardId, updateCard, updateWish, type Envelope, type Resolution, type Vault } from './lib/vault.ts';
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
-import { unlock } from '../lib/unlock.mjs';
+import { resume, unlock } from '../lib/unlock.mjs';
+import { clearSession, loadSession, saveSession, sessionKeys } from './lib/session.ts';
 import { decryptWithKey } from '../lib/crypto.mjs';
 import type { Collection, CollectionItem, Wishlist, WishlistItem } from './lib/types.ts';
 
@@ -47,7 +48,17 @@ interface AppState {
   adding: boolean;
   add: Omit<
     AddCardState,
-    'names' | 'lists' | 'onChange' | 'onField' | 'latest' | 'onSearch' | 'onSave' | 'onSaveWish' | 'onCancel' | 'nextId'
+    | 'names'
+    | 'lists'
+    | 'onChange'
+    | 'onField'
+    | 'latest'
+    | 'onSearch'
+    | 'onLoadMore'
+    | 'onSave'
+    | 'onSaveWish'
+    | 'onCancel'
+    | 'nextId'
   >;
   pendingCount: number;
   hasToken: boolean;
@@ -76,6 +87,8 @@ const blankAdd = (mode: AddMode = 'collection'): AppState['add'] => ({
   mode,
   results: [],
   searching: false,
+  hasMore: false,
+  loadingMore: false,
   picked: null,
   manual: false,
   photo: null,
@@ -297,15 +310,7 @@ function lockScreen(state: AppState): DocumentFragment {
         store.update({ phase: 'checking', message: 'Checking…' });
 
         try {
-          const opened = (await unlock(password)) as
-            | {
-                role: 'admin' | 'viewer';
-                files: Record<string, unknown>;
-                keys: Map<string, CryptoKey>;
-                envelopes: Map<string, Envelope>;
-              }
-            | { role: 'friend'; owner: string; list: Wishlist }
-            | null;
+          const opened = (await unlock(password)) as Opened;
 
           if (!opened) {
             // Says nothing about which file was tried or how close the guess was.
@@ -313,35 +318,7 @@ function lockScreen(state: AppState): DocumentFragment {
             return;
           }
 
-          const data = await loadPublicData();
-
-          if (opened.role === 'friend') {
-            store.update({
-              phase: 'open',
-              message: '',
-              data,
-              friend: { role: 'friend', owner: opened.owner, wishlist: opened.list },
-            });
-            return;
-          }
-
-          const readOnly = opened.role === 'viewer';
-          const vault = await buildVault(opened.files, opened.keys, opened.envelopes, data);
-          store.update({
-            phase: 'open',
-            message: '',
-            data,
-            vault,
-            readOnly,
-            hasToken: !readOnly && Boolean(getToken()),
-          });
-          void loadRange(RANGES[0]);
-
-          // Both of these exist to move unpublished work along, which a reader has none of.
-          if (!readOnly) {
-            await catchUpOnResolutions(vault);
-            await refreshPendingCount();
-          }
+          await begin(opened, true);
         } catch (error) {
           store.update({
             phase: 'locked',
@@ -373,6 +350,51 @@ function lockScreen(state: AppState): DocumentFragment {
   );
 }
 
+type Opened =
+  | { role: 'admin' | 'viewer'; files: Record<string, unknown>; keys: Map<string, CryptoKey>; envelopes: Map<string, Envelope> }
+  | { role: 'friend'; owner: string; list: Wishlist; key?: CryptoKey }
+  | null;
+
+/**
+ * Brings an opened vault on screen, however it was opened.
+ *
+ * Shared by the password form and by the reload path, so the two cannot drift into
+ * showing different things — which is what a second copy of this would eventually do.
+ */
+async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void> {
+  const data = await loadPublicData();
+
+  if (opened.role === 'friend') {
+    store.update({
+      phase: 'open',
+      message: '',
+      data,
+      friend: { role: 'friend', owner: opened.owner, wishlist: opened.list },
+    });
+    if (keep && opened.key) await saveSession({ role: 'friend', owner: opened.owner, key: opened.key });
+    return;
+  }
+
+  const readOnly = opened.role === 'viewer';
+  const vault = await buildVault(opened.files, opened.keys, opened.envelopes, data);
+  store.update({
+    phase: 'open',
+    message: '',
+    data,
+    vault,
+    readOnly,
+    hasToken: !readOnly && Boolean(getToken()),
+  });
+  if (keep) await saveSession({ role: opened.role, keys: opened.keys });
+  void loadRange(RANGES[0]);
+
+  // Both of these exist to move unpublished work along, which a reader has none of.
+  if (!readOnly) {
+    await catchUpOnResolutions(vault);
+    await refreshPendingCount();
+  }
+}
+
 /** Nudges a rebuild when something changed outside the store, such as the vault. */
 const rerender = (): void => store.update((current) => ({ tick: current.tick + 1 }) as Partial<AppState>);
 
@@ -389,19 +411,22 @@ function runCatalogSearch(query: string): void {
   clearTimeout(searchTimer);
 
   if (query.trim().length < 2) {
-    store.update((current) => ({ add: { ...current.add, results: [], searching: false } }));
+    store.update((current) => ({ add: { ...current.add, results: [], searching: false, hasMore: false } }));
     return;
   }
 
   const generation = ++searchGeneration;
-  store.update((current) => ({ add: { ...current.add, searching: true } }));
+  loadedPages = 1;
+  store.update((current) => ({ add: { ...current.add, searching: true, hasMore: false } }));
 
   searchTimer = setTimeout(async () => {
     const names = store.get().data?.names ?? emptyNames;
     try {
-      const results = await searchCards(query, names);
+      const { hits, hasMore } = await searchCards(query, names);
       if (generation !== searchGeneration) return;
-      store.update((current) => ({ add: { ...current.add, results, searching: false } }));
+      store.update((current) => ({
+        add: { ...current.add, results: hits, hasMore, searching: false, loadingMore: false },
+      }));
     } catch (error) {
       if (generation !== searchGeneration) return;
       store.update((current) => ({
@@ -409,6 +434,40 @@ function runCatalogSearch(query: string): void {
       }));
     }
   }, SEARCH_DELAY_MS);
+}
+
+/**
+ * The next page of results, when the end of the list comes into view.
+ *
+ * Pages are counted from what is on screen rather than stored, so a new search cannot
+ * leave a stale page number behind. A page that arrives after the query has moved on is
+ * discarded by the same generation check the first page uses.
+ */
+let loadedPages = 1;
+
+async function loadMoreResults(): Promise<void> {
+  const { add, data } = store.get();
+  if (add.loadingMore || !add.hasMore || add.searching) return;
+
+  const generation = searchGeneration;
+  loadedPages += 1;
+  const page = loadedPages;
+  store.update((current) => ({ add: { ...current.add, loadingMore: true } }));
+
+  try {
+    const { hits, hasMore } = await searchCards(add.query, data?.names ?? emptyNames, page);
+    if (generation !== searchGeneration) return;
+
+    store.update((current) => {
+      // Keyed by id, because a species can appear on a page boundary twice.
+      const merged = new Map(current.add.results.map((hit) => [hit.id, hit]));
+      for (const hit of hits) merged.set(hit.id, hit);
+      return { add: { ...current.add, results: [...merged.values()], hasMore, loadingMore: false } };
+    });
+  } catch {
+    // A page that will not load is not worth an error banner over results already shown.
+    store.update((current) => ({ add: { ...current.add, loadingMore: false, hasMore: false } }));
+  }
 }
 
 /**
@@ -710,6 +769,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           onField: (change) => store.set((current) => ({ add: { ...current.add, ...change } })),
           latest: () => store.get().add,
           onSearch: runCatalogSearch,
+          onLoadMore: () => void loadMoreResults(),
           onSave: saveCard,
           onSaveWish: saveWish,
           onCancel: () => store.update({ adding: false, add: blankAdd(state.add.mode) }),
@@ -784,7 +844,15 @@ function paint(state: AppState): void {
   actions.replaceChildren(
     state.phase === 'open'
       ? // Nothing readable is stored anywhere, so reloading is a complete lock.
-        el('button', { type: 'button', class: 'chip', text: 'Lock', onClick: () => location.reload() })
+        el('button', {
+          type: 'button',
+          class: 'chip',
+          text: 'Lock',
+          onClick: () => {
+            clearSession();
+            location.reload();
+          },
+        })
       : frag(),
   );
 
@@ -802,7 +870,39 @@ function paint(state: AppState): void {
   );
 }
 
+/**
+ * Reopens the vault if this tab still holds the keys from before the reload.
+ *
+ * Anything that does not work — no session, a key that no longer opens its file, a file
+ * that has moved — falls back to the password form rather than reporting a failure. The
+ * only thing that can go wrong here is being asked to type a password, which is what
+ * would have happened anyway.
+ */
+async function resumeSession(): Promise<void> {
+  const saved = loadSession();
+  if (!saved) return;
+
+  store.update({ phase: 'checking', message: 'Reopening…' });
+
+  const keys = await sessionKeys(saved);
+  const opened = keys ? ((await resume(saved, keys)) as Opened) : null;
+
+  if (!opened) {
+    clearSession();
+    store.update({ phase: 'locked', message: '' });
+    return;
+  }
+
+  try {
+    await begin(opened, false);
+  } catch {
+    clearSession();
+    store.update({ phase: 'locked', message: '' });
+  }
+}
+
 export function start(): void {
   store.subscribe(render);
   render(store.get());
+  void resumeSession();
 }

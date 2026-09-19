@@ -28,10 +28,12 @@ const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'));
 const collection = await readJson(options.collection);
 const overrides = await readJson('public/data/catalog-overrides.json');
 
-const wishlists = [];
+// Keyed by file name without its extension, which is the same id the browser holds and
+// the same one that ends up in a pending item's id.
+const wishlists = {};
 if (existsSync(options.wishlists)) {
   for (const name of (await readdir(options.wishlists)).filter((file) => file.endsWith('.json'))) {
-    wishlists.push(await readJson(`${options.wishlists}/${name}`));
+    wishlists[name.replace(/\.json$/, '')] = await readJson(`${options.wishlists}/${name}`);
   }
 }
 

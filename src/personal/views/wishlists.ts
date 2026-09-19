@@ -80,7 +80,7 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
   const image = fullImage(sample);
   const measure = reading?.basis === 'avg7' ? '7-day average' : '30-day average';
 
-  const row = (owner: string, list: Wishlist, item: WishlistItem) => {
+  const row = (list: Wishlist, item: WishlistItem) => {
     const bought = item.status === 'bought';
     const under = reading && item.targetPriceEur !== null && reading.value <= item.targetPriceEur;
     return el(
@@ -157,7 +157,7 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
           ),
         ),
         el('p', { class: 'wanters-heading ui', text: wanters.length === 1 ? 'Wanted by' : `Wanted by ${wanters.length} people` }),
-        el('div', { class: 'wanters' }, ...wanters.map(({ owner, list, item }) => row(owner, list, item))),
+        el('div', { class: 'wanters' }, ...wanters.map(({ list, item }) => row(list, item))),
       ),
       el('div', { class: 'detail-chart' }, state.chartFor?.(cardId) ?? frag()),
     ),

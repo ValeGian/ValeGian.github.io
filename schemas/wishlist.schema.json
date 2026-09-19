@@ -117,6 +117,12 @@
             "string",
             "null"
           ]
+        },
+        "hint": {
+          "$ref": "common.schema.json#/$defs/catalogHint"
+        },
+        "pendingSince": {
+          "$ref": "common.schema.json#/$defs/isoDate"
         }
       },
       "allOf": [
@@ -158,6 +164,24 @@
             }
           },
           "$comment": "A wanted card has not been bought, so it cannot carry a purchase."
+        },
+        {
+          "if": {
+            "required": [
+              "hint"
+            ]
+          },
+          "then": {
+            "required": [
+              "pendingSince"
+            ],
+            "not": {
+              "required": [
+                "cardId"
+              ]
+            }
+          },
+          "$comment": "A hint is what stands in for a card id. Holding both would mean the retry job keeps resolving a card that is already resolved."
         }
       ]
     }

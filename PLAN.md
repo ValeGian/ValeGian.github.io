@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 26 — detail layout, lightbox, pictures)
+**Last updated:** 2026-09-20 (rev 27 — read-only account, scroll to what you opened, M6a)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -372,7 +372,7 @@ pending for weeks.** That is the case this design exists for.
 
 ## 7. Security
 
-Three roles, but only one of them writes.
+Four roles, but only one of them writes.
 
 ### 7.1 Encryption is the access control
 
@@ -385,6 +385,8 @@ something without any account system, signup, or email.
 - `K_file` is wrapped under `PBKDF2-SHA256(password, per-file salt, 600 000 iterations)`.
 - `keyring.enc` holds every `K_file` wrapped under `cvalgian`, so my password opens
   everything — collection, all three lists, the combined shopping view.
+- `viewer-keyring.enc` holds **the same keys wrapped under a second password**, which is
+  the whole of the read-only account (§7.5).
 - A friend's password opens exactly one file.
 
 No key, proof or password ever leaves the browser: there is nowhere to send it.
@@ -444,6 +446,35 @@ With one writer its job changes from catching other people to catching *me*: a m
 that overwrote a purchase price, or a stale offline queue that flushed an old copy of a
 list. Combined with `git revert`, that is a complete recovery story. Phase 7.
 
+### 7.5 The read-only account
+
+Set with `npm run data:viewer`, which asks for the admin password and a new one and
+writes `viewer-keyring.enc`. `--remove` deletes it.
+
+**Read-only is not a rule the interface enforces.** A password in this design only ever
+decrypts; making a change reach the repository takes a GitHub token, and that token lives
+in one browser's `localStorage` on one device. This account is never given one, so its
+writes have nowhere to go — GitHub refuses them. The hidden buttons are a courtesy, not
+the mechanism.
+
+What it can do: everything I can see. Collection, every purchase price, every wishlist,
+what each friend owes, all history and charts. What it cannot do: add, edit, delete, mark
+a card bought, or publish.
+
+Two consequences worth stating plainly:
+
+- **A second password on the same keys means the vault is only as strong as the weaker
+  of the two.** The default `masuda-method-shiny-1996` is 24 characters and four
+  unrelated words, so it is the stronger of the pair, not the weaker — see §7.3 on what
+  `cvalgian` is actually worth.
+- **Rotating it does not retract it.** The ciphertext is public and git keeps every
+  revision, so anyone who kept a copy of the old `viewer-keyring.enc` keeps their access
+  to the revisions it covered. Rotation protects the future, never the past.
+
+`scripts/test-crypto.mjs` asserts the read-only keyring carries exactly the keys the
+admin keyring carries — the two are wrapped separately, so a reissued key would otherwise
+leave a reader quietly looking at an older version of a file.
+
 ---
 
 ## 8. Feature spec
@@ -470,7 +501,28 @@ list. Combined with `git revert`, that is a complete recovery story. Phase 7.
 | 11 | **Mark bought** | admin | One tap → price in ¥ or € → FX applied → *my* item moves to the collection; a *friend's* item flips to `bought` in place and lands in their balance. |
 | 12 | **Settlements** | admin | Record a repayment against a friend's balance. |
 
-### 8.3 What read-only friends cost
+### 8.3 Sets the catalog has not published yet
+
+TCGdex publishes the English side of a worldwide release first. Four days after the 30th
+Anniversary launch it carried the English `30th` set complete with artwork for all 158
+cards, and no Japanese `M6a` at all — so a card bought on release day could not be found
+by name, by number, or at all.
+
+`MIRRORED_SETS` in `src/personal/lib/tcgdex.ts` pairs the missing Japanese set with its
+English twin. A hit from the twin is shown as a stand-in, labelled *awaiting the Japanese
+catalog*, and saving one records a **pending** card under the Japanese set code and
+number — never the English card id, because that is a different Cardmarket product and
+would be priced wrong. `scripts/resolve-pending.mjs` fills it in when the set arrives.
+
+Three things keep it from becoming debt: stand-ins sort below real results and are capped
+at six unless the query names the set, so a plain search is unaffected; the row disables
+itself once TCGdex has the Japanese set, so forgetting to prune the table costs nothing;
+and the set is fetched once per session rather than per keystroke.
+
+Other free catalogues were checked and rejected: `apitcg.com` needs an API key,
+`api.pokemontcg.io` was unreachable and is English-only regardless.
+
+### 8.4 What read-only friends cost
 
 Every wishlist change comes through me: they message me a card, I add it with the same
 picker I use for my own (feature 10). Accepted as a manual step — no importer, no paste
@@ -641,6 +693,27 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-20 — rev 27 (read-only account, scroll to what you opened, M6a) ✅
+- **A read-only account.** `npm run data:viewer` wraps the existing keyring under a
+  second password. It reads everything the admin reads and can change nothing — not
+  because buttons are hidden, but because publishing needs a GitHub token it is never
+  given (§7.5). Six new assertions in `scripts/test-crypto.mjs` hold the two keyrings in
+  step. Password: `masuda-method-shiny-1996`.
+- **Opening a card moves the page to it.** Wired to opening a collection card, opening a
+  wishlist card, opening the add form, and switching tabs. Two things about it were
+  settled by measurement and are both the opposite of the obvious choice: an
+  `requestAnimationFrame` callback runs before the frame's layout and its scroll is
+  discarded, so it is scheduled as a task; and a smooth scroll is an animation that the
+  next rebuild cancels — the price history arriving a moment later was enough — so it is
+  instant. One frame, two frames and smooth all left the page exactly where it started.
+- **The detail panel's empty right column is gone.** The actions floated, which reserved
+  a column the width of two small buttons and left the rest of it blank for the full
+  height of the panel. They now sit in a full-width row of their own, and the three
+  columns share the whole width. The duplicate `.detail` rule block that had grown 750
+  lines away from the others was folded back in.
+- **M6a cards can be found.** TCGdex still has no Japanese 30th Anniversary set four days
+  after release; the English twin stands in until it does (§8.3).
 
 ### 2026-09-19 — rev 26 (detail layout, lightbox, the last three pictures) ✅
 - **The chart is a column beside the card**, not a block under it, and the empty state

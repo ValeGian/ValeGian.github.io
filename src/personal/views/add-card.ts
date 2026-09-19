@@ -128,6 +128,18 @@ async function submitWish(state: AddCardState): Promise<void> {
       return;
     }
 
+    if (state.picked.mirrorOf) {
+      await state.onSaveWish(state.owners, {
+        ...shared,
+        setId: state.picked.mirrorOf.setCode,
+        number: state.picked.localId,
+        nameJa: state.picked.name,
+        nameEn: state.picked.name,
+        imageBase: state.picked.image ?? '',
+      });
+      return;
+    }
+
     const detail = await cardDetail(state.picked.id);
     await state.onSaveWish(state.owners, {
       ...shared,
@@ -176,7 +188,10 @@ function resultTile(hit: CardHit, state: AddCardState): HTMLElement {
       'span',
       { class: 'result-text' },
       el('span', { class: 'result-name', text: toEnglish(hit.name, state.names) }),
-      el('span', { class: 'result-meta ui', text: hit.id }),
+      el('span', {
+        class: 'result-meta ui',
+        text: hit.mirrorOf ? `${hit.mirrorOf.setCode}-${hit.localId} · awaiting the Japanese catalog` : hit.id,
+      }),
     ),
   );
 }
@@ -388,6 +403,26 @@ export function renderAddCard(state: AddCardState): HTMLElement {
           },
           state.photo,
         );
+        return;
+      }
+
+      // A stand-in for a set TCGdex has not published. It names and pictures the card but
+      // is a different Cardmarket product, so it is recorded as pending under the Japanese
+      // set code and priced only once scripts/resolve-pending.mjs finds the real one.
+      if (state.picked.mirrorOf) {
+        await state.onSave({
+          ...base,
+          status: 'pending',
+          hint: {
+            setCode: state.picked.mirrorOf.setCode,
+            number: state.picked.localId,
+            nameJa: state.picked.name,
+          },
+          nameEn: state.picked.name,
+          number: state.picked.localId,
+          imageBase: state.picked.image ?? '',
+          pendingSince: fields.date,
+        });
         return;
       }
 

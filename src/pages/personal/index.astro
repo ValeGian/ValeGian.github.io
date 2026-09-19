@@ -363,7 +363,12 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 
   /* Detail */
 
+  /* A grid, so the actions take a full-width row of their own. They used to float, which
+     reserved a column beside the card for the width of two small buttons and left the
+     rest of it empty for the whole height of the panel. */
   .personal .detail {
+    display: grid;
+    gap: var(--space-4);
     border: 1px solid var(--rule-strong);
     border-radius: 2px;
     padding: var(--space-4);
@@ -371,8 +376,25 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     background: var(--paper-sunk);
   }
 
+  .personal .detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+  }
+
+  .personal .detail-delete {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    background: none;
+    border: 1px solid var(--down);
+    color: var(--down);
+    border-radius: 999px;
+    padding: var(--space-1) var(--space-3);
+    cursor: pointer;
+  }
+
   .personal .detail-close {
-    float: right;
     font-family: var(--font-ui);
     font-size: var(--size-xs);
     background: none;
@@ -1113,23 +1135,6 @@ import BaseLayout from '@layouts/BaseLayout.astro';
   .personal .form-error {
     color: var(--down);
     margin: 0;
-  }
-
-  .personal .detail-actions {
-    float: right;
-    display: flex;
-    gap: var(--space-2);
-  }
-
-  .personal .detail-delete {
-    font-family: var(--font-ui);
-    font-size: var(--size-xs);
-    background: none;
-    border: 1px solid var(--down);
-    color: var(--down);
-    border-radius: 999px;
-    padding: var(--space-1) var(--space-3);
-    cursor: pointer;
   }
 
   .personal .add-button {

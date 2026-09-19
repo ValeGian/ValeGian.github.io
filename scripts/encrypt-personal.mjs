@@ -10,6 +10,9 @@
  * from an argument, so they stay out of shell history and out of `ps`.
  *
  *   PERSONAL_PASSWORD_ADMIN=… node scripts/encrypt-personal.mjs
+ *
+ * The read-only account lives in viewer-keyring.enc and is not touched here; it is set
+ * and rotated by scripts/set-viewer-password.mjs.
  */
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -50,6 +53,9 @@ await mkdir(`${LOCAL}/wishlists`, { recursive: true });
 
 const keyring = {};
 
+/** Files that had to be given a new key this run; the read-only keyring will not have it. */
+const reissued = [];
+
 /**
  * Reuses the key a file already has.
  *
@@ -77,6 +83,7 @@ for (const file of FILES) {
   }
 
   const reused = await existingKey(file);
+  if (!reused) reissued.push(file.id);
   const { envelope, key } = await encrypt(passwords.get(file.owner), payload, reused);
   keyring[file.id] = await exportFileKey(key);
 
@@ -90,4 +97,18 @@ const { envelope: keyringEnvelope } = await encrypt(adminPassword, keyring);
 await writeFile(`${OUT}/keyring.enc`, `${JSON.stringify(keyringEnvelope)}\n`);
 
 console.log(`  ${'keyring'.padEnd(11)} opened by admin    ${Object.keys(keyring).length} key(s)`);
+
+/**
+ * The read-only keyring holds a copy of these same keys, wrapped under its own password,
+ * and cannot be rewrapped from here because that password is not asked for. A reissued
+ * key therefore leaves it opening a file that no longer exists in that form, which would
+ * otherwise only show up as a reader seeing stale data.
+ */
+if (reissued.length > 0 && existsSync(`${OUT}/viewer-keyring.enc`)) {
+  console.warn(
+    `\nNew key(s) for ${reissued.join(', ')}. The read-only account still holds the old ones — ` +
+      'run scripts/set-viewer-password.mjs to bring it up to date.',
+  );
+}
+
 console.log(`\nwritten to ${OUT}`);

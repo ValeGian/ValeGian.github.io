@@ -21,6 +21,7 @@
     "data:spot-check": "node scripts/spot-check.mjs",
     "test:crypto": "node scripts/test-crypto.mjs --self",
     "data:encrypt": "node scripts/encrypt-personal.mjs",
+    "data:viewer": "node scripts/set-viewer-password.mjs",
     "admin:commit": "node scripts/admin-commit.mjs",
     "test:crypto:real": "node scripts/test-crypto.mjs",
     "test": "node --test \"tests/*.test.ts\"",

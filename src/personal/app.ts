@@ -5,7 +5,7 @@
  * in a readable form, so closing the tab locks it; only ciphertext and already-public
  * JSON are ever written to the device.
  */
-import { el, frag, need, rebuildPreservingFocus } from './lib/dom.ts';
+import { el, frag, need, rebuildPreservingFocus, revealAfterPaint } from './lib/dom.ts';
 import { createStore } from './lib/store.ts';
 import { emptyFilters, type Filters, type SortKey } from './lib/filters.ts';
 import { value, type Valued } from './lib/money.ts';
@@ -30,6 +30,12 @@ interface AppState {
   phase: 'locked' | 'checking' | 'open';
   message: string;
   vault: Vault | null;
+  /**
+   * Set by the read-only password. It hides every control that would change something;
+   * the guarantee behind it is that publishing needs a GitHub token this account has no
+   * way to obtain, so nothing it could do to the DOM would reach the repository.
+   */
+  readOnly: boolean;
   friend: Friend | null;
   data: PublicData | null;
   tab: 'collection' | 'wishlists';
@@ -54,6 +60,8 @@ interface AppState {
   openWishCardId: string | null;
   history: HistorySource | null;
   chartOpen: boolean;
+  /** Consumed once after the next paint, to bring a newly opened panel into view. */
+  reveal: string | null;
   range: Range;
   view: 'list' | 'grid';
   /** Bumped to force a rebuild when the change was to the vault, not to this object. */
@@ -88,6 +96,7 @@ const store = createStore<AppState>({
   phase: 'locked',
   message: '',
   vault: null,
+  readOnly: false,
   friend: null,
   data: null,
   tab: 'collection',
@@ -109,6 +118,7 @@ const store = createStore<AppState>({
   openWishCardId: null,
   history: null,
   chartOpen: false,
+  reveal: null,
   range: RANGES[0],
   view: 'list',
   tick: 0,
@@ -268,6 +278,12 @@ function stalenessBanner(state: AppState): HTMLElement | null {
   });
 }
 
+/** Says why there are no buttons, so their absence reads as a rule and not a fault. */
+function readOnlyBanner(state: AppState): HTMLElement | null {
+  if (!state.readOnly) return null;
+  return el('p', { class: 'banner', text: 'Read-only: everything is visible, nothing can be changed.' });
+}
+
 function lockScreen(state: AppState): DocumentFragment {
   const form = el(
     'form',
@@ -282,7 +298,12 @@ function lockScreen(state: AppState): DocumentFragment {
 
         try {
           const opened = (await unlock(password)) as
-            | { role: 'admin'; files: Record<string, unknown>; keys: Map<string, CryptoKey>; envelopes: Map<string, Envelope> }
+            | {
+                role: 'admin' | 'viewer';
+                files: Record<string, unknown>;
+                keys: Map<string, CryptoKey>;
+                envelopes: Map<string, Envelope>;
+              }
             | { role: 'friend'; owner: string; list: Wishlist }
             | null;
 
@@ -304,11 +325,23 @@ function lockScreen(state: AppState): DocumentFragment {
             return;
           }
 
+          const readOnly = opened.role === 'viewer';
           const vault = await buildVault(opened.files, opened.keys, opened.envelopes, data);
-          store.update({ phase: 'open', message: '', data, vault, hasToken: Boolean(getToken()) });
-          await catchUpOnResolutions(vault);
-          await refreshPendingCount();
+          store.update({
+            phase: 'open',
+            message: '',
+            data,
+            vault,
+            readOnly,
+            hasToken: !readOnly && Boolean(getToken()),
+          });
           void loadRange(RANGES[0]);
+
+          // Both of these exist to move unpublished work along, which a reader has none of.
+          if (!readOnly) {
+            await catchUpOnResolutions(vault);
+            await refreshPendingCount();
+          }
         } catch (error) {
           store.update({
             phase: 'locked',
@@ -549,20 +582,31 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
         'aria-selected': String(state.tab === tab),
         class: state.tab === tab ? 'tab on' : 'tab',
         text: tab === 'collection' ? 'Collection' : 'Wishlists',
-        onClick: () => store.update({ tab, openItemId: null, adding: false, add: blankAdd(tab === 'collection' ? 'collection' : 'wishlist') }),
+        onClick: () =>
+          store.update({
+            tab,
+            openItemId: null,
+            openWishCardId: null,
+            adding: false,
+            add: blankAdd(tab === 'collection' ? 'collection' : 'wishlist'),
+            reveal: '.tabs',
+          }),
       }),
     ),
-    el('button', {
-      type: 'button',
-      class: 'chip add-button',
-      text: state.adding ? 'Close' : state.tab === 'collection' ? 'Add a card' : 'Add a wanted card',
-      onClick: () =>
-        store.update({
-          adding: !state.adding,
-          openItemId: null,
-          add: blankAdd(state.tab === 'collection' ? 'collection' : 'wishlist'),
+    state.readOnly
+      ? null
+      : el('button', {
+          type: 'button',
+          class: 'chip add-button',
+          text: state.adding ? 'Close' : state.tab === 'collection' ? 'Add a card' : 'Add a wanted card',
+          onClick: () =>
+            store.update({
+              adding: !state.adding,
+              openItemId: null,
+              add: blankAdd(state.tab === 'collection' ? 'collection' : 'wishlist'),
+              reveal: state.adding ? null : '.add-form',
+            }),
         }),
-    }),
   );
 
   const body =
@@ -581,7 +625,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
               sortKey: key,
               sortDescending: current.sortKey === key ? !current.sortDescending : true,
             })),
-          onOpen: (itemId) => store.update({ openItemId: itemId, adding: false, editingCard: null }),
+          onOpen: (itemId) =>
+            store.update({ openItemId: itemId, adding: false, editingCard: null, reveal: '.detail' }),
         })
       : renderWishlists({
           lists: vault.wishlists,
@@ -590,10 +635,10 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           combined: state.combined,
           view: state.view,
           onView: (view) => store.update({ view }),
-          canEdit: true,
+          canEdit: !state.readOnly,
           editing: state.editingWish,
           openCardId: state.openWishCardId,
-          onOpenCard: (cardId) => store.update({ openWishCardId: cardId }),
+          onOpenCard: (cardId) => store.update({ openWishCardId: cardId, reveal: cardId ? '.detail' : null }),
           chartFor: (cardId) => cardHistory(state, cardId),
           chartOpen: state.chartOpen,
           onToggleChart: () => store.update({ chartOpen: !state.chartOpen }),
@@ -655,7 +700,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
   return frag(
     tabs,
     state.tab === 'collection' && !state.adding ? valueOverTime(state, vault) : null,
-    state.adding
+    state.adding && !state.readOnly
       ? renderAddCard({
           ...state.add,
           names,
@@ -680,8 +725,8 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
             chartOpen: state.chartOpen,
             onToggleChart: () => store.update({ chartOpen: !state.chartOpen }),
             onClose: () => store.update({ openItemId: null, editingCard: null }),
-            onDelete: removeCard,
-            onStartEdit: (edit) => store.update({ editingCard: edit }),
+            onDelete: state.readOnly ? undefined : removeCard,
+            onStartEdit: state.readOnly ? undefined : (edit: CardEdit) => store.update({ editingCard: edit }),
             // Silent, like every other field: rebuilding would move the caret.
             onEditField: (change) =>
               store.set((current) => ({
@@ -708,13 +753,19 @@ function friendView(state: AppState, friend: Friend): DocumentFragment {
     canEdit: false,
     editing: null,
     openCardId: state.openWishCardId,
-    onOpenCard: (cardId) => store.update({ openWishCardId: cardId }),
+    onOpenCard: (cardId) => store.update({ openWishCardId: cardId, reveal: cardId ? '.detail' : null }),
     onToggleCombined: () => undefined,
   });
 }
 
 function render(state: AppState): void {
   rebuildPreservingFocus(() => paint(state));
+
+  if (state.reveal) {
+    revealAfterPaint(state.reveal);
+    // Cleared without notifying, or clearing it would itself trigger another render.
+    store.set({ reveal: null });
+  }
 }
 
 function paint(state: AppState): void {
@@ -739,7 +790,8 @@ function paint(state: AppState): void {
 
   root.replaceChildren(
     frag(
-      state.phase === 'open' ? publishBar(state) : null,
+      state.phase === 'open' && !state.readOnly ? publishBar(state) : null,
+      state.phase === 'open' ? readOnlyBanner(state) : null,
       state.phase === 'open' ? stalenessBanner(state) : null,
       state.phase === 'open' && state.vault
         ? adminView(state, state.vault)

@@ -91,6 +91,31 @@ export function rebuildPreservingFocus(rebuild: () => void): void {
   }
 }
 
+/**
+ * Brings a panel that just appeared into view.
+ *
+ * Opening a card renders its detail at the top of the tab, so clicking a row far down
+ * the list put the thing you asked for off-screen above you.
+ *
+ * Two details here are the result of measuring rather than preference, and both go
+ * against what the obvious version of this function would do:
+ *
+ * It is scheduled as a task, not with requestAnimationFrame. An animation-frame callback
+ * runs before the frame's layout, and the scroll it asks for is discarded as the replaced
+ * view is laid out. One frame and two frames both left the page exactly where it started.
+ *
+ * The scroll is instant, not smooth. A smooth scroll is an animation, and this view
+ * rebuilds itself whenever anything loads — the price history arrives a moment after a
+ * card is opened — which cancels an animation in flight. Every smooth attempt was
+ * cancelled; every instant one landed. A reduced-motion preference needs no special case
+ * as a result: there is no motion to reduce.
+ */
+export function revealAfterPaint(selector: string): void {
+  setTimeout(() => {
+    document.querySelector(selector)?.scrollIntoView({ behavior: 'auto', block: 'start' });
+  }, 0);
+}
+
 export function need<T extends Element>(selector: string, within: ParentNode = document): T {
   const found = within.querySelector<T>(selector);
   if (!found) throw new Error(`Missing element: ${selector}`);

@@ -5,6 +5,11 @@
  * one file and nothing else. Everything the site does about privacy is a consequence of
  * that, so it is asserted against the real files rather than a fixture.
  *
+ * They also check that the read-only keyring, when one exists, carries the same keys as
+ * the admin keyring. It is wrapped separately, so a reissued key can leave it opening an
+ * older version of a file — which would show up as a reader quietly seeing stale data
+ * rather than as any kind of error.
+ *
  *   PERSONAL_PASSWORD_ADMIN=… node scripts/test-crypto.mjs
  *   node scripts/test-crypto.mjs --self
  *
@@ -39,21 +44,34 @@ async function buildThrowawayVault() {
     keyring[name] = await exportFileKey(key);
   }
   envelopes.keyring = (await encrypt('test-admin', keyring)).envelope;
-  return { envelopes, admin: 'test-admin', collection: contents.collection };
+  envelopes['viewer-keyring'] = (await encrypt('test-viewer', keyring)).envelope;
+  return { envelopes, admin: 'test-admin', viewer: 'test-viewer', collection: contents.collection };
+}
+
+/** Returns null rather than throwing: the read-only account is optional. */
+async function readIfPresent(name) {
+  try {
+    return JSON.parse(await readFile(`${DIR}/${name}.enc`, 'utf8'));
+  } catch {
+    return null;
+  }
 }
 
 let admin;
+let viewer;
 let envelopes;
 let collection;
 
 if (options.self) {
-  ({ envelopes, admin, collection } = await buildThrowawayVault());
+  ({ envelopes, admin, viewer, collection } = await buildThrowawayVault());
 } else {
   admin = process.env.PERSONAL_PASSWORD_ADMIN;
   if (!admin) throw new Error('PERSONAL_PASSWORD_ADMIN is required, or pass --self');
+  viewer = process.env.PERSONAL_PASSWORD_VIEWER ?? null;
   envelopes = Object.fromEntries(
     await Promise.all(FILES.map(async (name) => [name, JSON.parse(await readFile(`${DIR}/${name}.enc`, 'utf8'))])),
   );
+  envelopes['viewer-keyring'] = await readIfPresent('viewer-keyring');
   collection = JSON.parse(await readFile('.local/collection.json', 'utf8'));
 }
 
@@ -74,6 +92,29 @@ check(keyring !== null, 'the admin password opens the keyring');
 for (const name of ['collection', 'valerio', 'tommy', 'lotad']) {
   const key = await importFileKey(keyring.payload[name]);
   check((await decryptWithKey(key, envelopes[name])) !== null, `the keyring opens ${name}.enc`);
+}
+
+// The read-only account reads everything and is a separate password from the admin one.
+// Skipped when there is no such account, or when its password was not supplied.
+if (envelopes['viewer-keyring'] && viewer) {
+  const viewerKeyring = await decrypt(viewer, envelopes['viewer-keyring']);
+  check(viewerKeyring !== null, 'the read-only password opens the read-only keyring');
+
+  check(
+    JSON.stringify(viewerKeyring?.payload) === JSON.stringify(keyring.payload),
+    'the read-only keyring carries exactly the keys the admin keyring carries',
+  );
+
+  for (const name of ['collection', 'valerio', 'tommy', 'lotad', 'keyring']) {
+    check((await decrypt(viewer, envelopes[name])) === null, `the read-only password does NOT open ${name}.enc`);
+  }
+
+  check(
+    (await decrypt(admin, envelopes['viewer-keyring'])) === null,
+    'the read-only keyring is a distinct password from the admin one',
+  );
+} else {
+  console.log('  skip  read-only account (none configured)');
 }
 
 // A friend's password opens their own file.

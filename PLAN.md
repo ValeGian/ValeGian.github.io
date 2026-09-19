@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 19 — calibration automated)
+**Last updated:** 2026-09-19 (rev 20 — search and publishing usability)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -643,6 +643,26 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 20 (search and publishing usability) ✅
+- **The search box lost focus on every keystroke**, so only the first character landed —
+  which is why the search looked broken rather than merely awkward. Cause was the
+  wholesale rebuild introduced in rev 16: it replaces the element the caret sits in. The
+  rev 16 note weighed that approach in render time and **missed that it discards focus
+  and selection**. Rebuilds now restore both by element id.
+- **The same rebuild was wiping the add-card form**, whose fields were uncontrolled and
+  recreated empty. Typing a price and then letting results arrive cleared the price. The
+  form is state-driven now, so a rebuild is lossless by construction.
+- **One search box, Cardmarket-shaped**: matches card id, set, number, rarity and both
+  names, and treats `S12a-261`, `S12a 261` and `s12a261` alike. Pasting an id into the
+  catalog search returns that exact card instead of guessing at names — in a shop the
+  code printed on the card is what is in front of you.
+- Catalog search is **live and debounced** rather than behind a button, and a slow
+  earlier reply can no longer overwrite a newer result.
+- **Publishing happens by itself** a couple of seconds after a change. A burst of edits
+  becomes one commit; a failure stays queued with the count on screen. The token is still
+  asked for once per device.
+- 35 tests. 360 px re-verified with the new form open.
 
 ### 2026-09-19 — rev 19 (calibration automated, price carry-forward) ✅
 - **The calibration week is gone; it is a daily job now.** The question was why `avg30`

@@ -1,8 +1,8 @@
 # valegian.github.io — Rebuild + Personal Collection Tracker
 
-**Status:** Phases 1–4 built; the price series is running. Next: Phase 5, crypto and the write path.
+**Status:** Phases 1–5 built; the vault is live. Next: Phase 6, the Personal area UI.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 14 — price pipeline live)
+**Last updated:** 2026-09-19 (rev 15 — vault encrypted and published)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -590,14 +590,15 @@ static lookup, never fetched at runtime.
       added and frozen into the purchase record, so there is nothing to cache. A daily
       rates file would have been a rewritten file earning its keep for nobody.
 
-### Phase 5 — Crypto + write path
-- [ ] WebCrypto module: PBKDF2 → AES-GCM wrap/unwrap, keyring
-- [ ] `encrypt-personal.mjs` — one-shot migration of plaintext data to `.enc`
-- [ ] Unlock screen; three roles resolved purely by which file a password opens
-- [ ] PAT admin unlock, Contents API writes, offline queue, batched commits,
-      *N unsynced* badge, *Forget token*
-- [ ] `scripts/admin-commit.mjs` — laptop fallback if the browser path ever fails
-- [ ] Tests: a friend password opens exactly one file and nothing else
+### Phase 5 — Crypto + write path  ✅ **built**
+- [x] WebCrypto module: PBKDF2 → AES-GCM wrap/unwrap, keyring
+- [x] `encrypt-personal.mjs` — plaintext under `.local/` → `.enc` under `public/data/`
+- [x] Unlock screen; roles resolved purely by which file a password opens
+- [x] Batched commit client (Git Data API, one commit per save, never forces a ref)
+- [x] `scripts/admin-commit.mjs` — laptop break-glass, refuses to run if `.local/` is staged
+- [x] Tests: 24 checks, including that a friend password opens exactly one file
+- [ ] PAT unlock UI, offline queue, *N unsynced* badge, *Forget token* — these are
+      interface, so they move to Phase 6 with the rest of the UI
 
 ### Phase 6 — Personal area UI
 - [ ] Collection tab: list/table, filters, detail, charts, totals
@@ -630,6 +631,43 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 15 (vault encrypted and published) ✅
+- **The collection is now ciphertext in a public repository**, and opening it needs a
+  password. Verified before publishing: no field name, card name, amount, exchange rate
+  or password appears anywhere in the five `.enc` files.
+- **Envelope format**: `password --PBKDF2(600k)--> wrapping key --unwraps--> AES-256-GCM
+  file key --decrypts--> payload`. The indirection is what lets one file be opened by two
+  passwords — its owner's and the admin keyring's — and makes a password change a
+  re-wrap rather than a re-encryption.
+- A wrong password fails on the GCM authentication tag, so there is no separate check to
+  get wrong, and callers get `null` rather than an error that would reveal how close a
+  guess was.
+- **24 encryption tests**, run two ways: against the real vault locally, and in `--self`
+  mode against a vault the test builds itself, so **CI proves the isolation property
+  without ever holding a secret**. They assert that Tommy's password opens `tommy.enc`
+  and none of the other four, that a flipped byte or replaced salt is detected, that the
+  same payload never encrypts identically twice, and that the round trip is lossless.
+- **Measured before choosing the unlock order.** One PBKDF2 derivation 194 ms, four in
+  sequence 642 ms, **four concurrently 804 ms** — parallelising is *slower*, because
+  WebCrypto serialises PBKDF2 and only adds overhead. So attempts run in order with the
+  keyring first: admin costs one derivation, a friend up to three. Expect roughly four
+  times those figures on the S10.
+- Verified in a real browser: admin unlocks in **675 ms** and reads 46 cards; `tommy`
+  opens only Tommy's list; a wrong password opens nothing and says nothing useful.
+- **Batched commit client** built on the Git Data API rather than Contents, because
+  Contents writes one commit per file and a shopping session would leave forty behind. It
+  never forces a ref — a rejected update means the nightly price job moved the branch, so
+  it rebuilds on top of it.
+- `admin-commit.mjs` refuses to run if anything under `.local/` has been staged. Git
+  history cannot be un-published.
+- Public pages still ship **zero JavaScript**; only `/personal` loads any.
+
+  **Reminder, unchanged from §7.3:** `cvalgian` is eight lowercase letters derived from
+  your handle. Strong against a generic attacker at 600k iterations, weak against a
+  wordlist built from your name. The exposure is read-only and offline — a guess can read
+  the vault, never write to it. Changing it is one command: `npm run data:encrypt` with a
+  new password, then `npm run admin:commit`.
 
 ### 2026-09-19 — rev 14 (price pipeline live) ✅
 - **First reading taken.** 46 cards priced — 43 from TCGdex, 3 from the manual overrides.

@@ -226,4 +226,60 @@ if (stale.length > 0) {
     ].join('\n'),
   );
 }
+/**
+ * Notices when the averages stop moving while the rest of the reading does.
+ *
+ * Measured 2026-09-20: across 25 cards from sets 604 to 1752 days old, `low` changed on
+ * 11 and `trend` on 20 between two refresh cycles, while `avg30`, `avg7` and `avg1`
+ * changed on none — and the site's own figures for the same card disagreed with all three
+ * averages while matching `low` and `trend` to the cent. A one-day average cannot be
+ * identical on twenty-five mature cards a day apart, so that is a dead field, not a quiet
+ * market.
+ *
+ * It matters because the headline value is `avg30`: a frozen field draws a flat line that
+ * looks like a stable market. The day is still recorded — a reading is a reading, and
+ * refusing would leave a hole that cannot be backfilled — but it is reported.
+ */
+const FROZEN_SHARE = 0.95;
+const FROZEN_MINIMUM = 10;
+
+const previousDay = days
+  .filter((name) => name < `${options.date}.json`)
+  .sort()
+  .at(-1);
+
+if (previousDay) {
+  const before = await readJson(`${DATA}/prices/daily/${previousDay}`);
+  const shared = Object.keys(prices).filter((cardId) => before.prices[cardId]);
+
+  const unmoved = (fields) =>
+    shared.filter((cardId) => fields.every((field) => prices[cardId][field] === before.prices[cardId][field]));
+
+  const averages = unmoved(['avg30', 'avg7', 'avg1']);
+  const spot = unmoved(['low', 'trend']);
+
+  if (shared.length >= FROZEN_MINIMUM && averages.length / shared.length >= FROZEN_SHARE) {
+    const line = `${averages.length} of ${shared.length} cards have identical avg30, avg7 and avg1 since ${previousDay.replace('.json', '')}`;
+    console.warn(`\nWARNING: ${line}`);
+    console.warn(`         low and trend are unchanged on only ${spot.length} of ${shared.length}, so the feed is alive.`);
+
+    await writeFile(
+      '.frozen-prices.md',
+      [
+        `**${line}**, while \`low\` and \`trend\` moved on ${shared.length - spot.length} of them.`,
+        '',
+        'A one-day average cannot be identical on that many mature cards a day apart. The',
+        'averages are almost certainly not being refreshed upstream, which matters because',
+        '`avg30` is the headline value — a dead field draws a flat line that reads as a',
+        'stable market.',
+        '',
+        'The day was still recorded; a gap cannot be backfilled later. See PLAN.md §8.4.',
+        '',
+        `- unchanged averages: ${averages.length}/${shared.length}`,
+        `- unchanged low+trend: ${spot.length}/${shared.length}`,
+      ].join('\n'),
+    );
+  }
+}
+
 console.log(`sum of avg30  EUR ${total.toFixed(2)}`);

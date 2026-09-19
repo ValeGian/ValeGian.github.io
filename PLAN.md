@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-20 (rev 29 — the numbering does not carry across; TCGdex looks frozen)
+**Last updated:** 2026-09-20 (rev 30 — the averages are frozen, low and trend are not)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -532,34 +532,51 @@ a wanted card, which nobody is holding, is stored without one and stays out of t
 queue. A wrong match is worse than no match — it would attach another card's price
 silently, the day the set is published.
 
-### 8.4 TCGdex's price mirror looks frozen — open
+### 8.4 TCGdex's averages are frozen; `low` and `trend` are not — open
 
 Measured 2026-09-20 on `S12a-212`, the same minute in both places:
 
-| | TCGdex | Cardmarket | drift |
+| | TCGdex | Cardmarket | |
 |---|---|---|---|
 | avg30 | 109.69 | 104.46 | +5.0% |
 | avg7 | 81.30 | 92.53 | −12.1% |
 | avg1 | 84.00 | 93.00 | −9.7% |
-| low | 68.00 | 65.00 | +4.6% |
+| **low** | **65.00** | **65.00** | exact |
+| **trend** | **75.17** | **75.17** | exact |
 
-And across 18 watched cards, the 19 Sep snapshot and the next day's TCGdex values are
-byte-identical **including `avg1`**, which cannot happen to eighteen cards at once if the
-figure were live. TCGdex re-stamps `updated` daily — its refresh pass runs at ~22:54 UTC
-and takes about 25 seconds — so `updated` is its own fetch time and says nothing about the
-age of the numbers. It matched Cardmarket to the cent when this was first verified, so
-this is an upstream regression rather than a wrong assumption.
+`low` and `trend` match to the cent. Only the three rolling averages disagree — and across
+25 watched cards, between two refresh cycles, `low` changed on 11 and `trend` on 20 while
+`avg30`, `avg7` and `avg1` changed on **none**. A one-day average cannot be identical on
+twenty-five cards a day apart, so this is a dead field rather than a quiet market.
 
-Consequences, unresolved: the history may be recording one datapoint repeatedly, and a
-flat chart would look like a quiet market rather than a dead feed. **Not yet fixed** — the
-options are a duplicate-day detector that raises an issue when a whole day's readings are
-unchanged, waiting for TCGdex to recover, or the official Cardmarket API (OAuth, an app
-registration, and a secret to keep, against the no-maintenance rule).
+Three explanations were tested and rejected:
 
-Scraping the website is not an option for the daily job: Cloudflare blocks non-browser
-clients outright — even `robots.txt` returns a challenge page — and getting past that
-means defeating bot detection. A real browser loads the pages fine, which is what the
-hand-checked override path in `catalog-overrides.json` already exists for.
+- **Wrong variant.** The card has one variant and the `-holo` fields on it are null, so the
+  plain fields are the right ones to read.
+- **Multi-server caching.** A TCGdex maintainer notes in
+  [issue #2337](https://github.com/tcgdex/cards-database/issues/2337) that prices refresh
+  once a day on a timer tied to server start, and that `eu` is served by three machines —
+  which is why `updated` differs between identical requests. Twelve requests for one card
+  returned four different timestamps and **identical values**, so the servers agree; the
+  jitter explains the timestamp, not the discrepancy.
+- **A short listing history.** The youngest set in the sample is 604 days old and the
+  oldest 1752, so nothing here is inside its first 30 days.
+
+No open TCGdex issue covers it. `updated` is TCGdex's own fetch time, not the age of the
+numbers, so it cannot be used to detect this.
+
+**What is in place:** `scripts/snapshot-prices.mjs` now compares each day against the last
+and reports when the averages are unchanged on 95% of shared cards while `low`/`trend` are
+not; the workflow opens one issue. The day is still recorded — a gap cannot be backfilled.
+
+**What is not decided:** whether to keep pricing on `avg30`. `trend` is live and matched
+Cardmarket exactly, and is Cardmarket's own smoothed estimate, so it is the better headline
+while this lasts — but switching changes the meaning of every figure already recorded, so
+it is the owner's call, not a silent fix.
+
+Scraping the site for the averages is not an option for the daily job: Cloudflare serves a
+challenge to non-browser clients, and `robots.txt` itself cannot be fetched. A real browser
+loads the pages fine, which is what the hand-checked override path already exists for.
 
 ### 8.5 Sets the catalog has not published yet
 
@@ -753,6 +770,17 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-20 — rev 30 (the averages are frozen, low and trend are not) ⚠️
+- Ran the comparison properly and **the earlier "TCGdex is frozen" call was too broad**.
+  `low` and `trend` match Cardmarket to the cent and move daily; only `avg30`, `avg7` and
+  `avg1` are stuck — unchanged on 25 of 25 mature cards across a refresh cycle. That is
+  the field the whole site prices on. §8.4 has the evidence and the three explanations
+  that were tested and ruled out, including the multi-server caching a TCGdex maintainer
+  describes in issue #2337, which turned out to explain the timestamp and not the values.
+- The daily job now notices it: if the averages are unchanged on 95% of cards while
+  `low`/`trend` are not, it writes a report and the workflow opens one issue. The reading
+  is still recorded, because a missing day cannot be backfilled.
 
 ### 2026-09-20 — rev 29 (the numbering does not carry across) ⚠️
 - **A bug I introduced, caught by checking against Cardmarket.** `MIRRORED_SETS` assumed

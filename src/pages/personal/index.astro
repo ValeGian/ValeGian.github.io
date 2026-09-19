@@ -1,0 +1,190 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Personal" description="Private area.">
+  <div class="page gate">
+    <h1>Personal</h1>
+    <p class="intro">Enter your password to open your list.</p>
+
+    <form id="unlock-form">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+      <button type="submit">Unlock</button>
+      <p id="status" class="status ui" role="status" aria-live="polite"></p>
+    </form>
+
+    <section id="vault" hidden>
+      <p id="whoami" class="ui"></p>
+      <dl id="summary" class="summary"></dl>
+      <button id="lock" type="button">Lock</button>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import { unlock } from '../../lib/unlock.mjs';
+
+  /** The markup above is fixed, so a missing element is a bug, not a runtime condition. */
+  function need<T extends Element>(selector: string): T {
+    const element = document.querySelector<T>(selector);
+    if (!element) throw new Error(`Missing element: ${selector}`);
+    return element;
+  }
+
+  const form = need<HTMLFormElement>('#unlock-form');
+  const submit = need<HTMLButtonElement>('#unlock-form button');
+  const passwordField = need<HTMLInputElement>('#password');
+  const status = need<HTMLParagraphElement>('#status');
+  const vault = need<HTMLElement>('#vault');
+  const whoami = need<HTMLParagraphElement>('#whoami');
+  const summary = need<HTMLDListElement>('#summary');
+
+  type Item = { status?: string };
+  type List = { items?: Item[] };
+  type Session =
+    | { role: 'admin'; files: Record<string, List | undefined> }
+    | { role: 'friend'; owner: string; list: List };
+
+  function describe(session: Session): [string, string][] {
+    if (session.role === 'admin') {
+      return [
+        ['Cards owned', String(session.files.collection?.items?.length ?? 0)],
+        ...(['valerio', 'tommy', 'lotad'] as const).map(
+          (owner): [string, string] => [`${owner} wants`, String(session.files[owner]?.items?.length ?? 0)],
+        ),
+      ];
+    }
+    const items = session.list.items ?? [];
+    return [
+      ['Cards on your list', String(items.filter((item) => item.status !== 'bought').length)],
+      ['Bought for you', String(items.filter((item) => item.status === 'bought').length)],
+    ];
+  }
+
+  function show(session: Session): void {
+    form.hidden = true;
+    vault.hidden = false;
+    whoami.textContent =
+      session.role === 'admin' ? 'Unlocked everything.' : `Unlocked ${session.owner}'s list.`;
+    summary.replaceChildren(
+      ...describe(session).flatMap(([label, value]) => {
+        const term = document.createElement('dt');
+        term.textContent = label;
+        const detail = document.createElement('dd');
+        detail.className = 'numeric';
+        detail.textContent = value;
+        return [term, detail];
+      }),
+    );
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    status.textContent = 'Checking…';
+    submit.disabled = true;
+
+    try {
+      const session = (await unlock(passwordField.value)) as Session | null;
+      if (!session) {
+        // Deliberately silent about which file was tried or how close the guess was.
+        status.textContent = 'That password does not open anything here.';
+        return;
+      }
+      passwordField.value = '';
+      status.textContent = '';
+      show(session);
+    } catch (error) {
+      status.textContent = `Could not read the vault: ${error instanceof Error ? error.message : String(error)}`;
+    } finally {
+      submit.disabled = false;
+    }
+  });
+
+  // Nothing is cached anywhere, so a reload is a complete lock.
+  need<HTMLButtonElement>('#lock').addEventListener('click', () => location.reload());
+</script>
+
+<style>
+  .gate {
+    padding-block: var(--space-16) 0;
+    max-width: 34rem;
+  }
+
+  h1 {
+    font-size: var(--size-2xl);
+    margin-bottom: var(--space-3);
+  }
+
+  .intro {
+    color: var(--muted);
+    margin-bottom: var(--space-8);
+  }
+
+  form {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  label {
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+    color: var(--muted);
+  }
+
+  input {
+    font: inherit;
+    font-family: var(--font-ui);
+    width: 100%;
+    max-width: 20rem;
+    padding: var(--space-2) var(--space-3);
+    background: var(--paper);
+    color: var(--ink);
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+  }
+
+  button {
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+    padding: var(--space-2) var(--space-6);
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: progress;
+  }
+
+  .status {
+    font-size: var(--size-sm);
+    color: var(--muted);
+    min-height: 1.5em;
+    margin: 0;
+  }
+
+  .summary {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2) var(--space-6);
+    margin: var(--space-6) 0;
+    padding-block: var(--space-4);
+    border-block: 1px solid var(--rule);
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+  }
+
+  .summary dt {
+    color: var(--muted);
+  }
+
+  .summary dd {
+    margin: 0;
+    text-align: right;
+  }
+</style>

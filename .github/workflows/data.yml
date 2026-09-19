@@ -26,6 +26,11 @@ jobs:
       - run: npm ci
       - name: Schema tests
         run: npm run test:schemas
+
+      # Builds its own throwaway vault, so CI proves the isolation property without ever
+      # holding a real password or a real file.
+      - name: Encryption tests
+        run: npm run test:crypto
       # Personal files live under .local/ and are absent here by design; the script
       # checks what exists and requires only the public files.
       - name: Validate data files

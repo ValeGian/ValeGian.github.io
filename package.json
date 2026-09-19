@@ -18,7 +18,11 @@
     "data:migrate": "node scripts/migrate-sheet.mjs",
     "data:snapshot": "node scripts/snapshot-prices.mjs",
     "data:resolve": "node scripts/resolve-pending.mjs",
-    "data:spot-check": "node scripts/spot-check.mjs"
+    "data:spot-check": "node scripts/spot-check.mjs",
+    "test:crypto": "node scripts/test-crypto.mjs --self",
+    "data:encrypt": "node scripts/encrypt-personal.mjs",
+    "admin:commit": "node scripts/admin-commit.mjs",
+    "test:crypto:real": "node scripts/test-crypto.mjs"
   },
   "dependencies": {
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",

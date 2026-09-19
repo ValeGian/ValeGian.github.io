@@ -575,7 +575,8 @@ static lookup, never fetched at runtime.
 - [x] `build-watchlist.mjs` → public `watchlist.json`, 43 cards
 - [x] JA↔EN name table generated from PokéAPI, translates 45/45
 - [x] Totals reconcile to €1218,97
-- [ ] Friend-list schema — deferred to Phase 6, when the wishlist UI defines its shape
+- [ ] Friend-list schema — the shape is settled now, but `validate.mjs` still cannot
+      check a decrypted wishlist
 
 ### Phase 4 — Price pipeline  ✅ **built**
 - [x] `snapshot-prices.mjs` — TCGdex, variant-aware → `latest.json` + `daily/<date>.json`
@@ -585,7 +586,7 @@ static lookup, never fetched at runtime.
 - [x] `build-watchlist.mjs` also emits `pending.json`
 - [x] **Calibration automated** — `scripts/calibrate.mjs` runs in the daily job and
       answers the `avg7`/`avg1` question from the snapshots themselves. No manual week.
-- [ ] Staleness banner in the UI — needs the UI; moved to Phase 6
+- [x] Staleness banner in the UI — done in Phase 6
 - [x] ~~Frankfurter FX cache~~ — **dropped.** The rate is looked up once when a card is
       added and frozen into the purchase record, so there is nothing to cache. A daily
       rates file would have been a rewritten file earning its keep for nobody.
@@ -597,8 +598,8 @@ static lookup, never fetched at runtime.
 - [x] Batched commit client (Git Data API, one commit per save, never forces a ref)
 - [x] `scripts/admin-commit.mjs` — laptop break-glass, refuses to run if `.local/` is staged
 - [x] Tests: 24 checks, including that a friend password opens exactly one file
-- [ ] PAT unlock UI, offline queue, *N unsynced* badge, *Forget token* — these are
-      interface, so they move to Phase 6 with the rest of the UI
+- [x] PAT unlock UI, offline queue, unpublished-count badge, *Forget token* — done in
+      Phase 6 (rev 17)
 
 ### Phase 6 — Personal area UI  ◐ **read side done, write side next**
 - [x] Collection tab: list, filters, sort, detail, totals

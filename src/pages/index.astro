@@ -1,0 +1,33 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import profile from '@data/profile.json';
+
+const { identity, links, projects } = profile;
+const fullName = `${identity.firstName} ${identity.lastName}`;
+const featured = projects.filter((project) => project.featured);
+---
+
+<BaseLayout title={fullName}>
+  <h1>{fullName}</h1>
+  <p>{identity.headline}</p>
+
+  <h2>Recent work</h2>
+  <ul>
+    {featured.map((project) => (
+      <li>
+        <a href={project.link}>{project.title}</a> — {project.description}
+      </li>
+    ))}
+  </ul>
+
+  <h2>Elsewhere</h2>
+  <ul>
+    {links.profiles.map((profileLink) => (
+      <li><a href={profileLink.url}>{profileLink.platform}</a></li>
+    ))}
+  </ul>
+
+  <p style="color: var(--muted)">
+    Placeholder shell — the design system and the remaining sections land in Phase 2.
+  </p>
+</BaseLayout>

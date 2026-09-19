@@ -1,0 +1,195 @@
+{
+  "identity": {
+    "firstName": "Valerio",
+    "lastName": "Giannini",
+    "headline": "AI Tech Lead / AI Inference Engineer",
+    "nationality": "Italian",
+    "birthday": "1998-12-30",
+    "portrait": "/images/portrait.jpg",
+    "bio": "",
+    "bioStatus": "placeholder"
+  },
+  "links": {
+    "email": "46gianninivalerio@gmail.com",
+    "profiles": [
+      { "platform": "GitHub", "url": "https://github.com/ValeGian", "handle": "ValeGian" },
+      { "platform": "LinkedIn", "url": "https://www.linkedin.com/in/valerio-giannini/", "handle": "valerio-giannini" },
+      { "platform": "Telegram", "url": "https://telegram.me/valeGiann", "handle": "valeGiann" },
+      { "platform": "Instagram", "url": "https://www.instagram.com/valegiann/", "handle": "valegiann" }
+    ]
+  },
+  "education": [
+    {
+      "degree": "M.Sc. Artificial Intelligence and Data Engineering",
+      "institution": "University of Pisa",
+      "country": "Italy",
+      "startYear": 2020,
+      "endYear": null,
+      "grade": null,
+      "syllabus": "https://computer.ing.unipi.it/aide-lm/study-plan-20-21",
+      "transcript": "/resources/master-transcript.pdf"
+    },
+    {
+      "degree": "B.Sc. Ingegneria Informatica (Computer Engineering)",
+      "institution": "University of Pisa",
+      "country": "Italy",
+      "startYear": 2017,
+      "endYear": 2020,
+      "endMonth": 9,
+      "grade": "110/110 cum laude",
+      "gradeNote": "Full marks with honours, the maximum mark in the Italian system",
+      "syllabus": "https://computer.ing.unipi.it/inginf-l/piano-di-studi-19-20",
+      "transcript": "/resources/bachelor-transcript.pdf"
+    }
+  ],
+  "experience": [],
+  "skills": {
+    "summary": "I have worked with a wide variety of programming languages and love learning how to use new tools. My interest mainly revolves around AI, but I continually try to expand my knowledge of other areas, focusing on the most cutting-edge technologies.",
+    "languages": ["Python", "C++", "C", "Java", "TypeScript", "JavaScript", "SQL", "Matlab", "PHP", "Erlang"],
+    "tools": ["PyTorch", "CUDA", "Docker", "Kubernetes", "AWS CDK", "Git", "MySQL", "MongoDB", "Neo4j", "LevelDB", "GlassFish"]
+  },
+  "projects": [
+    {
+      "slug": "liteinfer",
+      "title": "liteinfer",
+      "description": "A lightweight, hackable LLM inference engine built from scratch — paged KV cache, prefix caching, tensor parallelism, torch.compile and CUDA graphs, each isolated and benchmarkable.",
+      "type": "personal",
+      "featured": true,
+      "date": "2026-05-03",
+      "lastActivity": "2026-09-12",
+      "link": "https://github.com/ValeGian/liteinfer",
+      "package": "https://pypi.org/project/liteinfer/",
+      "languages": ["Python", "PyTorch", "CUDA"]
+    },
+    {
+      "slug": "variantgpt",
+      "title": "variantGPT",
+      "description": "Research framework for training GPT-2 with interchangeable attention mechanisms — MHA, MQA, GQA, sliding-window, linear, sparse (BigBird) and MLA (DeepSeek-V2) — compared under identical conditions.",
+      "type": "personal",
+      "featured": true,
+      "date": "2025-08-19",
+      "lastActivity": "2026-05-03",
+      "link": "https://github.com/ValeGian/variantGPT",
+      "languages": ["Python", "PyTorch"]
+    },
+    {
+      "slug": "specforge",
+      "title": "SpecForge",
+      "description": "Contributions to sgl-project/SpecForge — training speculative decoding models and porting them for serving.",
+      "type": "contribution",
+      "featured": true,
+      "date": "2025-10-07",
+      "lastActivity": "2025-10-07",
+      "link": "https://github.com/ValeGian/SpecForge",
+      "upstream": "https://github.com/sgl-project/SpecForge",
+      "languages": ["Python"]
+    },
+    {
+      "slug": "music-classifier",
+      "title": "MusicClassifier",
+      "description": "Generates accurate, reproducible machine-learning models that predict a song's genre from its audio features.",
+      "type": "personal",
+      "featured": false,
+      "date": "2021-10-24",
+      "link": "https://github.com/ValeGian/MusicClassifier",
+      "languages": ["Python", "Scikit-learn", "Pandas"]
+    },
+    {
+      "slug": "federated-dbscan",
+      "title": "FederatedDBSCAN",
+      "description": "A federated formulation of DBSCAN clustering.",
+      "type": "university",
+      "course": "Data Mining and Machine Learning",
+      "featured": false,
+      "date": "2021-02-05",
+      "link": "https://github.com/ValeGian/DataMining-MachineLearning_FederatedDBSCAN",
+      "languages": ["Python", "SciPy", "NumPy", "Scikit-learn", "Pandas"]
+    },
+    {
+      "slug": "smartpool",
+      "title": "SmartPool",
+      "description": "An IoT system monitoring and controlling a swimming pool.",
+      "type": "university",
+      "course": "Internet of Things",
+      "featured": false,
+      "date": "2021-07-16",
+      "link": "https://github.com/ValeGian/InternetOfThings_SmartPool",
+      "languages": ["C", "Java"]
+    },
+    {
+      "slug": "ceph-file-manager",
+      "title": "Ceph File Manager",
+      "description": "A file manager built on a Ceph distributed storage cluster.",
+      "type": "university",
+      "course": "Cloud Computing",
+      "featured": false,
+      "date": "2021-05-31",
+      "link": "https://github.com/ValeGian/CloudComputing_Ceph_File_Manager",
+      "languages": ["Python", "Docker"]
+    },
+    {
+      "slug": "pagerank",
+      "title": "PageRank",
+      "description": "Implementation of the PageRank algorithm on Hadoop and Spark.",
+      "type": "university",
+      "course": "Cloud Computing",
+      "featured": false,
+      "date": "2021-05-14",
+      "link": "https://github.com/ValeGian/CloudComputing_PageRank",
+      "languages": ["Java", "Python", "Hadoop", "Spark"]
+    },
+    {
+      "slug": "covid-tracker",
+      "title": "CovidTracker",
+      "description": "A distributed contact-tracing system.",
+      "type": "university",
+      "course": "Distributed Systems and Middleware Technologies",
+      "featured": false,
+      "date": "2020-12-24",
+      "link": "https://github.com/ValeGian/DistributedSystems-MiddlewareTechnologies_CovidTracker",
+      "languages": ["Java", "Erlang"]
+    },
+    {
+      "slug": "unimusic",
+      "title": "UniMusic",
+      "description": "A music application backed by both MongoDB and Neo4j.",
+      "type": "university",
+      "course": "Large-Scale and Multi-Structured Databases",
+      "featured": false,
+      "date": "2020-12-02",
+      "link": "https://github.com/ValeGian/LargeScale-MultiStructuredDatabase_UniMusic",
+      "languages": ["Java", "JavaFX", "MongoDB", "Neo4j"]
+    },
+    {
+      "slug": "frogger",
+      "title": "Frogger",
+      "description": "A Java/JavaFX version of the Frogger arcade game.",
+      "type": "university",
+      "featured": false,
+      "date": "2020-04-18",
+      "link": "https://github.com/ValeGian/Frogger-Game",
+      "languages": ["Java", "JavaFX"]
+    },
+    {
+      "slug": "pacman",
+      "title": "PacMan",
+      "description": "A version of Pac-Man written with Java 8 and the JavaFX 2.2 API.",
+      "type": "personal",
+      "featured": false,
+      "date": "2019-12-04",
+      "link": "https://github.com/ValeGian/JavaFX_PacMan",
+      "languages": ["Java", "JavaFX"]
+    },
+    {
+      "slug": "hardware-ecommerce",
+      "title": "Hardware E-Commerce Website",
+      "description": "An e-commerce site built for the Web Development course. The site itself is in Italian.",
+      "type": "university",
+      "course": "Web Development",
+      "featured": false,
+      "date": "2018-02-20",
+      "link": "https://github.com/ValeGian/Hardware-ECommerce-Website",
+      "languages": ["JavaScript", "Ajax", "PHP", "HTML5", "CSS3"]
+    }
+  ]
+}

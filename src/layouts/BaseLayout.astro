@@ -1,0 +1,54 @@
+---
+/**
+ * Minimal document shell. Phase 2 replaces this with the real design system;
+ * until then it only guarantees a valid, responsive, theme-aware document.
+ */
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Personal site of Valerio Giannini.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <style is:global>
+      :root {
+        color-scheme: light dark;
+        --bg: #fbfbfa;
+        --fg: #1b1b1a;
+        --muted: #6b6b68;
+        --rule: #e3e3e0;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #141414;
+          --fg: #ececea;
+          --muted: #9a9a96;
+          --rule: #2b2b2a;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 3rem 1rem calc(3rem + env(safe-area-inset-bottom, 0px));
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      main { max-width: 42rem; margin-inline: auto; }
+      a { color: inherit; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

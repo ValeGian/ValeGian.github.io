@@ -1,0 +1,32 @@
+name: Data
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'schemas/**'
+      - 'scripts/**'
+      - 'public/data/**'
+      - '.github/workflows/data.yml'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Schema tests
+        run: npm run test:schemas
+      # Personal files live under .local/ and are absent here by design; the script
+      # checks what exists and requires only the public files.
+      - name: Validate data files
+        run: npm run validate

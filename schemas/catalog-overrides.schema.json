@@ -5,40 +5,99 @@
   "description": "Hand-written catalog entries, merged over TCGdex. Card facts only — no ownership and no purchase data, so this file is safe to serve publicly.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "cards"],
+  "required": [
+    "version",
+    "cards"
+  ],
   "properties": {
-    "version": { "const": 1 },
+    "version": {
+      "const": 1
+    },
     "cards": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["cardId", "setId", "number", "nameJa", "nameEn", "setName", "reason", "price"],
+        "required": [
+          "cardId",
+          "reason",
+          "price"
+        ],
         "properties": {
-          "cardId": { "$ref": "common.schema.json#/$defs/cardId" },
-          "setId": { "type": "string" },
-          "setName": { "type": "string" },
-          "number": { "type": "string" },
-          "nameJa": { "type": "string" },
-          "nameEn": { "type": "string" },
-          "rarity": { "type": ["string", "null"] },
-          "imageBase": { "type": ["string", "null"] },
+          "cardId": {
+            "$ref": "common.schema.json#/$defs/cardId"
+          },
+          "setId": {
+            "type": "string"
+          },
+          "setName": {
+            "type": "string"
+          },
+          "number": {
+            "type": "string"
+          },
+          "nameJa": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "rarity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "imageBase": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "reason": {
             "type": "string",
             "description": "Why this card needs an override at all. Without it nobody can tell whether the entry is still necessary."
           },
-          "cardmarketUrl": { "type": "string", "format": "uri" },
+          "cardmarketUrl": {
+            "type": "string",
+            "format": "uri"
+          },
           "price": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["source", "currency", "checkedOn"],
+            "required": [
+              "source",
+              "currency",
+              "checkedOn"
+            ],
             "properties": {
-              "source": { "const": "manual" },
-              "currency": { "$ref": "common.schema.json#/$defs/currency" },
-              "checkedOn": { "$ref": "common.schema.json#/$defs/isoDate" },
-              "avg30": { "type": ["number", "null"] },
-              "trend": { "type": ["number", "null"] },
-              "low": { "type": ["number", "null"] }
+              "source": {
+                "const": "manual"
+              },
+              "currency": {
+                "$ref": "common.schema.json#/$defs/currency"
+              },
+              "checkedOn": {
+                "$ref": "common.schema.json#/$defs/isoDate"
+              },
+              "avg30": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "trend": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "low": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
             }
           }
         }

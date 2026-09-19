@@ -4,55 +4,166 @@
   "title": "Owned cards",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "items"],
+  "required": [
+    "version",
+    "items"
+  ],
   "properties": {
-    "version": { "const": 1 },
+    "version": {
+      "const": 1
+    },
     "items": {
       "type": "array",
-      "items": { "$ref": "#/$defs/item" }
+      "items": {
+        "$ref": "#/$defs/item"
+      }
     }
   },
   "$defs": {
     "item": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "status", "condition", "isGraded", "quantity", "purchase"],
+      "required": [
+        "id",
+        "status",
+        "condition",
+        "isGraded",
+        "quantity",
+        "purchase"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^itm_[0-9]{4,}$" },
-        "status": { "enum": ["resolved", "pending"] },
-        "cardId": { "$ref": "common.schema.json#/$defs/cardId" },
-        "variantId": { "type": "string" },
-        "setId": { "type": "string" },
-        "number": { "type": "string" },
-        "nameJa": { "type": "string" },
-        "nameEn": { "type": "string" },
-        "rarity": { "type": ["string", "null"] },
+        "id": {
+          "type": "string",
+          "pattern": "^itm_[0-9]{4,}$"
+        },
+        "status": {
+          "enum": [
+            "resolved",
+            "pending"
+          ]
+        },
+        "cardId": {
+          "$ref": "common.schema.json#/$defs/cardId"
+        },
+        "variantId": {
+          "type": "string"
+        },
+        "setId": {
+          "type": "string"
+        },
+        "number": {
+          "type": "string"
+        },
+        "nameJa": {
+          "type": "string"
+        },
+        "nameEn": {
+          "type": "string"
+        },
+        "rarity": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "imageBase": {
           "type": "string",
           "description": "TCGdex asset base with no extension; the renderer appends a size and format."
         },
-        "catalogSource": { "enum": ["tcgdex", "override"] },
-        "condition": { "$ref": "common.schema.json#/$defs/condition" },
-        "isGraded": { "const": false },
-        "quantity": { "type": "integer", "minimum": 1 },
-        "purchase": { "$ref": "common.schema.json#/$defs/purchase" },
+        "catalogSource": {
+          "enum": [
+            "tcgdex",
+            "override"
+          ]
+        },
+        "condition": {
+          "$ref": "common.schema.json#/$defs/condition"
+        },
+        "isGraded": {
+          "const": false
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "purchase": {
+          "$ref": "common.schema.json#/$defs/purchase"
+        },
         "acquiredFrom": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Wishlist item this card came from, when it came from one."
         },
-        "notes": { "type": "string" },
-        "hint": { "$ref": "common.schema.json#/$defs/catalogHint" },
-        "photoUrl": { "type": "string" },
-        "pendingSince": { "$ref": "common.schema.json#/$defs/isoDate" }
+        "notes": {
+          "type": "string"
+        },
+        "hint": {
+          "$ref": "common.schema.json#/$defs/catalogHint"
+        },
+        "photoUrl": {
+          "type": "string"
+        },
+        "pendingSince": {
+          "$ref": "common.schema.json#/$defs/isoDate"
+        }
       },
       "allOf": [
         {
-          "if": { "properties": { "status": { "const": "resolved" } }, "required": ["status"] },
-          "then": { "required": ["cardId", "setId", "number", "nameJa", "catalogSource"] }
+          "if": {
+            "properties": {
+              "status": {
+                "const": "resolved"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "cardId",
+              "catalogSource"
+            ]
+          }
         },
         {
-          "if": { "properties": { "status": { "const": "pending" } }, "required": ["status"] },
-          "then": { "required": ["hint", "pendingSince"] }
+          "if": {
+            "properties": {
+              "catalogSource": {
+                "const": "tcgdex"
+              }
+            },
+            "required": [
+              "catalogSource"
+            ]
+          },
+          "then": {
+            "required": [
+              "setId",
+              "number",
+              "nameJa"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pending"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "hint",
+              "pendingSince"
+            ]
+          }
         }
       ]
     }

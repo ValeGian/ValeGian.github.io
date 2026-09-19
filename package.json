@@ -10,7 +10,12 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "validate": "node scripts/validate.mjs",
+    "test:schemas": "node scripts/test-schemas.mjs",
+    "data:names": "node scripts/build-name-map.mjs",
+    "data:watchlist": "node scripts/build-watchlist.mjs",
+    "data:migrate": "node scripts/migrate-sheet.mjs"
   },
   "dependencies": {
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",

@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 24 — editing, photos, price fallback)
+**Last updated:** 2026-09-19 (rev 25 — charts, grid, layout)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -613,7 +613,7 @@ static lookup, never fetched at runtime.
 - [x] Editing a **wishlist** item in place
 - [x] Editing a **collection** card in place
 - [x] Photo upload for pending cards
-- [ ] Value-over-time charts — needs more than one day of history
+- [x] Value-over-time charts, for the collection and per card
 
 ### Phase 7 — Hardening  ✅ **complete**
 - [x] `scripts/audit.mjs` — decrypt-and-diff history
@@ -641,6 +641,33 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 25 (charts, grid, wider dashboard) ✅
+- **No free source of Cardmarket EUR history exists.** Checked directly:
+  PokemonPriceTracker's free tier **excludes CardMarket** (paid, +1 credit/card) and caps
+  history at **3 days**; TCG API and PokéWallet are TCGplayer/USD; Cardmarket's own API is
+  pro-sellers-only. JustTCG's 365 days are TCGplayer/USD — a different market, which is
+  why splicing it onto this series was rejected in rev 2 and still is. **The Cardmarket
+  series starts the day tracking did and there is no way to buy that back.**
+- **Charts, with the range choosing the resolution**: 1W daily, 1M weekly, 6M/1Y/5Y/All
+  monthly, each coarser bucket the mean of the days inside it. Daily points come from the
+  immutable per-day files, fetched only for the span asked for and once each; coarser
+  ranges read one rollup file written by the daily job.
+- **The rollups hold per-card prices only.** What a collection is worth is holdings ×
+  prices, and holdings are private — so that sum happens in the browser and nothing
+  published reveals a portfolio.
+- **One decision worth recording.** Every imported card carries the bootstrap date, which
+  means *unknown*, not *bought that morning*. Reading those as acquisitions made the line
+  start the day the tracker did and flattened every earlier reading to zero — a chart of
+  the tool's age, not the collection's value. Placeholder dates now count throughout, and
+  the chart says so; real purchase dates still gate their card.
+- **No chart for a single reading** — one point is a figure, not a trend, and a line
+  through it implies a shape nobody measured.
+- **Grid view** of card art, which on a wide screen is how a card is actually found. The
+  figures stay on the tiles. The gated area gets its own width: it is a dashboard, not a
+  reading column.
+- Tested against **800 days of throwaway history**, deleted before committing: 1W → 7
+  daily, 1M → 5 weekly, 6M → 6 monthly, 1Y → 12, All → 27. 47 tests.
 
 ### 2026-09-19 — rev 24 (editing, photos, price fallback) ✅
 - **Two requests were already true** and were confirmed rather than rebuilt. A card on

@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 20 — search and publishing usability)
+**Last updated:** 2026-09-19 (rev 21 — wishlist add flow)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -643,6 +643,24 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 21 (wishlist add flow) ✅
+- **Search results were ordered by card id**, which put the 1996 sets first — and TCGdex
+  has no artwork for those, so the first screenful of any search was blank frames: the
+  cards *least* likely to be the one in your hand. Cards with artwork sort first now.
+  Result thumbnails also load eagerly; they appear because someone just asked for them,
+  and deferring the one thing that distinguishes them defeats the search.
+- **The add form asked what a card cost even on a wishlist** — asking about something
+  that has not happened. The form takes its shape from the destination now: owned cards
+  have a price, a currency and a date; wanted cards have a target in euro and a priority.
+  **An empty target is allowed and means something** — wanting a card at any price is a
+  real answer.
+- **One card onto several lists in one action.** Whose-list is a set of toggles, not a
+  single choice, because two people wanting the same card is ordinary. Each list gets its
+  own item with its own id, target and outcome; nothing is shared. Verified: one card
+  onto two lists queued four writes — both encrypted lists plus the regenerated public
+  files — and the watchlist grew to include a card nobody owns yet, so the nightly job
+  prices it.
 
 ### 2026-09-19 — rev 20 (search and publishing usability) ✅
 - **The search box lost focus on every keystroke**, so only the first character landed —

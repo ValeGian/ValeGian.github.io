@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 18 — hardening)
+**Last updated:** 2026-09-19 (rev 19 — calibration automated)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -583,8 +583,8 @@ static lookup, never fetched at runtime.
 - [x] `prices.yml` daily cron at 06:20 UTC, commit only on change; verified end to end
 - [x] Liveness alerting: one reusable issue on failure, not one per day
 - [x] `build-watchlist.mjs` also emits `pending.json`
-- [ ] **Calibration week** — runs 2026-09-20 → 26. `npm run data:spot-check` each day,
-      record readings in §13. Decides whether `avg7`/`avg1` are ever shown.
+- [x] **Calibration automated** — `scripts/calibrate.mjs` runs in the daily job and
+      answers the `avg7`/`avg1` question from the snapshots themselves. No manual week.
 - [ ] Staleness banner in the UI — needs the UI; moved to Phase 6
 - [x] ~~Frankfurter FX cache~~ — **dropped.** The rate is looked up once when a card is
       added and frozen into the purchase record, so there is nothing to cache. A daily
@@ -630,11 +630,9 @@ static lookup, never fetched at runtime.
 
 ## 12. Still open
 
-0. **Before the Japan trip**, in order:
-   a. Create the fine-grained PAT and confirm one **Publish** from the browser — the ref
-      update is the only step never exercised (§13 rev 17).
-   b. Run the **calibration week** (§13 rev 14) so `avg7`/`avg1` can be trusted or dropped.
-   c. Send the seven master's marks and the graduation grade (§13 rev 11).
+0. **Before the Japan trip:** create the fine-grained PAT and confirm one **Publish**
+   from the browser. The ref update is the only step never exercised (§13 rev 17).
+   Everything else that was outstanding is now automated or answered.
 1. **Bio copy** — a few lines for the front page. Deferred by you; needed in Phase 2.
 2. *(optional)* Strengthen `cvalgian` with a random suffix (§7.3). Recommended, not a
    blocker.
@@ -645,6 +643,33 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 19 (calibration automated, price carry-forward) ✅
+- **The calibration week is gone; it is a daily job now.** The question was why `avg30`
+  agreed with Cardmarket within 2,3 % while `avg7`/`avg1` were out by up to 33 %. A
+  one-day eyeball comparison could never answer that — it cannot separate a thinly traded
+  card whose weekly average genuinely swings from a field that is mislabelled or stale.
+  **The snapshots answer it without Cardmarket**: if the fields mean what they say, a
+  reported `avg7` tracks the mean of the last seven reported `avg1` values. Thirty
+  observations instead of one, no access needed to a site that refuses automated clients,
+  and it runs on its own. Quiet until eight days of history exist.
+  *(It proves internal consistency, not agreement with Cardmarket — that was already
+  established by direct comparison and was never in doubt for `avg30`.)*
+- It also catches the failure that matters more: **a frozen upstream mirror looks exactly
+  like a calm market.** A week of identical `updated` timestamps across most cards fails
+  the job.
+- **Found a real bug while checking.** Two cards failed a lookup in an earlier run and
+  were **dropped from `latest.json` entirely**, so the collection screen reported
+  Charizard V and Latios as having no price while Cardmarket listed both. The two files
+  now answer different questions: `daily/<date>.json` holds only what was observed,
+  because a gap in the record is a real gap; `latest.json` holds the best price currently
+  known and carries a reading forward, visible as old rather than missing. Tested.
+- **Hand-checked prices**: cannot be refreshed automatically, but going stale unnoticed
+  can be prevented — anything not re-read in 90 days opens an issue with the links.
+- Master's final grade set to **110/110 cum laude**. The weighted average is no longer
+  shown for a degree whose record is incomplete: six of thirteen exams is not that
+  degree's average, and the final grade stands on its own.
+- 33 tests.
 
 ### 2026-09-19 — rev 18 (hardening) ✅
 - **30 unit tests** on Node's built-in runner, which strips types itself — no dependency,

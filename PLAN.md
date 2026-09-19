@@ -2,7 +2,7 @@
 
 **Status:** All seven phases done. Open items in §12.
 **Owner:** Valerio Giannini
-**Last updated:** 2026-09-19 (rev 23 — wishlist editing)
+**Last updated:** 2026-09-19 (rev 24 — editing, photos, price fallback)
 
 This file is both the plan and the progress log. Section 13 is the running log —
 append to it, never rewrite history. Checkboxes in §11 are the source of truth for
@@ -575,8 +575,7 @@ static lookup, never fetched at runtime.
 - [x] `build-watchlist.mjs` → public `watchlist.json`, 43 cards
 - [x] JA↔EN name table generated from PokéAPI, translates 45/45
 - [x] Totals reconcile to €1218,97
-- [ ] Friend-list schema — the shape is settled now, but `validate.mjs` still cannot
-      check a decrypted wishlist
+- [x] Wishlist schema, and `validate.mjs` checks the decrypted working copies
 
 ### Phase 4 — Price pipeline  ✅ **built**
 - [x] `snapshot-prices.mjs` — TCGdex, variant-aware → `latest.json` + `daily/<date>.json`
@@ -612,8 +611,8 @@ static lookup, never fetched at runtime.
 - [x] Mark bought, both behaviours
 - [x] Staleness banner
 - [x] Editing a **wishlist** item in place
-- [ ] Editing a **collection** card in place (delete-and-re-add works today)
-- [ ] Photo upload for pending cards
+- [x] Editing a **collection** card in place
+- [x] Photo upload for pending cards
 - [ ] Value-over-time charts — needs more than one day of history
 
 ### Phase 7 — Hardening  ✅ **complete**
@@ -642,6 +641,38 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-19 — rev 24 (editing, photos, price fallback) ✅
+- **Two requests were already true** and were confirmed rather than rebuilt. A card on
+  several lists is **queried once** — the watchlist is keyed by card id, so two cards on
+  two lists give 45 entries with no duplicates; the page reads one prices file, and
+  repeated art is one request because the browser caches by URL. And the **daily job
+  already covered wishlists**: wanted cards joined the watchlist when that was fixed, and
+  both are now priced. It costs nothing — Actions minutes are unlimited on public repos.
+- **Owned cards are editable in place**: condition, copies, price, currency, date, notes.
+  The rate is only re-fetched when the money changed — a card bought at a rate recorded
+  at the time keeps it, because recomputing from today would restate what was paid.
+- **Photographs for cards the catalog has not published.** Shrunk below 200 KB before
+  being accepted and **refused if it will not shrink**: the repository keeps every
+  version of everything, so an oversized image would be permanent. Needed the commit path
+  to carry bytes rather than text.
+- **Pending cards fill themselves in.** The daily job already found them and published
+  the answers; nothing applied them. Applied on the next unlock, unprompted.
+- **A wanted card opens** to show the market price and everyone who wants it with their
+  own target — the picture the combined view cannot give, having one row per person.
+- **`avg7` stands in when there is no `avg30`**, labelled wherever it appears. The two
+  are not the same measurement, so the screen says which it used.
+- **Wishlist schema**, including the two rules that matter: a bought card must say what
+  it cost or a debt goes unrecorded, and a wanted card cannot carry a purchase that has
+  not happened.
+- **Two bugs found while testing.** Submitting the add form read a **stale snapshot of
+  its own fields** — silent field edits meant the props the handler closed over went
+  stale the moment anything was typed, so every add would have failed with "enter what
+  the card cost" while the price sat visible on screen. That is the cost of the silent
+  update path, and the two editors written later already avoid it by reading the store.
+  Separately, a filtered view with nothing priced printed **€0,00**, saying those cards
+  are worthless when it meant their price is unknown.
+- 42 tests, 19 schema tests.
 
 ### 2026-09-19 — rev 23 (wishlist editing, decrypt script) ✅
 - **Corrected the one piece of real damage the caret bug did**: a target price read €2

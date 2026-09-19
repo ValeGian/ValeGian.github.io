@@ -13,14 +13,29 @@ import { displayName, subtitle, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
+export interface WishlistEdit {
+  owner: string;
+  itemId: string;
+  target: string;
+  priority: WishlistItem['priority'];
+  notes: string;
+}
+
 export interface WishlistViewState {
   lists: Record<string, Wishlist>;
   prices: PriceSnapshot | null;
   names: NameTable;
   combined: boolean;
   canEdit: boolean;
+  /** The row currently open for editing, if any. */
+  editing: WishlistEdit | null;
   onToggleCombined(): void;
   onMarkBought?(owner: string, itemId: string): void;
+  onStartEdit?(edit: WishlistEdit): void;
+  onEditField?(change: Partial<WishlistEdit>): void;
+  onCancelEdit?(): void;
+  onSaveEdit?(): Promise<void>;
+  onDeleteWish?(owner: string, itemId: string): Promise<void>;
 }
 
 const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | undefined =>
@@ -45,12 +60,107 @@ function targetMarker(item: WishlistItem, price: Price | undefined): HTMLElement
   });
 }
 
+/**
+ * The row in edit mode.
+ *
+ * Fields report their value without rebuilding the view: rebuilding replaces the element
+ * the caret is in, and on a number input the caret cannot be put back, so digits arrive
+ * in the wrong order. That is what turned a target of 30 into 3, then into 2.
+ */
+function editRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
+  const edit = state.editing;
+  if (!edit) return el('li');
+
+  const set = (change: Partial<WishlistEdit>) => state.onEditField?.(change);
+
+  return el(
+    'li',
+    { class: 'wish-row editing' },
+    el(
+      'form',
+      {
+        class: 'wish-edit',
+        onSubmit: (event: Event) => {
+          event.preventDefault();
+          void state.onSaveEdit?.();
+        },
+      },
+      el('p', { class: 'wish-edit-title', text: item.nameEn ?? item.nameJa ?? item.cardId ?? 'this card' }),
+      el(
+        'div',
+        { class: 'grid-fields' },
+        el(
+          'label',
+          { class: 'field', for: 'edit-target' },
+          el('span', { text: 'Target price (€)' }),
+          el('input', {
+            id: 'edit-target',
+            type: 'number',
+            min: '0',
+            step: '0.01',
+            inputmode: 'decimal',
+            placeholder: 'any price',
+            value: edit.target,
+            onInput: (event: Event) => set({ target: (event.target as HTMLInputElement).value }),
+          }),
+        ),
+        el(
+          'label',
+          { class: 'field', for: 'edit-priority' },
+          el('span', { text: 'Priority' }),
+          el(
+            'select',
+            {
+              id: 'edit-priority',
+              onChange: (event: Event) =>
+                set({ priority: (event.target as HTMLSelectElement).value as WishlistItem['priority'] }),
+            },
+            ...(['high', 'normal', 'low'] as const).map((level) =>
+              el('option', { value: level, text: level, selected: edit.priority === level }),
+            ),
+          ),
+        ),
+      ),
+      el(
+        'label',
+        { class: 'field', for: 'edit-notes' },
+        el('span', { text: 'Notes' }),
+        el('input', {
+          id: 'edit-notes',
+          type: 'text',
+          value: edit.notes,
+          onInput: (event: Event) => set({ notes: (event.target as HTMLInputElement).value }),
+        }),
+      ),
+      el(
+        'div',
+        { class: 'form-actions' },
+        el('button', { type: 'submit', text: 'Save' }),
+        el('button', { type: 'button', class: 'chip', text: 'Cancel', onClick: () => state.onCancelEdit?.() }),
+        el('button', {
+          type: 'button',
+          class: 'chip danger',
+          text: 'Remove',
+          onClick: () => {
+            const name = item.nameEn ?? item.nameJa ?? item.cardId;
+            if (confirm(`Remove ${name} from this list?`)) void state.onDeleteWish?.(edit.owner, edit.itemId);
+          },
+        }),
+      ),
+    ),
+  );
+}
+
 function wishRow(
   item: WishlistItem,
   owner: string,
   state: WishlistViewState,
   showOwner: boolean,
 ): HTMLElement {
+  if (state.editing?.owner === owner && state.editing.itemId === item.id) {
+    return editRow(item, state);
+  }
+
   const price = priceFor(item, state.prices);
   const market = marketValue(price);
   const bought = item.status === 'bought';
@@ -69,7 +179,7 @@ function wishRow(
         'span',
         { class: 'card-meta ui' },
         subtitle(item),
-        showOwner ? el('span', { class: 'owner', text: owner }) : null,
+        showOwner ? el('span', { class: 'owner', text: state.lists[owner]?.owner ?? owner }) : null,
         item.priority === 'high' ? el('span', { class: 'flag', text: 'priority' }) : null,
       ),
       item.notes ? el('span', { class: 'wish-note', text: item.notes }) : null,
@@ -89,14 +199,35 @@ function wishRow(
           })
         : targetMarker(item, price),
     ),
-    bought || !state.canEdit || !state.onMarkBought
+    bought || !state.canEdit
       ? null
-      : el('button', {
-          type: 'button',
-          class: 'mark-bought',
-          text: 'Bought',
-          onClick: () => state.onMarkBought?.(owner, item.id),
-        }),
+      : el(
+          'span',
+          { class: 'wish-actions' },
+          state.onMarkBought
+            ? el('button', {
+                type: 'button',
+                class: 'mark-bought',
+                text: 'Bought',
+                onClick: () => state.onMarkBought?.(owner, item.id),
+              })
+            : null,
+          state.onStartEdit
+            ? el('button', {
+                type: 'button',
+                class: 'chip',
+                text: 'Edit',
+                onClick: () =>
+                  state.onStartEdit?.({
+                    owner,
+                    itemId: item.id,
+                    target: item.targetPriceEur === null ? '' : String(item.targetPriceEur),
+                    priority: item.priority,
+                    notes: item.notes ?? '',
+                  }),
+              })
+            : null,
+        ),
   );
 }
 
@@ -153,7 +284,7 @@ function combinedView(state: WishlistViewState): HTMLElement {
   return el(
     'ul',
     { class: 'wish-rows' },
-    ...wanted.map(({ owner, item }) => wishRow(item, state.lists[owner].owner, state, true)),
+    ...wanted.map(({ owner, item }) => wishRow(item, owner, state, true)),
   );
 }
 

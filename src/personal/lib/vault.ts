@@ -136,6 +136,18 @@ export async function addWishToMany(
   return buildWrites(vault, touched);
 }
 
+export async function updateWish(
+  vault: Vault,
+  owner: string,
+  id: string,
+  patch: Partial<WishlistItem>,
+): Promise<Write[]> {
+  const item = vault.wishlists[owner]?.items.find((candidate) => candidate.id === id);
+  if (!item) throw new Error(`No wishlist item ${id} for ${owner}`);
+  Object.assign(item, patch);
+  return buildWrites(vault, [owner]);
+}
+
 export async function deleteWish(vault: Vault, owner: string, id: string): Promise<Write[]> {
   const list = vault.wishlists[owner];
   list.items = list.items.filter((item) => item.id !== id);

@@ -12,10 +12,10 @@ import { value, type Valued } from './lib/money.ts';
 import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
 import { renderCollection } from './views/collection.ts';
 import { renderDetail } from './views/detail.ts';
-import { renderWishlists } from './views/wishlists.ts';
+import { renderWishlists, type WishlistEdit } from './views/wishlists.ts';
 import { blankFields, renderAddCard, searchCards, type AddCardState, type AddMode } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
-import { addCard, addWishToMany, deleteCard, markBought, newCardId, type Envelope, type Vault } from './lib/vault.ts';
+import { addCard, addWishToMany, deleteCard, deleteWish, markBought, newCardId, updateWish, type Envelope, type Vault } from './lib/vault.ts';
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
 import { unlock } from '../lib/unlock.mjs';
@@ -44,6 +44,7 @@ interface AppState {
   publishMessage: string;
   lastCommitUrl: string | null;
   askingForToken: boolean;
+  editingWish: WishlistEdit | null;
   /** Bumped to force a rebuild when the change was to the vault, not to this object. */
   tick: number;
 }
@@ -91,6 +92,7 @@ const store = createStore<AppState>({
   publishMessage: '',
   lastCommitUrl: null,
   askingForToken: false,
+  editingWish: null,
   tick: 0,
 });
 
@@ -415,7 +417,38 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           names,
           combined: state.combined,
           canEdit: true,
+          editing: state.editingWish,
           onToggleCombined: () => store.update((current) => ({ combined: !current.combined })),
+          onStartEdit: (edit) => store.update({ editingWish: edit }),
+          // Silent, for the same reason the add form's fields are: rebuilding replaces
+          // the element the caret is in.
+          onEditField: (change) =>
+            store.set((current) => ({
+              editingWish: current.editingWish ? { ...current.editingWish, ...change } : null,
+            })),
+          onCancelEdit: () => store.update({ editingWish: null }),
+          onSaveEdit: async () => {
+            const edit = store.get().editingWish;
+            if (!edit) return;
+            const target = edit.target.trim() === '' ? null : Number(edit.target);
+            if (target !== null && (!Number.isFinite(target) || target <= 0)) return;
+            await savePending(
+              await updateWish(vault, edit.owner, edit.itemId, {
+                targetPriceEur: target,
+                priority: edit.priority,
+                notes: edit.notes,
+              }),
+            );
+            await refreshPendingCount();
+            store.update({ editingWish: null });
+            schedulePublish();
+          },
+          onDeleteWish: async (owner, itemId) => {
+            await savePending(await deleteWish(vault, owner, itemId));
+            await refreshPendingCount();
+            store.update({ editingWish: null });
+            schedulePublish();
+          },
           onMarkBought: async (owner, itemId) => {
             const paid = prompt('What did it cost? Enter the amount, then the currency.', '');
             if (paid === null) return;
@@ -468,6 +501,7 @@ function friendView(state: AppState, friend: Friend): DocumentFragment {
     names: state.data?.names ?? emptyNames,
     combined: false,
     canEdit: false,
+    editing: null,
     onToggleCombined: () => undefined,
   });
 }

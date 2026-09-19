@@ -500,8 +500,49 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     border: 1px solid currentColor;
   }
 
-  .personal .mark-bought {
+  .personal .wish-actions {
     grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+  }
+
+  .personal .wish-edit {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+  }
+
+  .personal .wish-edit-title {
+    margin: 0;
+    font-size: var(--size-md);
+  }
+
+  .personal .wish-row.editing {
+    background: var(--paper-sunk);
+    padding-inline: var(--space-3);
+  }
+
+  .personal .wish-edit button[type='submit'] {
+    font-family: var(--font-ui);
+    font-size: var(--size-xs);
+    min-height: 2.75rem;
+    padding: 0 var(--space-5, 1.25rem);
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  .personal .chip.danger {
+    color: var(--down);
+    border-color: var(--down);
+  }
+
+  .personal .mark-bought {
     justify-self: start;
     font-family: var(--font-ui);
     font-size: var(--size-xs);

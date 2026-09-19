@@ -1,0 +1,78 @@
+name: Prices
+
+on:
+  schedule:
+    # 06:20 UTC. TCGdex refreshes its Cardmarket mirror overnight; the offset keeps this
+    # off the top of the hour, when GitHub's scheduler is busiest and most likely to delay.
+    - cron: '20 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: prices
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Snapshot prices
+        run: npm run data:snapshot
+
+      - name: Retry cards awaiting the catalog
+        run: npm run data:resolve
+
+      - name: Validate what was written
+        run: npm run validate
+
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/data
+          if git diff --cached --quiet; then
+            echo 'nothing changed'
+            exit 0
+          fi
+          git commit -m "chore(prices): snapshot $(date -u +%F)"
+          git push
+
+      - name: Report cards that entered the catalog
+        if: success() && hashFiles('.resolution-report.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue create --title "Cards resolved $(date -u +%F)" --body-file .resolution-report.md --label pipeline
+
+      # A silently dead cron means silently missing history, and history cannot be
+      # backfilled. One open issue is kept and reused so a long outage does not produce
+      # one issue per day.
+      - name: Raise the alarm
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          existing=$(gh issue list --label pipeline --state open --search 'Price pipeline failing in:title' --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "Failed again on $(date -u +%F). $RUN_URL"
+          else
+            gh issue create \
+              --title 'Price pipeline failing' \
+              --label pipeline \
+              --body "The daily snapshot failed on $(date -u +%F).
+
+          Missing days cannot be backfilled: TCGdex only serves today's figures. Every day
+          this stays broken is a permanent gap in the series.
+
+          $RUN_URL"
+          fi

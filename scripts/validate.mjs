@@ -7,16 +7,18 @@
  *
  *   node scripts/validate.mjs
  */
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
-const SCHEMAS = ['common', 'collection', 'catalog-overrides', 'watchlist'];
+const SCHEMAS = ['common', 'collection', 'catalog-overrides', 'watchlist', 'pending', 'price-snapshot'];
 
 const TARGETS = [
   { file: 'public/data/catalog-overrides.json', schema: 'catalog-overrides', required: true },
   { file: 'public/data/watchlist.json', schema: 'watchlist', required: true },
+  { file: 'public/data/pending.json', schema: 'pending', required: true },
+  { file: 'public/data/prices/latest.json', schema: 'price-snapshot', required: false },
   { file: '.local/collection.json', schema: 'collection', required: false },
 ];
 
@@ -30,6 +32,14 @@ addFormats(ajv);
 
 for (const name of SCHEMAS) {
   ajv.addSchema(await readJson(`schemas/${name}.schema.json`), `${name}.schema.json`);
+}
+
+/** Every daily snapshot is checked, not just the newest: a bad one is permanent. */
+const dailyDir = 'public/data/prices/daily';
+if (existsSync(dailyDir)) {
+  for (const name of (await readdir(dailyDir)).filter((file) => file.endsWith('.json')).sort()) {
+    TARGETS.push({ file: `${dailyDir}/${name}`, schema: 'price-snapshot', required: true });
+  }
 }
 
 let failures = 0;

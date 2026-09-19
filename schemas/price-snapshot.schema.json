@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://valegian.github.io/schemas/price-snapshot.schema.json",
+  "title": "One day of prices",
+  "description": "Market data only. Public by nature — these are Cardmarket's numbers, not anyone's holdings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "date", "generatedAt", "prices"],
+  "properties": {
+    "version": { "const": 1 },
+    "date": { "$ref": "common.schema.json#/$defs/isoDate" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "prices": {
+      "type": "object",
+      "propertyNames": { "$ref": "common.schema.json#/$defs/cardId" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "currency", "avg30"],
+        "properties": {
+          "source": {
+            "description": "Where the figure came from. Cardmarket and TCGplayer are different markets and must never be averaged together, so every reading carries its origin.",
+            "enum": ["cardmarket/tcgdex", "cardmarket/manual"]
+          },
+          "currency": { "$ref": "common.schema.json#/$defs/currency" },
+          "updated": { "type": ["string", "null"] },
+          "avg30": { "type": ["number", "null"] },
+          "avg7": { "type": ["number", "null"] },
+          "avg1": { "type": ["number", "null"] },
+          "trend": { "type": ["number", "null"] },
+          "low": { "type": ["number", "null"] },
+          "avg": { "type": ["number", "null"] }
+        }
+      }
+    }
+  }
+}

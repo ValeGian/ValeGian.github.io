@@ -1,12 +1,14 @@
 /**
- * Writes public/data/watchlist.json: every card the daily price job should snapshot.
+ * Writes the two public files the daily job works from:
  *
- * The file deliberately carries no owner, no price paid and no target, so the pipeline
- * never needs a decryption key and the file is safe to serve from a public repository.
- * That split is the whole reason the personal data can be encrypted without giving the
- * job a secret.
+ *   public/data/watchlist.json  cards to snapshot a price for
+ *   public/data/pending.json    cards the catalog has not published yet, to retry
  *
- *   node scripts/build-watchlist.mjs [--collection path] [--out path]
+ * Both carry card identifiers only — no owner, no price paid, no target — so the job
+ * never needs a decryption key. That split is what lets the personal data be encrypted
+ * without handing the pipeline a secret.
+ *
+ *   node scripts/build-watchlist.mjs [--collection path]
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
@@ -15,6 +17,7 @@ const { values: options } = parseArgs({
   options: {
     collection: { type: 'string', default: '.local/collection.json' },
     out: { type: 'string', default: 'public/data/watchlist.json' },
+    pending: { type: 'string', default: 'public/data/pending.json' },
   },
 });
 
@@ -25,9 +28,16 @@ const overrides = await readJson('public/data/catalog-overrides.json');
 const manual = new Set(overrides.cards.map((card) => card.cardId));
 
 const cards = new Map();
+const waiting = [];
 const skipped = [];
 
 for (const item of collection.items) {
+  if (item.status === 'pending') {
+    // The hint is what the owner typed off the physical card. It identifies a printing,
+    // not an owner, so it is as publishable as the card id it will become.
+    waiting.push({ id: item.id, hint: item.hint, pendingSince: item.pendingSince });
+    continue;
+  }
   if (item.status !== 'resolved') continue;
 
   // A card priced by hand in catalog-overrides.json has nothing for the job to fetch.
@@ -50,8 +60,16 @@ const watchlist = {
   cards: [...cards.values()].sort((a, b) => a.cardId.localeCompare(b.cardId)),
 };
 
-await writeFile(options.out, `${JSON.stringify(watchlist, null, 2)}\n`);
+const pendingFile = {
+  version: 1,
+  generatedAt: new Date().toISOString(),
+  items: waiting.sort((a, b) => a.id.localeCompare(b.id)),
+};
 
-console.log(`cards to price  ${watchlist.cards.length}`);
+await writeFile(options.out, `${JSON.stringify(watchlist, null, 2)}\n`);
+await writeFile(options.pending, `${JSON.stringify(pendingFile, null, 2)}\n`);
+
+console.log(`cards to price      ${watchlist.cards.length}`);
+console.log(`awaiting catalog    ${pendingFile.items.length}`);
 for (const reason of skipped) console.log(`  skipped: ${reason}`);
-console.log(`written to      ${options.out}`);
+console.log(`written to          ${options.out}, ${options.pending}`);

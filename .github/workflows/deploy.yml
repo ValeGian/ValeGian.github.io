@@ -3,6 +3,11 @@ name: Deploy site
 on:
   push:
     branches: [master]
+  # A push made with GITHUB_TOKEN does not trigger other workflows, so the nightly price
+  # commit would never reach the site. Deploy when that workflow finishes instead.
+  workflow_run:
+    workflows: [Prices]
+    types: [completed]
   workflow_dispatch:
 
 # Least privilege: the build reads the repo, the deploy publishes to Pages.

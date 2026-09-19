@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://valegian.github.io/schemas/pending.schema.json",
+  "title": "Cards awaiting a catalog entry",
+  "description": "Identifies printings, not owners. Carries no price paid and no target, so the retry job needs no key.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "generatedAt", "items"],
+  "properties": {
+    "version": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "hint", "pendingSince"],
+        "properties": {
+          "id": { "type": "string" },
+          "hint": { "$ref": "common.schema.json#/$defs/catalogHint" },
+          "pendingSince": { "$ref": "common.schema.json#/$defs/isoDate" }
+        }
+      }
+    }
+  }
+}

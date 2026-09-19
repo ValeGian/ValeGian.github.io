@@ -15,7 +15,10 @@
     "test:schemas": "node scripts/test-schemas.mjs",
     "data:names": "node scripts/build-name-map.mjs",
     "data:watchlist": "node scripts/build-watchlist.mjs",
-    "data:migrate": "node scripts/migrate-sheet.mjs"
+    "data:migrate": "node scripts/migrate-sheet.mjs",
+    "data:snapshot": "node scripts/snapshot-prices.mjs",
+    "data:resolve": "node scripts/resolve-pending.mjs",
+    "data:spot-check": "node scripts/spot-check.mjs"
   },
   "dependencies": {
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",

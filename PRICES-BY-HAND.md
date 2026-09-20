@@ -70,8 +70,15 @@ node scripts/price-todo.mjs
 
 It prints two lists:
 
-- **still to read** — cards with a card id whose price is missing, frozen, or a
-  hand-checked figure gone stale. These can be priced directly.
+- **still to read** — ordered by the money resting on each figure, most first, with a
+  running share so it is obvious where to stop. Cards qualify when the price is missing,
+  frozen across three readings, a hand-checked figure has gone stale, or **avg30 disagrees
+  with TCGdex's own trend by 8% or more** — the two describe the same market from the same
+  feed, so a wide gap means avg30 is the stale one, and that catches a card on day one
+  where the frozen test needs three.
+
+  **Work down from the top and stop when the allowance runs out.** The first ten or so
+  cards carry most of the value; the long tail of 5 euro Pikachus can wait indefinitely.
 - **need identifying first** — cards with no catalog entry at all. These need step 4
   before they can be priced.
 

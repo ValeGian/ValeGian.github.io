@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-20T18:18:11.989Z",
+  "generatedAt": "2026-09-20T18:39:14.524Z",
   "items": [
     {
       "id": "lotad/wish_0002",
@@ -769,56 +769,6 @@
         "setName": "30th Anniversary",
         "number": "133",
         "nameEn": "Salamence ex"
-      },
-      "pendingSince": "2026-09-20"
-    },
-    {
-      "id": "valerio/wish_0048",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "137",
-        "nameEn": "Charizard"
-      },
-      "pendingSince": "2026-09-20"
-    },
-    {
-      "id": "valerio/wish_0049",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "141",
-        "nameEn": "Shining Celebi"
-      },
-      "pendingSince": "2026-09-20"
-    },
-    {
-      "id": "valerio/wish_0050",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "142",
-        "nameEn": "Lugia"
-      },
-      "pendingSince": "2026-09-20"
-    },
-    {
-      "id": "valerio/wish_0051",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "146",
-        "nameEn": "Metagross"
-      },
-      "pendingSince": "2026-09-20"
-    },
-    {
-      "id": "valerio/wish_0052",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "165",
-        "nameEn": "Magikarp"
       },
       "pendingSince": "2026-09-20"
     }

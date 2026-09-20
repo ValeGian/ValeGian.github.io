@@ -68,7 +68,7 @@
         },
         "imageBase": {
           "type": "string",
-          "description": "TCGdex asset base with no extension; the renderer appends a size and format."
+          "description": "Where the picture is: either a TCGdex asset base with no extension, to which the renderer appends a size and format, or a complete image URL ending .jpg/.png/.webp as the official Japanese card database serves."
         },
         "catalogSource": {
           "enum": [

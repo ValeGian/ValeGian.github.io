@@ -113,6 +113,9 @@ function derivedBase(item: { cardId?: string; setId?: string; number?: string })
   return `https://assets.tcgdex.net/ja/${series}/${setId}/${number}`;
 }
 
+/** True when the stored value is a finished image rather than a base to append a size to. */
+const isCompleteImage = (url: string): boolean => /\.(jpe?g|png|webp)$/i.test(url);
+
 type Illustrated = {
   imageBase?: string;
   photoUrl?: string;
@@ -141,7 +144,9 @@ export function picture(item: Illustrated, size: 'low' | 'high'): string | null 
   const key = priceKey(item);
   const found = key ? discoveredArtwork.get(key) : undefined;
   if (found) return `${found}/${size}.webp`;
-  if (item.imageBase) return `${item.imageBase}/${size}.webp`;
+  // TCGdex serves a base path and wants a size appended; the official Japanese card
+  // database serves one finished file. A value that already names a file is used as it is.
+  if (item.imageBase) return isCompleteImage(item.imageBase) ? item.imageBase : `${item.imageBase}/${size}.webp`;
   if (item.photoUrl) return item.photoUrl;
   const derived = derivedBase(item);
   return derived ? `${derived}/${size}.webp` : null;

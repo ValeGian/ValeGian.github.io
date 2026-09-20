@@ -167,7 +167,33 @@ For a pair that is not in that file:
 5. If you cannot tell them apart with confidence, **leave it and say which ones**. A wrong
    number attaches another card's price permanently.
 
-### 4a. Storm Emerald (M6) cannot be given a stand-in — checked 2026-09-20
+### 4a. Artwork the catalogs do not have: the official Japanese database
+
+TCGdex has no artwork for any Mega-era Japanese set, and the assets are absent from its
+CDN entirely. **pokemon-card.com, the publisher's own card database, does have them**, and
+it is the authoritative source for a Japanese card.
+
+Search it by the Japanese name — the results are rendered in the browser, so a plain fetch
+returns nothing and the page has to be loaded:
+
+```
+https://www.pokemon-card.com/card-search/index.php?keyword=<name>&se_ta=&regulation_sidebar_form=all&sm_and_keyword=true
+```
+
+Result images sit at `/assets/images/card_images/large/<SET>/<id>_P_<NAME>.jpg`. The id is
+internal, not the collector number, and a species usually appears two or three times in a
+set — the plain card, then the AR and SAR. **Within the alternate-art block the id runs in
+step with the collector number**: in M6 it is `050441 + number`, confirmed on eight cards.
+Use that to pick the right one, then confirm the artwork against whatever you are matching
+before storing it.
+
+These are stored as a complete URL, and `picture()` recognises one by its extension rather
+than appending a size. `artwork.json` still wins, so the day TCGdex scans the set the
+borrowed picture is replaced with no action.
+
+### 4b. Storm Emerald (M6) has no English twin — checked 2026-09-20
+
+This is why the images above come from the official site rather than an English printing:
 
 Seven wishlist cards from M6 have no picture and none can be borrowed. Do not spend time
 re-deriving this:
@@ -182,8 +208,8 @@ re-deriving this:
   Raikou ex at 200 HP have no English printing at all; the Inkay, Kyogre, Groudon,
   Kecleon and Altaria matches that turn up on HP alone are unrelated cards from old sets.
 
-They will take their artwork from `artwork.json` on the day TCGdex scans M6, with no
-action needed. Re-check only if a new English Mega set appears.
+Their pictures now come from the official Japanese database instead (§4a), and will be
+replaced from `artwork.json` on the day TCGdex scans M6.
 
 Once the number is known, set it on the item in `.local/`, then re-encrypt:
 

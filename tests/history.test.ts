@@ -78,3 +78,55 @@ test('a placeholder purchase date counts throughout, because it means unknown', 
   assert.deepEqual(points.map((p) => p.period), ['2026-09-17', '2026-09-18', '2026-09-19']);
   assert.deepEqual(points.map((p) => p.value), [20, 22, 24], 'quantity multiplies each reading');
 });
+
+test('a series can be drawn on any measure the rollups kept', () => {
+  // The point of keeping every field: the reader changes their mind about which measure
+  // a chart means, and a period that is over cannot be re-measured.
+  const rolled: HistorySource = {
+    index: { days: [], firstDay: null, lastDay: null },
+    daily: new Map(),
+    rollups: {
+      weekly: {
+        A: [
+          { period: '2026-W37', avg1: 10, avg7: 12, avg30: 14, trend: 11, days: 7 },
+          { period: '2026-W38', avg1: 20, avg7: 18, avg30: 16, trend: 19, days: 7 },
+        ],
+      },
+      monthly: {},
+    },
+  };
+
+  const on = (basis: 'avg1' | 'avg7' | 'avg30' | 'trend') =>
+    cardSeries(rolled, 'A', { ...range('1m'), days: null }, basis).map((point) => point.value);
+
+  assert.deepEqual(on('avg1'), [10, 20], 'the one-day means, not the thirty-day ones');
+  assert.deepEqual(on('avg7'), [12, 18]);
+  assert.deepEqual(on('avg30'), [14, 16]);
+  assert.deepEqual(on('trend'), [11, 19]);
+});
+
+test('a period with no one-day average falls back rather than breaking the line', () => {
+  // A quiet card can carry a trend every day of a week and never sell once, so the week
+  // has no one-day average at all. A gap in the middle of a line reads as a crash.
+  const patchy: HistorySource = {
+    index: { days: [], firstDay: null, lastDay: null },
+    daily: new Map(),
+    rollups: {
+      weekly: {
+        A: [
+          { period: '2026-W37', avg1: 10, avg7: 12, avg30: 14, trend: 11, days: 7 },
+          { period: '2026-W38', avg1: null, avg7: 13, avg30: 15, trend: 12, days: 7 },
+        ],
+      },
+      monthly: {},
+    },
+  };
+
+  const points = cardSeries(patchy, 'A', { ...range('1m'), days: null }, 'avg1');
+
+  assert.deepEqual(
+    points.map((point) => point.value),
+    [10, 13],
+    'the nearest window stands in, as it does for a single day',
+  );
+});

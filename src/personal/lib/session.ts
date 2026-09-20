@@ -19,6 +19,7 @@
  * than returning null, and a locked vault is a better failure than a blank screen.
  */
 import { exportFileKey, importFileKey } from '../../lib/crypto.mjs';
+import type { Basis } from './money.ts';
 
 const KEY = 'personal.session';
 const TAB_KEY = 'personal.tab';
@@ -109,7 +110,7 @@ export async function sessionKeys(saved: SavedSession): Promise<Map<string, Cryp
 }
 
 /** Which market figure the reader chose to value on; see money.ts `quote`. */
-export function saveBasis(basis: 'avg30' | 'trend'): void {
+export function saveBasis(basis: Basis): void {
   try {
     sessionStorage.setItem(BASIS_KEY, basis);
   } catch {
@@ -117,10 +118,12 @@ export function saveBasis(basis: 'avg30' | 'trend'): void {
   }
 }
 
-export function loadBasis(): 'avg30' | 'trend' | null {
+const BASES: Basis[] = ['avg1', 'avg7', 'avg30', 'trend'];
+
+export function loadBasis(): Basis | null {
   try {
-    const saved = sessionStorage.getItem(BASIS_KEY);
-    return saved === 'avg30' || saved === 'trend' ? saved : null;
+    const saved = sessionStorage.getItem(BASIS_KEY) as Basis | null;
+    return saved && BASES.includes(saved) ? saved : null;
   } catch {
     return null;
   }

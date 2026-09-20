@@ -849,6 +849,39 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 37 (the rollups keep every figure; the chart can use any of them) ✅
+
+Your point about aggregation is right and the code did not reflect it. A thirty-day
+average already contains the previous twenty-nine days, so rolling it up into weeks and
+months smooths what is already smooth, and a month-over-month move is damped and arrives
+about half a window late. For a series we aggregate ourselves the honest primitive is the
+finest grain the source publishes — the one-day average — with the longer windows kept
+beside it.
+
+- **Rollups now keep every field.** `avg1`, `avg7`, `avg30`, `trend`, `low` and `avg`,
+  each as its own running mean, counted over the days that actually carried a figure
+  rather than treating a missing day as zero. Before, a closed period kept `avg30` and
+  `trend` and dropped the rest. Daily files were already complete, and nothing prunes
+  them, so nothing was lost — but a period is summarised once and the rest of the record
+  should not depend on that being noticed.
+- **Four bases, not two.** 1-day, 7-day, 30-day and price trend, each with a fallback to
+  the nearest window when a quiet card had no sale that day. That fallback is also the
+  behaviour you described for a card just added: with no one-day figure of its own it is
+  seeded from the longer window and moves onto its own daily readings as they arrive.
+- **Every figure on screen still names its measure**, now including which window.
+
+**The default stays on the 30-day average, and here is why.** TCGdex's one-day average is
+frozen in exactly the same way as its thirty-day one: across the 19→20 September refresh,
+`avg1`, `avg7` and `avg30` moved on **0 of 43** catalogued cards while `trend` moved on 29
+and `low` on 15. Charting on `avg1` today would draw a flat line for two thirds of the
+collection. Read straight off Cardmarket by hand it is a real, distinct figure — 39 of
+today's 43 hand readings carry one, and they differ from the weekly and monthly windows
+(Moltres: 9.24 against 10.29) — so the measure is alive at the source, not in the feed.
+
+The collection stands at €2,472.80 on the one-day average, €2,516.77 on the seven-day,
+€2,657.71 on the thirty-day and €2,561.64 on the trend. Switching the default is one line
+whenever you want it.
+
 ### 2026-09-20 — rev 36 (every card links to its own page on both markets) ✅
 
 Each card's detail panel now carries two links: Cardmarket and PriceCharting. The one

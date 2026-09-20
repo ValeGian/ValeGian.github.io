@@ -16,23 +16,37 @@ export const signedMoney = (value: number): string => SIGNED.format(value);
 export const percent = (ratio: number): string => PERCENT.format(ratio);
 
 /** Which figure the reader asked to see. Not necessarily the one they get — see quote. */
-export type Basis = 'avg30' | 'trend';
+export type Basis = 'avg1' | 'avg7' | 'avg30' | 'trend';
 
 export interface Quote {
   value: number;
   /** Which field the figure actually came from, so the screen can say when it is not the one asked for. */
-  basis: 'avg30' | 'avg7' | 'trend';
-  /** True when avg30 was read off Cardmarket by hand rather than taken from the catalog. */
+  basis: Basis;
+  /** True when the figure was read off Cardmarket by hand rather than taken from the catalog. */
   handRead?: boolean;
 }
 
 /**
- * Whether a 30-day average was read off Cardmarket rather than taken from the catalog.
+ * Whether a figure was read off Cardmarket rather than taken from the catalog.
  *
- * Only affects how the figure is described. Both are 30-day averages; the catalog's is
- * the one that stopped being refreshed (PLAN.md §8.4) and so may be days behind.
+ * Only affects how it is described. Both are the same measurement; the catalog's averages
+ * are the ones that stopped being refreshed (PLAN.md §8.4) and so may be days behind.
  */
 const isHandRead = (price: Price): boolean => price.source === 'cardmarket/manual';
+
+/**
+ * What to reach for when the measure asked for is not in the record.
+ *
+ * Nearest window first, and never `low` — that is the cheapest listing in any condition,
+ * which usually means a damaged copy. The screen always says which one it ended up with,
+ * so a substitution is visible rather than silent.
+ */
+const FALLBACKS: Record<Basis, Basis[]> = {
+  avg1: ['avg1', 'avg7', 'avg30', 'trend'],
+  avg7: ['avg7', 'avg30', 'avg1', 'trend'],
+  avg30: ['avg30', 'trend', 'avg7'],
+  trend: ['trend', 'avg30', 'avg7', 'avg1'],
+};
 
 /**
  * What one card is worth, on the measure the reader asked for.
@@ -59,13 +73,11 @@ const isHandRead = (price: Price): boolean => price.source === 'cardmarket/manua
 export function quote(price: Price | undefined, want: Basis = 'avg30'): Quote | null {
   if (!price) return null;
 
-  const average = typeof price.avg30 === 'number' ? price.avg30 : null;
-  const trend = typeof price.trend === 'number' ? price.trend : null;
+  for (const basis of FALLBACKS[want] ?? FALLBACKS.avg30) {
+    const value = price[basis];
+    if (typeof value === 'number') return { value, basis, handRead: isHandRead(price) };
+  }
 
-  if (want === 'trend' && trend !== null) return { value: trend, basis: 'trend' };
-  if (average !== null) return { value: average, basis: 'avg30', handRead: isHandRead(price) };
-  if (trend !== null) return { value: trend, basis: 'trend' };
-  if (typeof price.avg7 === 'number') return { value: price.avg7, basis: 'avg7' };
   return null;
 }
 
@@ -78,15 +90,21 @@ export const marketValue = (price: Price | undefined, want: Basis = 'avg30'): nu
  * Said in full wherever a price appears, because the site now mixes three measures and a
  * reader should never have to guess which one a number is.
  */
-export function basisLabel(reading: { basis: Quote['basis'] | null; handRead?: boolean } | null): string {
+const WINDOW: Record<Exclude<Basis, 'trend'>, string> = {
+  avg1: '1-day average',
+  avg7: '7-day average',
+  avg30: '30-day average',
+};
+
+export function basisLabel(reading: { basis: Basis | null; handRead?: boolean } | null): string {
   // A reading can exist with no usable figure in it — a catalog entry whose averages and
   // trend are all null — and calling that a 30-day average would be a lie on the screen.
   if (!reading || reading.basis === null) return 'no price';
-  if (reading.basis === 'avg7') return '7-day average, all conditions';
   if (reading.basis === 'trend') return 'price trend';
-  // Said plainly, because the catalog's averages stopped refreshing and a reader has no
-  // other way to know which of the two they are looking at.
-  return reading.handRead ? '30-day average, read by hand' : '30-day average, catalog — may be behind';
+
+  // Which of the two an average is matters: the catalog's stopped refreshing, and a
+  // reader has no other way to tell a fresh figure from one that is days behind.
+  return `${WINDOW[reading.basis]}, ${reading.handRead ? 'read by hand' : 'catalog — may be behind'}`;
 }
 
 /**

@@ -418,8 +418,15 @@ async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void
  * every reading, so switching re-reads history rather than restarting it.
  */
 function basisTabs(state: AppState): HTMLElement {
+  // In window order, shortest first. A one-day average is the honest primitive for a
+  // series we aggregate ourselves — a 30-day average already contains the previous 29
+  // days, so rolling it up by week and month smooths what is already smooth and lags by
+  // half the window. It is not the default yet only because the catalog's averages have
+  // stopped moving (PLAN.md §8.4); the daily files keep all four either way.
   const choices = [
-    ['avg30', '30-day avg', 'Hand-read where we have one, price trend elsewhere'],
+    ['avg1', '1-day avg', 'One day of completed sales — the finest grain there is, and often no sales at all'],
+    ['avg7', '7-day avg', 'A week of completed sales'],
+    ['avg30', '30-day avg', 'Hand-read where we have one, the catalog otherwise'],
     ['trend', 'Price trend', "Cardmarket's own estimate, live for every card"],
   ] as const;
 

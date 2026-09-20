@@ -48,20 +48,31 @@ const weekly = new Map();
 const monthly = new Map();
 
 /**
- * Accumulates a mean per field rather than one figure.
+ * Every figure Cardmarket publishes, kept as its own running mean.
  *
- * Both `avg30` and `trend` are kept, because which of them a chart should draw is the
- * reader's choice and cannot be made here — and because a rollup is written once for a
- * period that is over, so a field dropped now can never be recovered.
+ * Not just the one the chart draws today. Which measure a series should be built on is
+ * the reader's choice and may change — a one-day average is the honest primitive for a
+ * series we aggregate ourselves, where a thirty-day average is already a mean of the
+ * previous thirty days and aggregating it again smooths what is already smooth. Keeping
+ * all of them costs a few kilobytes and means that choice stays open.
+ *
+ * Counted per field, because they are not populated equally: a card can have a trend on a
+ * day when no copy sold and so has no one-day average at all. A mean over the days that
+ * had a figure is honest; treating a missing day as zero is not.
  */
-const add = (bucket, cardId, period, values) => {
+const FIELDS = ['avg1', 'avg7', 'avg30', 'trend', 'low', 'avg'];
+
+const add = (bucket, cardId, period, price) => {
   if (!bucket.has(cardId)) bucket.set(cardId, new Map());
   const periods = bucket.get(cardId);
-  const running = periods.get(period) ?? { avg30: { sum: 0, count: 0 }, trend: { sum: 0, count: 0 }, days: 0 };
+  const running = periods.get(period) ?? {
+    ...Object.fromEntries(FIELDS.map((field) => [field, { sum: 0, count: 0 }])),
+    days: 0,
+  };
 
-  for (const field of ['avg30', 'trend']) {
-    if (typeof values[field] !== 'number') continue;
-    running[field].sum += values[field];
+  for (const field of FIELDS) {
+    if (typeof price[field] !== 'number') continue;
+    running[field].sum += price[field];
     running[field].count += 1;
   }
 
@@ -74,10 +85,10 @@ for (const name of files) {
   days.push(snapshot.date);
 
   for (const [cardId, price] of Object.entries(snapshot.prices)) {
-    // avg7 stands in for a card too new to have a thirty-day average, as it does everywhere.
-    const avg30 = typeof price.avg30 === 'number' ? price.avg30 : price.avg7;
-    const values = { avg30, trend: price.trend };
-    if (typeof values.avg30 !== 'number' && typeof values.trend !== 'number') continue;
+    // avg7 stands in for a card too new to have a thirty-day average, as it does
+    // everywhere else; the real avg7 is kept alongside it either way.
+    const values = { ...price, avg30: typeof price.avg30 === 'number' ? price.avg30 : price.avg7 };
+    if (!FIELDS.some((field) => typeof values[field] === 'number')) continue;
     add(weekly, cardId, isoWeek(snapshot.date), values);
     add(monthly, cardId, month(snapshot.date), values);
   }
@@ -92,7 +103,11 @@ const flatten = (bucket) =>
         .map(([period, running]) => {
           const mean = (field) =>
             running[field].count === 0 ? null : Math.round((running[field].sum / running[field].count) * 100) / 100;
-          return { period, avg30: mean('avg30'), trend: mean('trend'), days: running.days };
+          return {
+            period,
+            ...Object.fromEntries(FIELDS.map((field) => [field, mean(field)])),
+            days: running.days,
+          };
         }),
     ]),
   );

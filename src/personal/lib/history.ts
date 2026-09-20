@@ -38,13 +38,13 @@ export interface Point {
   value: number;
 }
 
-interface RollupEntry {
-  period: string;
-  /** Both are kept so the reader can change their mind about which to chart. */
-  avg30: number | null;
-  trend: number | null;
-  days: number;
-}
+/**
+ * A closed period, holding the mean of every figure the days inside it carried.
+ *
+ * All of them, not only the one being charted: which measure a series should be built on
+ * is the reader's choice and may change, and a rollup covers a period that is over.
+ */
+type RollupEntry = { period: string; days: number } & Partial<Record<Basis | 'low' | 'avg', number | null>>;
 
 export interface HistorySource {
   index: { days: string[]; firstDay: string | null; lastDay: string | null };
@@ -108,6 +108,27 @@ function withinRange(at: number, range: Range): boolean {
 }
 
 /**
+ * The same order of preference `quote` uses, applied to a period rather than a day.
+ *
+ * Kept beside it rather than shared with it because a rollup is not a price record: it
+ * has no source and no currency, only means.
+ */
+const ROLLUP_FALLBACKS: Record<Basis, (Basis)[]> = {
+  avg1: ['avg1', 'avg7', 'avg30', 'trend'],
+  avg7: ['avg7', 'avg30', 'avg1', 'trend'],
+  avg30: ['avg30', 'trend', 'avg7'],
+  trend: ['trend', 'avg30', 'avg7', 'avg1'],
+};
+
+function rollupValue(entry: RollupEntry, basis: Basis): number | null {
+  for (const field of ROLLUP_FALLBACKS[basis] ?? ROLLUP_FALLBACKS.avg30) {
+    const value = entry[field];
+    if (typeof value === 'number') return value;
+  }
+  return null;
+}
+
+/**
  * The series for one card at the resolution the range calls for.
  *
  * Returns an empty list rather than a guess when there is nothing: a chart of one point
@@ -130,9 +151,11 @@ export function cardSeries(source: HistorySource, cardId: string, range: Range, 
 
   return entries
     .map((entry) => {
-      // A period may hold one field and not the other, so fall back rather than break the line.
-      const value = basis === 'trend' ? (entry.trend ?? entry.avg30) : (entry.avg30 ?? entry.trend);
-      return value === null || value === undefined ? null : { period: entry.period, at: at(entry.period), value };
+      // A period may hold one measure and not another — a quiet card can have a trend
+      // every day and a one-day average on none of them — so fall back the same way the
+      // figures do rather than break the line.
+      const value = rollupValue(entry, basis);
+      return value === null ? null : { period: entry.period, at: at(entry.period), value };
     })
     .filter((point): point is Point => point !== null)
     .filter((point) => withinRange(point.at, range));

@@ -116,17 +116,23 @@ test('which figure a card is valued at, and what it admits to using', async () =
     'a stale 30-day average beats a live figure that measures something else',
   );
 
-  // Asking for trend gets trend, whatever averages exist.
+  // Asking for trend gets trend, whatever averages exist. It is marked hand-read for the
+  // same reason the averages are: a person read it off the page.
   assert.deepEqual(
     quote(priced({ source: 'cardmarket/manual', avg30: 41.82, trend: 39 }), 'trend'),
-    { value: 39, basis: 'trend' },
+    { value: 39, basis: 'trend', handRead: true },
   );
 
   // No average at all: trend rather than nothing, and labelled.
-  assert.deepEqual(quote(priced({ trend: 12 }), 'avg30'), { value: 12, basis: 'trend' });
+  assert.deepEqual(quote(priced({ trend: 12 }), 'avg30'), { value: 12, basis: 'trend', handRead: false });
 
   // A card too new for either still gets a figure.
-  assert.deepEqual(quote(priced({ avg7: 48.19 }), 'avg30'), { value: 48.19, basis: 'avg7' });
+  assert.deepEqual(quote(priced({ avg7: 48.19 }), 'avg30'), { value: 48.19, basis: 'avg7', handRead: false });
+
+  // A one-day average is a measure in its own right, and the nearest window stands in
+  // for it when a quiet card had no sale that day.
+  assert.deepEqual(quote(priced({ avg1: 9.24, avg7: 10.29 }), 'avg1'), { value: 9.24, basis: 'avg1', handRead: false });
+  assert.deepEqual(quote(priced({ avg7: 10.29, avg30: 11 }), 'avg1'), { value: 10.29, basis: 'avg7', handRead: false });
 
   // `low` is the cheapest listing in any condition, so it is never a valuation.
   assert.equal(quote(priced({ low: 3 }), 'avg30'), null, 'low is never used as a valuation');
@@ -144,5 +150,9 @@ test('a card with no usable figure is described as having no price, not as an av
   assert.equal(basisLabel({ basis: 'avg30', handRead: true }), '30-day average, read by hand');
   assert.equal(basisLabel({ basis: 'avg30' }), '30-day average, catalog — may be behind');
   assert.equal(basisLabel({ basis: 'trend' }), 'price trend');
-  assert.equal(basisLabel({ basis: 'avg7' }), '7-day average, all conditions');
+
+  // Every window is described the same way, and each one carries the same warning about
+  // where it came from: the catalog's averages are all frozen together, not just avg30.
+  assert.equal(basisLabel({ basis: 'avg7' }), '7-day average, catalog — may be behind');
+  assert.equal(basisLabel({ basis: 'avg1', handRead: true }), '1-day average, read by hand');
 });

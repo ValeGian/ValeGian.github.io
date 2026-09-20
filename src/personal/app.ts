@@ -8,7 +8,7 @@
 import { el, frag, need, rebuildPreservingFocus, revealAfterPaint } from './lib/dom.ts';
 import { createStore } from './lib/store.ts';
 import { emptyFilters, type Filters, type SortKey } from './lib/filters.ts';
-import { value, type Valued } from './lib/money.ts';
+import { value, type Basis, type Valued } from './lib/money.ts';
 import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
 import { RANGES, cardSeries, daysNeeded, ensureDays, holdingsSeries, loadHistory, type HistorySource, type Range } from './lib/history.ts';
 import { renderChart, renderRangeTabs } from './views/chart.ts';
@@ -21,7 +21,7 @@ import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markB
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
 import { resume, unlock } from '../lib/unlock.mjs';
-import { clearSession, loadSession, loadTab, saveSession, saveTab, sessionKeys } from './lib/session.ts';
+import { clearSession, loadBasis, loadSession, loadTab, saveBasis, saveSession, saveTab, sessionKeys } from './lib/session.ts';
 import { decryptWithKey } from '../lib/crypto.mjs';
 import type { Collection, CollectionItem, Wishlist, WishlistItem } from './lib/types.ts';
 
@@ -76,6 +76,8 @@ interface AppState {
   chartOpen: boolean;
   /** Consumed once after the next paint, to bring a newly opened panel into view. */
   reveal: string | null;
+  /** Which market figure to value and chart on. See money.ts `quote`. */
+  basis: Basis;
   range: Range;
   view: 'list' | 'grid';
   /** Bumped to force a rebuild when the change was to the vault, not to this object. */
@@ -137,6 +139,7 @@ const store = createStore<AppState>({
   history: null,
   chartOpen: false,
   reveal: null,
+  basis: 'avg30',
   range: RANGES[0],
   view: 'list',
   tick: 0,
@@ -244,7 +247,7 @@ function holdings(vault: Vault) {
 }
 
 function valueOverTime(state: AppState, vault: Vault): HTMLElement {
-  const points = state.history ? holdingsSeries(state.history, holdings(vault), state.range) : [];
+  const points = state.history ? holdingsSeries(state.history, holdings(vault), state.range, state.basis) : [];
 
   return el(
     'section',
@@ -254,6 +257,7 @@ function valueOverTime(state: AppState, vault: Vault): HTMLElement {
       { class: 'chart-head' },
       el('h2', { text: 'What the collection has been worth' }),
       renderRangeTabs(state.range, RANGES, (range) => void loadRange(range)),
+      basisTabs(state),
     ),
     renderChart({ points, range: state.range, label: 'Collection value over time' }),
     vault.collection.items.some((item) => item.purchase.dateIsBootstrap)
@@ -266,7 +270,7 @@ function valueOverTime(state: AppState, vault: Vault): HTMLElement {
 }
 
 function cardHistory(state: AppState, cardId: string): HTMLElement {
-  const points = state.history ? cardSeries(state.history, cardId, state.range) : [];
+  const points = state.history ? cardSeries(state.history, cardId, state.range, state.basis) : [];
 
   return el(
     'section',
@@ -276,6 +280,7 @@ function cardHistory(state: AppState, cardId: string): HTMLElement {
       { class: 'chart-head' },
       el('h4', { text: 'What this card has been worth' }),
       renderRangeTabs(state.range, RANGES, (range) => void loadRange(range)),
+      basisTabs(state),
     ),
     renderChart({ points, range: state.range, label: 'Card value over time' }),
   );
@@ -283,7 +288,7 @@ function cardHistory(state: AppState, cardId: string): HTMLElement {
 
 function valuedRows(state: AppState): Valued[] {
   if (!state.vault) return [];
-  return state.vault.collection.items.map((item) => value(item, state.data?.prices ?? null));
+  return state.vault.collection.items.map((item) => value(item, state.data?.prices ?? null, state.basis));
 }
 
 function stalenessBanner(state: AppState): HTMLElement | null {
@@ -389,6 +394,7 @@ async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void
     vault,
     readOnly,
     tab: loadTab() ?? 'collection',
+    basis: loadBasis() ?? 'avg30',
     hasToken: !readOnly && Boolean(getToken()),
   });
   if (keep) await saveSession({ role: opened.role, keys: opened.keys });
@@ -399,6 +405,41 @@ async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void
     await catchUpOnResolutions(vault);
     await refreshPendingCount();
   }
+}
+
+/**
+ * Which market figure everything is valued and charted on.
+ *
+ * Offered rather than decided because the two answer different questions and neither is
+ * simply better: the 30-day average is the measure this site was built on, and the trend
+ * is the one that is currently reliable everywhere (PLAN.md §8.4). Both are recorded for
+ * every reading, so switching re-reads history rather than restarting it.
+ */
+function basisTabs(state: AppState): HTMLElement {
+  const choices = [
+    ['avg30', '30-day avg', 'Hand-read where we have one, price trend elsewhere'],
+    ['trend', 'Price trend', "Cardmarket's own estimate, live for every card"],
+  ] as const;
+
+  return el(
+    'div',
+    { class: 'chips basis-tabs' },
+    el('span', { class: 'chips-label ui', text: 'Value on' }),
+    ...choices.map(([basis, label, title]) =>
+      el('button', {
+        type: 'button',
+        role: 'tab',
+        title,
+        'aria-selected': String(state.basis === basis),
+        class: state.basis === basis ? 'chip on' : 'chip',
+        text: label,
+        onClick: () => {
+          saveBasis(basis);
+          store.update({ basis });
+        },
+      }),
+    ),
+  );
 }
 
 /** Nudges a rebuild when something changed outside the store, such as the vault. */

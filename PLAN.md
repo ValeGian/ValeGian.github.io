@@ -826,6 +826,24 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 33 (value on avg30 or trend, both always recorded) ✅
+- **Every reading now keeps both figures, and the reader picks which one counts.** A
+  control beside the range tabs switches the whole site — card values, collection total,
+  gain, and both charts — between the 30-day average and Cardmarket's price trend. The
+  choice is kept for the session like the open tab.
+- **Asking for avg30 is a preference, not a promise.** A 30-day average read off
+  Cardmarket by hand is used where one exists; everywhere else the catalog's frozen figure
+  is passed over in favour of `trend`, which tracks Cardmarket to the cent one guide
+  behind (§8.4). Every price on screen names the measure it used, so a borrowed trend is
+  never mistaken for a 30-day average.
+- **The rollups keep both means per period.** They are written once for a period that is
+  over, so a field dropped now could never be recovered — switching the basis re-reads the
+  history rather than restarting it.
+- The immediate effect: Charizard ex shows 357.63, the figure verified against Cardmarket,
+  where it had been showing a frozen 399.08. The collection total moved from 2,570.90 to
+  2,561.64 between the two bases, the gap being the handful of cards with a hand-read
+  average.
+
 ### 2026-09-20 — rev 32 (the wants list, and a verified 30th map) ✅
 - **44 cards read out of `wishlist-cards.pdf`** and added to both lists: 36 to Valerio's
   (70 items), 38 to Lotad's (42). Skipped for Valerio what he already owns — Charizard

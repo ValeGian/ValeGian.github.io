@@ -22,6 +22,7 @@ import { exportFileKey, importFileKey } from '../../lib/crypto.mjs';
 
 const KEY = 'personal.session';
 const TAB_KEY = 'personal.tab';
+const BASIS_KEY = 'personal.basis';
 
 /** What survives a reload. Keys are raw AES-256 material, base64, as the keyring holds them. */
 export type SavedSession =
@@ -63,6 +64,7 @@ export function clearSession(): void {
   try {
     sessionStorage.removeItem(KEY);
     sessionStorage.removeItem(TAB_KEY);
+    sessionStorage.removeItem(BASIS_KEY);
   } catch {
     // Nothing to do; the tab closing clears it anyway.
   }
@@ -101,6 +103,24 @@ export async function sessionKeys(saved: SavedSession): Promise<Map<string, Cryp
     const keys = new Map<string, CryptoKey>();
     for (const [name, raw] of entries) keys.set(name, await importFileKey(raw));
     return keys;
+  } catch {
+    return null;
+  }
+}
+
+/** Which market figure the reader chose to value on; see money.ts `quote`. */
+export function saveBasis(basis: 'avg30' | 'trend'): void {
+  try {
+    sessionStorage.setItem(BASIS_KEY, basis);
+  } catch {
+    // A preference, not data; losing it costs one click.
+  }
+}
+
+export function loadBasis(): 'avg30' | 'trend' | null {
+  try {
+    const saved = sessionStorage.getItem(BASIS_KEY);
+    return saved === 'avg30' || saved === 'trend' ? saved : null;
   } catch {
     return null;
   }

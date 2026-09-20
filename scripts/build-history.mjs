@@ -47,12 +47,25 @@ const days = [];
 const weekly = new Map();
 const monthly = new Map();
 
-const add = (bucket, cardId, period, value) => {
+/**
+ * Accumulates a mean per field rather than one figure.
+ *
+ * Both `avg30` and `trend` are kept, because which of them a chart should draw is the
+ * reader's choice and cannot be made here — and because a rollup is written once for a
+ * period that is over, so a field dropped now can never be recovered.
+ */
+const add = (bucket, cardId, period, values) => {
   if (!bucket.has(cardId)) bucket.set(cardId, new Map());
   const periods = bucket.get(cardId);
-  const running = periods.get(period) ?? { sum: 0, count: 0 };
-  running.sum += value;
-  running.count += 1;
+  const running = periods.get(period) ?? { avg30: { sum: 0, count: 0 }, trend: { sum: 0, count: 0 }, days: 0 };
+
+  for (const field of ['avg30', 'trend']) {
+    if (typeof values[field] !== 'number') continue;
+    running[field].sum += values[field];
+    running[field].count += 1;
+  }
+
+  running.days += 1;
   periods.set(period, running);
 };
 
@@ -61,11 +74,12 @@ for (const name of files) {
   days.push(snapshot.date);
 
   for (const [cardId, price] of Object.entries(snapshot.prices)) {
-    // The same measure the rest of the site uses, with the same fallback.
-    const value = typeof price.avg30 === 'number' ? price.avg30 : price.avg7;
-    if (typeof value !== 'number') continue;
-    add(weekly, cardId, isoWeek(snapshot.date), value);
-    add(monthly, cardId, month(snapshot.date), value);
+    // avg7 stands in for a card too new to have a thirty-day average, as it does everywhere.
+    const avg30 = typeof price.avg30 === 'number' ? price.avg30 : price.avg7;
+    const values = { avg30, trend: price.trend };
+    if (typeof values.avg30 !== 'number' && typeof values.trend !== 'number') continue;
+    add(weekly, cardId, isoWeek(snapshot.date), values);
+    add(monthly, cardId, month(snapshot.date), values);
   }
 }
 
@@ -75,7 +89,11 @@ const flatten = (bucket) =>
       cardId,
       [...periods]
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([period, { sum, count }]) => ({ period, value: Math.round((sum / count) * 100) / 100, days: count })),
+        .map(([period, running]) => {
+          const mean = (field) =>
+            running[field].count === 0 ? null : Math.round((running[field].sum / running[field].count) * 100) / 100;
+          return { period, avg30: mean('avg30'), trend: mean('trend'), days: running.days };
+        }),
     ]),
   );
 

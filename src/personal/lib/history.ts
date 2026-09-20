@@ -9,6 +9,7 @@
  * Daily points come from the immutable per-day files, fetched only for the span asked
  * for. Anything coarser comes from one rollup file.
  */
+import { quote, type Basis } from './money.ts';
 import type { PriceSnapshot } from './types.ts';
 
 export type RangeKey = '1w' | '1m' | '6m' | '1y' | '5y' | 'all';
@@ -39,7 +40,9 @@ export interface Point {
 
 interface RollupEntry {
   period: string;
-  value: number;
+  /** Both are kept so the reader can change their mind about which to chart. */
+  avg30: number | null;
+  trend: number | null;
   days: number;
 }
 
@@ -110,13 +113,14 @@ function withinRange(at: number, range: Range): boolean {
  * Returns an empty list rather than a guess when there is nothing: a chart of one point
  * is not a trend, and the caller shows a figure instead.
  */
-export function cardSeries(source: HistorySource, cardId: string, range: Range): Point[] {
+export function cardSeries(source: HistorySource, cardId: string, range: Range, basis: Basis = 'avg30'): Point[] {
   if (range.bucket === 'day') {
     return daysNeeded(source, range)
       .map((date) => {
         const price = source.daily.get(date)?.prices[cardId];
-        const value = typeof price?.avg30 === 'number' ? price.avg30 : price?.avg7;
-        return typeof value === 'number' ? { period: date, at: Date.parse(`${date}T12:00:00Z`), value } : null;
+        // The same rule the figures use, so a chart and the number above it agree.
+        const reading = quote(price, basis);
+        return reading ? { period: date, at: Date.parse(`${date}T12:00:00Z`), value: reading.value } : null;
       })
       .filter((point): point is Point => point !== null);
   }
@@ -125,7 +129,12 @@ export function cardSeries(source: HistorySource, cardId: string, range: Range):
   const at = range.bucket === 'week' ? midOfWeek : midOfMonth;
 
   return entries
-    .map((entry) => ({ period: entry.period, at: at(entry.period), value: entry.value }))
+    .map((entry) => {
+      // A period may hold one field and not the other, so fall back rather than break the line.
+      const value = basis === 'trend' ? (entry.trend ?? entry.avg30) : (entry.avg30 ?? entry.trend);
+      return value === null || value === undefined ? null : { period: entry.period, at: at(entry.period), value };
+    })
+    .filter((point): point is Point => point !== null)
     .filter((point) => withinRange(point.at, range));
 }
 
@@ -153,11 +162,12 @@ export function holdingsSeries(
   source: HistorySource,
   holdings: Holding[],
   range: Range,
+  basis: Basis = 'avg30',
 ): Point[] {
   const byPeriod = new Map<string, { at: number; value: number }>();
 
   for (const holding of holdings) {
-    for (const point of cardSeries(source, holding.cardId, range)) {
+    for (const point of cardSeries(source, holding.cardId, range, basis)) {
       if (!holding.dateIsBootstrap && point.period < holding.boughtOn.slice(0, point.period.length)) continue;
       const running = byPeriod.get(point.period) ?? { at: point.at, value: 0 };
       running.value += point.value * holding.quantity;

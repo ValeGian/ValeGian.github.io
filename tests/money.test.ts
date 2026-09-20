@@ -88,21 +88,45 @@ test('a set of cards with no prices has no value, which is not a value of zero',
   assert.ok(figures.ratio === null && figures.valued === 0, 'the two together mean "unknown", not "worthless"');
 });
 
-test('the 7-day average stands in when there is no 30-day one, and says so', async () => {
+test('which figure a card is valued at, and what it admits to using', async () => {
   const { quote } = await import('../src/personal/lib/money.ts');
+  const priced = (over: Record<string, unknown>) => ({
+    source: 'cardmarket/tcgdex' as const,
+    currency: 'EUR' as const,
+    updated: null,
+    avg30: null,
+    avg7: null,
+    trend: null,
+    low: null,
+    ...over,
+  });
 
+  // A 30-day average read off Cardmarket by hand is the real thing and wins.
   assert.deepEqual(
-    quote({ source: 'cardmarket/tcgdex', currency: 'EUR', updated: null, avg30: 41.82, avg7: 48.19, trend: null, low: null }),
-    { value: 41.82, basis: 'avg30' },
+    quote(priced({ source: 'cardmarket/manual', avg30: 41.82, trend: 39 }), 'avg30'),
+    { value: 41.82, basis: 'avg30', handRead: true },
   );
+
+  // One from the catalog is frozen (PLAN.md §8.4), so trend is used instead and says so.
   assert.deepEqual(
-    quote({ source: 'cardmarket/tcgdex', currency: 'EUR', updated: null, avg30: null, avg7: 48.19, trend: null, low: null }),
-    { value: 48.19, basis: 'avg7' },
-    'a card too new for a 30-day average still gets a figure, labelled',
+    quote(priced({ avg30: 436.5, trend: 297.77 }), 'avg30'),
+    { value: 297.77, basis: 'trend' },
+    'a catalog average is passed over rather than shown as a 30-day figure',
   );
-  assert.equal(
-    quote({ source: 'cardmarket/tcgdex', currency: 'EUR', updated: null, avg30: null, avg7: null, trend: 12, low: 3 }),
-    null,
-    'trend and low are never used as a valuation',
+
+  // Asking for trend gets trend, even where a believable average exists.
+  assert.deepEqual(
+    quote(priced({ source: 'cardmarket/manual', avg30: 41.82, trend: 39 }), 'trend'),
+    { value: 39, basis: 'trend' },
   );
+
+  // Nothing to fall back to: a stale average beats saying nothing, and is labelled.
+  assert.deepEqual(quote(priced({ avg30: 41.82 }), 'avg30'), { value: 41.82, basis: 'avg30', handRead: false });
+
+  // A card too new for either still gets a figure.
+  assert.deepEqual(quote(priced({ avg7: 48.19 }), 'avg30'), { value: 48.19, basis: 'avg7' });
+
+  // `low` is the cheapest listing in any condition, so it is never a valuation.
+  assert.equal(quote(priced({ low: 3 }), 'avg30'), null, 'low is never used as a valuation');
+  assert.equal(quote(undefined, 'avg30'), null);
 });

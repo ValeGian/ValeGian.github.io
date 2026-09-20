@@ -6,7 +6,7 @@
  * so a number without its origin is not worth showing.
  */
 import { el, frag } from '../lib/dom.ts';
-import { money, signedMoney, percent, type Valued } from '../lib/money.ts';
+import { money, signedMoney, percent, basisLabel, type Valued } from '../lib/money.ts';
 import { displayName, fullImage, type CatalogOverride, type NameTable } from '../lib/data.ts';
 import type { Condition, Currency } from '../lib/types.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
@@ -32,10 +32,7 @@ const CONDITIONS: Condition[] = ['M', 'NM', 'EX', 'GD', 'LP', 'PL', 'PO'];
  * third was read by a person, so a bare number would be asking the reader to assume.
  */
 function sourceLabel(entry: Valued): string {
-  const measure = entry.basis === 'avg7' ? '7-day average' : '30-day average';
-  return entry.price?.source === 'cardmarket/manual'
-    ? `Cardmarket, checked by hand`
-    : `Cardmarket ${measure}, all conditions`;
+  return `Cardmarket ${basisLabel(entry)}`;
 }
 
 const dateLabel = (iso: string | null | undefined): string =>

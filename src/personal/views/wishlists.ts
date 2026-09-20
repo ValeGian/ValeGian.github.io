@@ -8,7 +8,7 @@
  * bought, and its cost joins what they owe. Their cards are not my assets.
  */
 import { el, frag } from '../lib/dom.ts';
-import { money, quote } from '../lib/money.ts';
+import { money, quote, basisLabel } from '../lib/money.ts';
 import { displayName, subtitle, fullImage, priceKey, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
 import { chartIcon } from './icons.ts';
@@ -118,7 +118,7 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
   const price = state.prices?.prices[cardId];
   const reading = quote(price);
   const image = fullImage(sample);
-  const measure = reading?.basis === 'avg7' ? '7-day average' : '30-day average';
+  const measure = basisLabel(reading);
 
   const row = (list: Wishlist, item: WishlistItem) => {
     const bought = item.status === 'bought';
@@ -191,7 +191,7 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
               {},
               reading ? money(reading.value) : 'No price yet',
               price
-                ? el('span', { class: 'detail-note', text: `Cardmarket ${measure}, all conditions` })
+                ? el('span', { class: 'detail-note', text: `Cardmarket ${measure}` })
                 : null,
             ),
           ),

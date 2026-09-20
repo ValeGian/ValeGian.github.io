@@ -13,7 +13,7 @@ const day = (date: string, value: number): PriceSnapshot => ({
   date,
   generatedAt: `${date}T06:20:00.000Z`,
   prices: {
-    A: { source: 'cardmarket/tcgdex', currency: 'EUR', updated: null, avg30: value, trend: null, low: null },
+    A: { source: 'cardmarket/tcgdex', currency: 'EUR', updated: null, avg30: value, trend: value, low: null },
   },
 });
 
@@ -22,11 +22,11 @@ function source(): HistorySource {
   return {
     index: { days, firstDay: days[0], lastDay: days.at(-1) ?? null },
     rollups: {
-      weekly: { A: [{ period: '2026-W38', value: 20, days: 3 }] },
+      weekly: { A: [{ period: '2026-W38', avg30: 20, trend: 18, days: 3 }] },
       monthly: {
         A: [
-          { period: '2026-08', value: 10, days: 31 },
-          { period: '2026-09', value: 20, days: 19 },
+          { period: '2026-08', avg30: 10, trend: 9, days: 31 },
+          { period: '2026-09', avg30: 20, trend: 18, days: 19 },
         ],
       },
     },

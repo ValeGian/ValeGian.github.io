@@ -132,3 +132,17 @@ test('which figure a card is valued at, and what it admits to using', async () =
   assert.equal(quote(priced({ low: 3 }), 'avg30'), null, 'low is never used as a valuation');
   assert.equal(quote(undefined, 'avg30'), null);
 });
+test('a card with no usable figure is described as having no price, not as an average', async () => {
+  const { basisLabel } = await import('../src/personal/lib/money.ts');
+
+  // `value()` returns basis: null for a card the market has not priced. Describing that
+  // as "30-day average" would put a source on a number that does not exist — and the
+  // detail panel does call this whenever a price record exists, even an empty one.
+  assert.equal(basisLabel({ basis: null }), 'no price');
+  assert.equal(basisLabel(null), 'no price');
+
+  assert.equal(basisLabel({ basis: 'avg30', handRead: true }), '30-day average, read by hand');
+  assert.equal(basisLabel({ basis: 'avg30' }), '30-day average, catalog — may be behind');
+  assert.equal(basisLabel({ basis: 'trend' }), 'price trend');
+  assert.equal(basisLabel({ basis: 'avg7' }), '7-day average, all conditions');
+});

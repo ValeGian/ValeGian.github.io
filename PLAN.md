@@ -837,10 +837,76 @@ static lookup, never fetched at runtime.
 3. *(optional, later)* JustTCG as a clearly-separate TCGplayer/USD series. Default: no.
 4. **Public watchlist, or encrypted with an Actions secret?** It lists which cards are in
    the collection, nothing more. Default: leave it public (§13 rev 13).
+5. **Recording a sale.** There is no "sold" today — only Remove, which deletes the card and
+   the gain with it. Needs a decision on whether a sold card stays visible and what it does
+   to the totals (§13 rev 34).
+6. **Retry the catalog lookup when adding a card.** One transient "Failed to fetch" loses
+   the whole submission (§13 rev 34).
 
 ---
 
 ## 13. Progress log
+
+### 2026-09-20 — rev 34 (a QA pass over the whole thing, and four defects) ✅
+
+Everything below was measured, not reasoned about. The vault and the data were copied to
+`~/pokemon-backups/20260920T095314Z` first; every interaction test ran against a separate
+build with a throwaway keyring and no publishing token, and the data on disk is
+byte-identical to that copy afterwards.
+
+**The imported collection is right.** All 46 rows of the Google sheet match the 46 stored
+items; all 46 card ids were re-checked against TCGdex for set, number and translated name,
+with no near-miss chosen; every purchase price matches and the two totals agree to the
+cent (€1,218.97). No card is graded, all are NM, all quantity 1.
+
+**Interactions behave.** Adding a card, moving a wanted card into the collection (its
+price history follows it, because both are keyed the same way), buying a card for a friend
+(it stays on their list and joins what they owe — it never becomes an asset), and signing
+in as a friend (their list only, no edit controls, no other name anywhere). At 386px there
+is no horizontal overflow, the detail panel is one column and the chart stays behind its
+toggle.
+
+Four defects, all fixed:
+
+- **The detail panel's picture never loaded.** It was `loading="lazy"`, and Chrome made no
+  request for it at all — inserted into an open panel, inside the viewport, the image sat
+  at `complete: false` with nothing on the wire until the attribute was changed. This is
+  most of "plenty of cards have no image". The picture is the reason the panel was opened,
+  so it is eager now, and `views/artwork.ts` is the one place that builds it.
+- **A flaky CDN blanked cards permanently.** `assets.tcgdex.net` answers 503 intermittently
+  under repeated requests — the same URL gave 200, then 503, then 200 again a minute later.
+  A failure was final, and the detail panel showed a broken-image icon inside a button that
+  opened nothing. Now: one retry after 1.2s, then the same empty frame a card with no
+  artwork gets. Verified in the browser — exactly two requests, then the frame.
+- **Two thirds of the wishlist could not be opened.** 72 of 112 rows are 30th Anniversary
+  cards waiting on TCGdex, which carry a set and a number but no catalog id; the open
+  button was disabled on all of them. Their prices were on the row already, stored under
+  the set-and-number key, so the panel now groups on `priceKey` like everything else. All
+  112 rows open; 0 disabled.
+- **The daily job's loss guard counted wrong.** It totalled every price it held and
+  subtracted the hand-priced overrides, which only agrees when every override has a price;
+  one without was subtracted having never been added, making a complete day look short.
+  The guard decides whether a day is written at all. It now counts watched cards directly
+  (`scripts/lib/coverage.mjs`, six tests) and names what is missing when it refuses.
+
+Also: `basisLabel` would describe a card with no usable figure as a 30-day average — a
+reading can exist with every field null. It says "no price" now, and the type no longer
+permits the confusion.
+
+Two things found and left alone, both deliberate:
+
+- **There is no "sold".** Removing a card deletes it and the gain it made. Selling is a
+  real event in a collection; recording it needs a decision about whether a sold card stays
+  visible, which is yours to make.
+- **A transient TCGdex failure loses an add.** `cardDetail()` threw "Failed to fetch"
+  during a submit, with no retry, and the form's contents went with it. The same URL
+  worked moments later.
+
+Unchanged and verified: 61 of 62 watched cards priced today; every currency EUR with no
+rounding drift above half a cent; 61 of 62 cards have exactly one priced variant, none
+ambiguous; all 42 `artwork.json` entries and all 108 stored picture URLs resolve. The one
+card with no price anywhere is `SV11W-171` (サザンドラ ex), whose only variant carries no
+Cardmarket pricing at all — `price:todo` reports it correctly as "no price at all".
 
 ### 2026-09-20 — rev 33 (value on avg30 or trend, both always recorded) ✅
 - **Every reading now keeps both figures, and the reader picks which one counts.** A

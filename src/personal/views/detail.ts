@@ -11,7 +11,7 @@ import { displayName, fullImage, type CatalogOverride, type NameTable } from '..
 import type { Condition, Currency } from '../lib/types.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import { chartIcon } from './icons.ts';
-import { openLightbox } from './lightbox.ts';
+import { artworkPanel } from './artwork.ts';
 
 export interface CardEdit {
   itemId: string;
@@ -251,18 +251,11 @@ export function renderDetail(
     el(
       'div',
       { class: 'detail-body' },
-      image
-        ? el(
-            'button',
-            {
-              type: 'button',
-              class: 'detail-image-button',
-              'aria-label': `See ${displayName(item, names)} larger`,
-              onClick: () => openLightbox(image, displayName(item, names)),
-            },
-            el('img', { class: 'detail-image', src: image, alt: displayName(item, names), loading: 'lazy' }),
-          )
-        : el('div', { class: 'detail-image detail-image-empty ui', text: 'No image in the catalog' }),
+      artworkPanel({
+        source: image,
+        alt: displayName(item, names),
+        emptyText: 'No image in the catalog',
+      }),
       el(
         'div',
         {},

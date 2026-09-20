@@ -78,8 +78,10 @@ export const marketValue = (price: Price | undefined, want: Basis = 'avg30'): nu
  * Said in full wherever a price appears, because the site now mixes three measures and a
  * reader should never have to guess which one a number is.
  */
-export function basisLabel(reading: Quote | { basis: Quote['basis']; handRead?: boolean } | null): string {
-  if (!reading) return 'no price';
+export function basisLabel(reading: { basis: Quote['basis'] | null; handRead?: boolean } | null): string {
+  // A reading can exist with no usable figure in it — a catalog entry whose averages and
+  // trend are all null — and calling that a 30-day average would be a lie on the screen.
+  if (!reading || reading.basis === null) return 'no price';
   if (reading.basis === 'avg7') return '7-day average, all conditions';
   if (reading.basis === 'trend') return 'price trend';
   // Said plainly, because the catalog's averages stopped refreshing and a reader has no

@@ -12,7 +12,7 @@ import { money, quote, basisLabel } from '../lib/money.ts';
 import { displayName, subtitle, fullImage, priceKey, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
 import { chartIcon } from './icons.ts';
-import { openLightbox } from './lightbox.ts';
+import { artworkPanel } from './artwork.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
 export interface WishlistEdit {
@@ -58,6 +58,12 @@ export interface WishlistViewState {
   chartOpen?: boolean;
   onToggleChart?(): void;
 }
+
+/** Opens the card behind a row, by the key its price is stored under. */
+const openThis = (item: WishlistItem, onOpenCard?: WishlistViewState['onOpenCard']): void => {
+  const key = priceKey(item);
+  if (key) onOpenCard?.(key);
+};
 
 const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | undefined => {
   const key = priceKey(item);
@@ -108,14 +114,18 @@ export function balance(list: Wishlist): { bought: number; settled: number; owed
  * place the whole picture appears at once — useful when two people want it at different
  * prices and only one of them is worth buying today.
  */
-function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | null {
+function wishDetail(key: string, state: WishlistViewState): HTMLElement | null {
+  // Keyed on `priceKey`, not on `cardId`: most of the 30th Anniversary list is still
+  // waiting on TCGdex to publish the set, and those items carry a set and a number but
+  // no catalog id. Keying on the id left two thirds of the wishlist unopenable, while
+  // their prices — stored under that same set-and-number key — were on the row already.
   const wanters = Object.entries(state.lists).flatMap(([owner, list]) =>
-    list.items.filter((item) => item.cardId === cardId).map((item) => ({ owner, list, item })),
+    list.items.filter((item) => priceKey(item) === key).map((item) => ({ owner, list, item })),
   );
   if (wanters.length === 0) return null;
 
   const sample = wanters[0].item;
-  const price = state.prices?.prices[cardId];
+  const price = state.prices?.prices[key];
   const reading = quote(price);
   const image = fullImage(sample);
   const measure = basisLabel(reading);
@@ -161,18 +171,11 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
     el(
       'div',
       { class: 'detail-body' },
-      image
-        ? el(
-            'button',
-            {
-              type: 'button',
-              class: 'detail-image-button',
-              'aria-label': `See ${displayName(sample, state.names)} larger`,
-              onClick: () => openLightbox(image, displayName(sample, state.names)),
-            },
-            el('img', { class: 'detail-image', src: image, alt: displayName(sample, state.names), loading: 'eager' }),
-          )
-        : el('div', { class: 'detail-image detail-image-empty ui', text: 'No artwork in the catalog yet' }),
+      artworkPanel({
+        source: image,
+        alt: displayName(sample, state.names),
+        emptyText: 'No artwork in the catalog yet',
+      }),
       el(
         'div',
         {},
@@ -199,7 +202,7 @@ function wishDetail(cardId: string, state: WishlistViewState): HTMLElement | nul
         el('p', { class: 'wanters-heading ui', text: wanters.length === 1 ? 'Wanted by' : `Wanted by ${wanters.length} people` }),
         el('div', { class: 'wanters' }, ...wanters.map(({ list, item }) => row(list, item))),
       ),
-      el('div', { class: 'detail-chart' }, state.chartFor?.(cardId) ?? frag()),
+      el('div', { class: 'detail-chart' }, state.chartFor?.(key) ?? frag()),
     ),
   );
 }
@@ -330,8 +333,8 @@ function wishRow(
       {
         type: 'button',
         class: 'card-name wish-open',
-        disabled: !item.cardId || !state.onOpenCard,
-        onClick: () => item.cardId && state.onOpenCard?.(item.cardId),
+        disabled: !priceKey(item) || !state.onOpenCard,
+        onClick: () => openThis(item, state.onOpenCard),
       },
       el('span', { class: 'card-title', text: displayName(item, state.names) }),
       el(
@@ -410,8 +413,8 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
       {
         type: 'button',
         class: 'tile-open',
-        disabled: !item.cardId || !state.onOpenCard,
-        onClick: () => item.cardId && state.onOpenCard?.(item.cardId),
+        disabled: !priceKey(item) || !state.onOpenCard,
+        onClick: () => openThis(item, state.onOpenCard),
       },
       cardThumb(item, { width: 160, height: 224 }, 'lazy'),
       el('span', { class: 'tile-name', text: displayName(item, state.names) }),

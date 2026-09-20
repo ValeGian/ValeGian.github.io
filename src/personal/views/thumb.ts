@@ -1,5 +1,6 @@
 import { el } from '../lib/dom.ts';
 import { thumbnail } from '../lib/data.ts';
+import { artwork } from './artwork.ts';
 
 /**
  * A card thumbnail that degrades quietly.
@@ -19,16 +20,8 @@ export function cardThumb(
   loading: 'lazy' | 'eager' = 'lazy',
 ): HTMLElement {
   const source = thumbnail(item);
-  if (!source) return el('span', { class: 'thumb thumb-empty', 'aria-hidden': 'true' });
+  const empty = () => el('span', { class: 'thumb thumb-empty', 'aria-hidden': 'true' });
+  if (!source) return empty();
 
-  const image = el('img', {
-    class: 'thumb',
-    src: source,
-    alt: '',
-    loading,
-    ...size,
-    onError: () => image.replaceWith(el('span', { class: 'thumb thumb-empty', 'aria-hidden': 'true' })),
-  });
-
-  return image;
+  return artwork({ source, alt: '', className: 'thumb', loading, size, whenBroken: empty });
 }

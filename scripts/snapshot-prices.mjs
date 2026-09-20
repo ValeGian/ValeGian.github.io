@@ -28,6 +28,7 @@ import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { card, chooseVariant, cardmarketPrice } from './lib/tcgdex.mjs';
+import { watchlistCoverage, isTooIncomplete } from './lib/coverage.mjs';
 
 const DATA = 'public/data';
 const FIELDS = ['avg30', 'avg7', 'avg1', 'trend', 'low', 'avg'];
@@ -114,16 +115,17 @@ for (const override of overrides.cards) {
   };
 }
 
-const expected = watchlist.cards.length;
-const got = Object.keys(prices).length - overrides.cards.filter((entry) => entry.price?.avg30 !== null).length;
+const coverage = watchlistCoverage(watchlist, prices);
+const { expected, got } = coverage;
 
 if (failed.length > 0) {
   console.error('failed lookups:');
   for (const message of failed) console.error(`  ${message}`);
 }
 
-if (expected > 0 && got / expected < 1 - MAX_LOSS_RATIO) {
+if (isTooIncomplete(coverage, MAX_LOSS_RATIO)) {
   console.error(`\nOnly ${got} of ${expected} watched cards priced. Refusing to write a partial day.`);
+  console.error(`missing: ${coverage.missing.join(', ')}`);
   process.exit(1);
 }
 

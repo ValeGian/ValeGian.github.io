@@ -55,6 +55,16 @@ jobs:
           git commit -m "chore(prices): snapshot $(date -u +%F)"
           git push
 
+      # gh refuses to create an issue with a label the repository does not have, and the
+      # whole job goes red on it — which is what happened the first time the frozen-average
+      # detector fired, on 2026-09-20: the prices were written and pushed, and the run
+      # still reported failure. Creating the label is idempotent, so it just has to happen
+      # before anything tries to use it.
+      - name: Make sure the report label exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh label create pipeline --description 'Opened by the daily price job' --color BFD4F2 --force
+
       - name: Report hand-checked prices that have gone stale
         if: success() && hashFiles('.stale-prices.md') != ''
         env:

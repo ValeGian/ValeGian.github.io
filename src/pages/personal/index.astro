@@ -806,6 +806,45 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 
   /* Grid view */
 
+  /*
+   * The line that says which set the next few cards belong to. Quiet — it is a signpost
+   * while walking a shelf, not a title — and sticky, because the run below it can be
+   * thirty cards long and by then you have scrolled the heading away.
+   */
+  .personal .set-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin-top: var(--space-4);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--rule-strong);
+    background: var(--paper);
+    font-size: var(--size-xs);
+  }
+
+  .personal .wish-rows.by-set > .set-heading:first-child,
+  .personal .card-grid.by-set > .set-heading:first-child {
+    margin-top: 0;
+  }
+
+  .personal .set-heading-name {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .personal .set-heading-count {
+    color: var(--muted);
+  }
+
+  /* A heading is a row of its own in the grid, not a cell beside the cards. */
+  .personal .card-grid.by-set > .set-heading {
+    grid-column: 1 / -1;
+  }
+
   .personal .card-grid {
     list-style: none;
     margin: 0;

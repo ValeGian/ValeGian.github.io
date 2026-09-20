@@ -22,7 +22,7 @@ import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markB
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
 import { resume, unlock } from '../lib/unlock.mjs';
-import { clearSession, loadBasis, loadSession, loadTab, saveBasis, saveSession, saveTab, sessionKeys } from './lib/session.ts';
+import { clearSession, loadBasis, loadSession, loadTab, loadWishView, saveBasis, saveSession, saveTab, saveWishView, sessionKeys } from './lib/session.ts';
 import { decryptWithKey } from '../lib/crypto.mjs';
 import type { Collection, CollectionItem, Wishlist, WishlistItem } from './lib/types.ts';
 
@@ -124,9 +124,11 @@ const store = createStore<AppState>({
   filters: { ...emptyFilters },
   sortKey: 'value',
   sortDescending: true,
-  combined: true,
-  wishPriority: 'all',
-  wishSort: 'priority',
+  // Whatever the wishlist was last set to in this session, so a refresh in a shop does
+  // not undo it. See session.ts.
+  combined: loadWishView()?.combined ?? true,
+  wishPriority: (loadWishView()?.priority as PriorityFilter) ?? 'all',
+  wishSort: (loadWishView()?.sort as WishSort) ?? 'priority',
   openItemId: null,
   adding: false,
   add: blankAdd(),
@@ -145,7 +147,7 @@ const store = createStore<AppState>({
   reveal: null,
   basis: 'avg30',
   range: RANGES[0],
-  view: 'list',
+  view: loadWishView()?.view ?? 'list',
   tick: 0,
 });
 
@@ -420,6 +422,17 @@ async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void
  * is the one that is currently reliable everywhere (PLAN.md §8.4). Both are recorded for
  * every reading, so switching re-reads history rather than restarting it.
  */
+/** Records how the wishlist is laid out, after any of its four controls changes it. */
+function rememberWishView(): void {
+  const state = store.get();
+  saveWishView({
+    combined: state.combined,
+    view: state.view,
+    sort: state.wishSort,
+    priority: state.wishPriority,
+  });
+}
+
 function basisTabs(state: AppState): HTMLElement {
   // In window order, shortest first. A one-day average is the honest primitive for a
   // series we aggregate ourselves — a 30-day average already contains the previous 29
@@ -754,11 +767,20 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           names,
           combined: state.combined,
           view: state.view,
-          onView: (view) => store.update({ view }),
+          onView: (view) => {
+            store.update({ view });
+            rememberWishView();
+          },
           priority: state.wishPriority,
           sort: state.wishSort,
-          onPriority: (wishPriority) => store.update({ wishPriority }),
-          onSort: (wishSort) => store.update({ wishSort }),
+          onPriority: (wishPriority) => {
+            store.update({ wishPriority });
+            rememberWishView();
+          },
+          onSort: (wishSort) => {
+            store.update({ wishSort });
+            rememberWishView();
+          },
           canEdit: !state.readOnly,
           editing: state.editingWish,
           openCardId: state.openWishCardId,
@@ -766,7 +788,10 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           chartFor: (cardId) => cardHistory(state, cardId),
           chartOpen: state.chartOpen,
           onToggleChart: () => store.update({ chartOpen: !state.chartOpen }),
-          onToggleCombined: () => store.update((current) => ({ combined: !current.combined })),
+          onToggleCombined: () => {
+            store.update((current) => ({ combined: !current.combined }));
+            rememberWishView();
+          },
           onStartEdit: (edit) => store.update({ editingWish: edit }),
           // Silent, for the same reason the add form's fields are: rebuilding replaces
           // the element the caret is in.

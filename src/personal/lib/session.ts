@@ -66,6 +66,7 @@ export function clearSession(): void {
     sessionStorage.removeItem(KEY);
     sessionStorage.removeItem(TAB_KEY);
     sessionStorage.removeItem(BASIS_KEY);
+    sessionStorage.removeItem(WISH_KEY);
   } catch {
     // Nothing to do; the tab closing clears it anyway.
   }
@@ -104,6 +105,41 @@ export async function sessionKeys(saved: SavedSession): Promise<Map<string, Cryp
     const keys = new Map<string, CryptoKey>();
     for (const [name, raw] of entries) keys.set(name, await importFileKey(raw));
     return keys;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * How the wishlist is laid out: per person or combined, list or grid, and the order.
+ *
+ * Kept for the same reason the open tab is. Someone standing in a shop with the list set
+ * to their friend's cards, grouped by set, should not have to set it up again because the
+ * connection dropped and they pulled to refresh — which is exactly when they reload.
+ */
+export interface WishView {
+  combined: boolean;
+  view: 'list' | 'grid';
+  sort: string;
+  priority: string;
+}
+
+const WISH_KEY = 'personal.wishview';
+
+export function saveWishView(wish: WishView): void {
+  try {
+    sessionStorage.setItem(WISH_KEY, JSON.stringify(wish));
+  } catch {
+    // A layout, not data; losing it costs two taps.
+  }
+}
+
+export function loadWishView(): Partial<WishView> | null {
+  try {
+    const saved = sessionStorage.getItem(WISH_KEY);
+    if (!saved) return null;
+    const parsed = JSON.parse(saved) as Partial<WishView>;
+    return typeof parsed === 'object' && parsed !== null ? parsed : null;
   } catch {
     return null;
   }

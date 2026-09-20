@@ -849,6 +849,29 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 43 (a wishlist grouped by set, and a layout that survives a reload) ✅
+
+Sorting by person and then by set already worked — **By person** plus **Sort: Set** — but
+nothing on screen said so. The set code sat in small grey text on each row, so thirty
+cards deep the order was invisible, which is the opposite of what the order is for.
+
+- **A heading wherever the set changes**, in both the per-person and the combined view,
+  and in list and grid. It names the set as a person would say it and counts the run:
+  "30th Celebration JP · 51 cards", "Storm Emeralda · 7 cards". The names come from the
+  market data, which holds Cardmarket's own expansion names, so M6 reads as *Storm
+  Emeralda* rather than something plausible. Sticky, because a run can be fifty cards.
+- Runs, not groups: the list is already ordered and re-grouping it would quietly override
+  the order asked for. Headings appear only under Sort: Set; anywhere else every run is
+  one card long and a heading on each would be noise. Bought cards keep their own tail.
+- **The layout is remembered for the session** — person or combined, list or grid, the
+  sort and the priority filter. Setting it up again after every reload defeats it, and a
+  reload is how a bad connection in a shop is recovered from.
+
+Worth recording as a process failure: an edit script asserted, threw halfway, and wrote
+nothing — and the `npm run check` that followed was read through `tail -3`, which shows
+the warnings and hints lines and cuts off the one that said "4 errors". The browser then
+showed a feature that did nothing. **Read the Result line, not the tail.**
+
 ### 2026-09-20 — rev 42 (publishing was broken by a header I added this morning) 🔴→✅
 
 "Failed to fetch" was not a network blip and the retry in rev 41 did not help, because

@@ -14,7 +14,7 @@ import { cardThumb } from './thumb.ts';
 import { chartIcon } from './icons.ts';
 import { artworkPanel } from './artwork.ts';
 import { armedButton } from './armed-button.ts';
-import { marketRow } from './market.ts';
+import { marketRow, setName } from './market.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
 /**
@@ -610,6 +610,72 @@ function rows(items: WishlistItem[], owner: string, state: WishlistViewState, sh
     : el('ul', { class: 'wish-rows' }, ...items.map((item) => wishRow(item, owner, state, showOwner)));
 }
 
+/** The set a card belongs to, whether it has a catalog entry yet or not. */
+const setOf = (item: WishlistItem): string => item.setId ?? item.hint?.setCode ?? '';
+
+/**
+ * Consecutive runs of the same set, in the order they were sorted into.
+ *
+ * Runs rather than a grouping: the list has already been ordered, and re-grouping it
+ * would quietly override the sort the reader chose.
+ */
+function runsBySet<T>(items: T[], setOfItem: (item: T) => string): { setId: string; items: T[] }[] {
+  const runs: { setId: string; items: T[] }[] = [];
+
+  for (const item of items) {
+    const setId = setOfItem(item);
+    const last = runs.at(-1);
+    if (last?.setId === setId) last.items.push(item);
+    else runs.push({ setId, items: [item] });
+  }
+
+  return runs;
+}
+
+/**
+ * The heading above a run of cards from one set.
+ *
+ * Sorting by set already puts them together; this is what makes that visible. Thirty
+ * cards deep into a list, "M6a" in grey on each row is not something you can see the
+ * shape of, and the point of the order is to walk a shop one set at a time.
+ */
+function setHeading(setId: string, count: number, hinted?: string): HTMLElement {
+  const name = setName(setId, hinted);
+  return el(
+    'li',
+    { class: 'set-heading ui' },
+    el('span', { class: 'set-heading-name', text: name ?? 'Set unknown' }),
+    el('span', { class: 'set-heading-count', text: `${count} card${count === 1 ? '' : 's'}` }),
+  );
+}
+
+/**
+ * The same rows, with a heading wherever the set changes.
+ *
+ * Only when the reader asked to sort by set: under any other order the runs are one card
+ * long and a heading on each would be noise.
+ */
+function rowsBySet(
+  entries: { item: WishlistItem; owner: string }[],
+  state: WishlistViewState,
+  showOwner: boolean,
+): HTMLElement {
+  const runs = runsBySet(entries, (entry) => setOf(entry.item));
+  const build = (entry: { item: WishlistItem; owner: string }) =>
+    state.view === 'grid'
+      ? gridTile(entry.item, entry.owner, state, showOwner)
+      : wishRow(entry.item, entry.owner, state, showOwner);
+
+  return el(
+    'ul',
+    { class: state.view === 'grid' ? 'card-grid by-set' : 'wish-rows by-set' },
+    ...runs.flatMap((run) => [
+      setHeading(run.setId, run.items.length, run.items[0].item.hint?.setName),
+      ...run.items.map(build),
+    ]),
+  );
+}
+
 function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTMLElement {
   const wanted = arrange(list.items.filter((item) => item.status !== 'bought'), state);
   // Bought cards keep their own order and sit at the end: the list is for shopping, and
@@ -635,7 +701,14 @@ function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTM
       ? el('p', { class: 'empty', text: 'Nothing on this list yet.' })
       : wanted.length + purchased.length === 0
         ? el('p', { class: 'empty', text: `Nothing on this list at ${state.priority} priority.` })
-        : rows([...wanted, ...purchased], owner, state, false),
+        : state.sort === 'set'
+          ? // Bought cards stay in their own tail rather than joining a set's run: the
+            // headings are for walking a shop, and these are the part already done.
+            frag(
+              wanted.length > 0 ? rowsBySet(wanted.map((item) => ({ item, owner })), state, false) : null,
+              purchased.length > 0 ? rows(purchased, owner, state, false) : null,
+            )
+          : rows([...wanted, ...purchased], owner, state, false),
     list.settlements.length === 0
       ? null
       : el(
@@ -667,6 +740,8 @@ function combinedView(state: WishlistViewState): HTMLElement {
           : `Nothing on anyone’s list at ${state.priority} priority.`,
     });
   }
+
+  if (state.sort === 'set') return rowsBySet(wanted, state, true);
 
   return state.view === 'grid'
     ? el('ul', { class: 'card-grid' }, ...wanted.map(({ owner, item }) => gridTile(item, owner, state, true)))

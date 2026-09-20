@@ -15,6 +15,21 @@ export function usePublishedMarket(market: Market | null): void {
   published = market;
 }
 
+/**
+ * A set's name as a person would say it, for a heading.
+ *
+ * Taken from the market data, which holds Cardmarket's own expansion names — read off
+ * their expansion list rather than invented here, so "M6" reads as "Storm Emeralda" and
+ * not as something plausible. A card still waiting on the catalog carries the set name
+ * that was typed with it, and the bare code is the last resort: better a code than a
+ * guess, since the code is what is printed on the card.
+ */
+export function setName(setId: string | undefined, hinted?: string): string | null {
+  if (!setId) return hinted ?? null;
+  const known = published?.sets?.[setId]?.cardmarket?.expansion;
+  return known ?? hinted ?? setId;
+}
+
 interface Identifiable {
   cardId?: string;
   setId?: string;

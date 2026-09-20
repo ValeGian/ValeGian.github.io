@@ -158,6 +158,24 @@ For a pair that is not in that file:
 5. If you cannot tell them apart with confidence, **leave it and say which ones**. A wrong
    number attaches another card's price permanently.
 
+### 4a. Storm Emerald (M6) cannot be given a stand-in — checked 2026-09-20
+
+Seven wishlist cards from M6 have no picture and none can be borrowed. Do not spend time
+re-deriving this:
+
+- TCGdex lists M6 without artwork, and the Japanese Mega-era assets are absent from the
+  CDN entirely — `ja/M/M6/…`, `ja/me/M6/…` and `ja/M5/…` all return 404, while SV-era
+  paths return 200.
+- The English counterpart set does not exist. The Mega-era English releases stop at
+  **me05 Pitch Black**, which is Abyss Eye's twin (M5), not Storm Emerald's. There is no
+  me06.
+- No other English card carries the same illustration. Mega Rayquaza ex at 280 HP and
+  Raikou ex at 200 HP have no English printing at all; the Inkay, Kyogre, Groudon,
+  Kecleon and Altaria matches that turn up on HP alone are unrelated cards from old sets.
+
+They will take their artwork from `artwork.json` on the day TCGdex scans M6, with no
+action needed. Re-check only if a new English Mega set appears.
+
 Once the number is known, set it on the item in `.local/`, then re-encrypt:
 
 ```bash

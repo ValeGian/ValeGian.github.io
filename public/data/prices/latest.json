@@ -1,7 +1,7 @@
 {
   "version": 1,
   "date": "2026-09-19",
-  "generatedAt": "2026-09-20T01:07:27.128Z",
+  "generatedAt": "2026-09-20T06:57:38.643Z",
   "prices": {
     "S12a-212": {
       "source": "cardmarket/tcgdex",
@@ -680,6 +680,116 @@
       "avg1": 72.47,
       "trend": 63.24,
       "low": 70
+    },
+    "M6a-132": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.361Z",
+      "avg30": 57.72,
+      "avg7": 57.72,
+      "avg1": 48.96,
+      "trend": 39.84,
+      "low": 44.99
+    },
+    "M6a-133": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.395Z",
+      "avg30": 19.95,
+      "avg7": 19.95,
+      "avg1": 17,
+      "trend": 12.79,
+      "low": 17
+    },
+    "M6a-137": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.424Z",
+      "avg30": 134.47,
+      "avg7": 134.47,
+      "avg1": 139.48,
+      "trend": 140.44,
+      "low": 140.99
+    },
+    "M6a-141": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.452Z",
+      "avg30": 33.36,
+      "avg7": 33.36,
+      "avg1": 29.9,
+      "trend": 30.53,
+      "low": 35
+    },
+    "M6a-142": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.478Z",
+      "avg30": 159.96,
+      "avg7": 159.96,
+      "avg1": 169.22,
+      "trend": 164.48,
+      "low": 199.95
+    },
+    "M6a-146": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.505Z",
+      "avg30": 18.37,
+      "avg7": 18.37,
+      "avg1": 12.55,
+      "trend": 12.55,
+      "low": 16.99
+    },
+    "M6a-165": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.535Z",
+      "avg30": 67.3,
+      "avg7": 67.3,
+      "avg1": 63.71,
+      "trend": 62.13,
+      "low": 63
+    },
+    "M6a-018": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.561Z",
+      "avg30": 5,
+      "avg7": 5,
+      "avg1": 5,
+      "trend": 5,
+      "low": 2.99
+    },
+    "M6a-019": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.588Z",
+      "avg30": 6.66,
+      "avg7": 6.66,
+      "avg1": 4.99,
+      "trend": 6.06,
+      "low": 2.99
+    },
+    "M6a-020": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.615Z",
+      "avg30": 6.33,
+      "avg7": 6.33,
+      "avg1": 4.33,
+      "trend": 3.61,
+      "low": 2.99
+    },
+    "M6a-021": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T06:57:38.643Z",
+      "avg30": 5.5,
+      "avg7": 5.5,
+      "avg1": 4.99,
+      "trend": 4.99,
+      "low": 1.99
     }
   }
 }

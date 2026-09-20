@@ -97,6 +97,9 @@ https://www.cardmarket.com/en/Pokemon/Products/Singles/<Expansion-Name>?searchSt
 
 Then **check you are on the right card before recording anything**:
 
+- **the number in the page title is the card's number; the slug's is not always.**
+  `…/Shining-Celebi-m6aNDE-140` opens a page titled *Shining Celebi (141)*, and 141 is
+  correct. Read the title, never the URL.
 - the number in the page title matches the card you wanted, e.g. `Moltres (105)`
 - the expansion in the breadcrumb is the right one — `30th Celebration JP` and
   `30th Celebration` are different sets with different numbering

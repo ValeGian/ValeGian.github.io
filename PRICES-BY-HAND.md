@@ -130,10 +130,16 @@ A set's card list can be walked a page at a time, and that is cheap. A price has
 from the product's own page, one navigation each — so reading thirty prices is thirty
 page loads, and is worth spreading over more than one sitting.
 
-**Measured batch size: about a dozen.** On 2026-09-20 a run of six list pages followed by
-eleven product pages, each a real navigation roughly two seconds apart, was challenged on
-the twelfth. Plan for ten to twelve product pages per sitting and stop when challenged —
-the work already recorded is kept, and `price:todo` will not offer those cards again today.
+**Batch size shrinks as the day goes on — the limit is cumulative, not per sitting.**
+Measured on 2026-09-20, all at roughly three seconds a page: the first run managed eleven
+product pages before being challenged, a second run eleven more, a third eleven more, and
+the fourth was challenged on its **third** page. Roughly forty pages in an afternoon is
+where it stopped.
+
+So plan on ten to twelve for the first sitting of a day and expect less each time after.
+Stop the moment a challenge appears; it clears on its own in twenty minutes or so, but the
+allowance does not reset with it. The work already recorded is kept, and `price:todo` will
+not offer those cards again today.
 
 ### 4. Identifying a card with no catalog entry
 

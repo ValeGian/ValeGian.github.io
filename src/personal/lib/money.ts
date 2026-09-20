@@ -4,6 +4,7 @@
  * Every figure the site shows comes from here, so there is one place to check when a
  * number looks wrong, and one place where the rules about which price to use live.
  */
+import { priceKey } from './data.ts';
 import type { CollectionItem, Price, PriceSnapshot } from './types.ts';
 
 const EUR = new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' });
@@ -60,7 +61,9 @@ export interface Valued {
 }
 
 export function value(item: CollectionItem, snapshot: PriceSnapshot | null): Valued {
-  const price = item.cardId ? snapshot?.prices[item.cardId] : undefined;
+  // Also finds a hand-read price for a card the catalog has not published — see priceKey.
+  const key = priceKey(item);
+  const price = key ? snapshot?.prices[key] : undefined;
   const reading = quote(price);
   const unit = reading?.value ?? null;
   const paid = cents(item.purchase.amountEur * item.quantity);

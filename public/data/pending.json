@@ -1,7 +1,67 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-20T00:06:45.034Z",
+  "generatedAt": "2026-09-20T00:21:01.421Z",
   "items": [
+    {
+      "id": "lotad/wish_0002",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "105",
+        "nameEn": "Moltres"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0003",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "108",
+        "nameEn": "Zapdos"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0004",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "107",
+        "nameEn": "Articuno"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0002",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "105",
+        "nameEn": "Moltres"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0003",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "108",
+        "nameEn": "Zapdos"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0004",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "107",
+        "nameEn": "Articuno"
+      },
+      "pendingSince": "2026-09-20"
+    },
     {
       "id": "valerio/wish_0005",
       "hint": {

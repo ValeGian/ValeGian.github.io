@@ -1,7 +1,7 @@
 {
   "version": 1,
   "date": "2026-09-19",
-  "generatedAt": "2026-09-20T00:06:51.055Z",
+  "generatedAt": "2026-09-20T00:21:21.766Z",
   "prices": {
     "S12a-212": {
       "source": "cardmarket/tcgdex",
@@ -540,6 +540,36 @@
       "avg1": 5,
       "trend": 5,
       "low": 2.99
+    },
+    "M6a-105": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T00:21:13.641Z",
+      "avg30": 10.29,
+      "avg7": 10.29,
+      "avg1": 9.24,
+      "trend": 9.61,
+      "low": 6.99
+    },
+    "M6a-107": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T00:21:21.738Z",
+      "avg30": 11.24,
+      "avg7": 11.24,
+      "avg1": 10.26,
+      "trend": 10.2,
+      "low": 6.49
+    },
+    "M6a-108": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T00:21:21.765Z",
+      "avg30": 11.67,
+      "avg7": 11.67,
+      "avg1": 11.74,
+      "trend": 11.56,
+      "low": 8.99
     }
   }
 }

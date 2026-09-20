@@ -147,6 +147,27 @@ export function picture(item: Illustrated, size: 'low' | 'high'): string | null 
 export const thumbnail = (item: Illustrated): string | null => picture(item, 'low');
 export const fullImage = (item: Illustrated): string | null => picture(item, 'high');
 
+/**
+ * The key a card's price is filed under.
+ *
+ * Normally its catalog id. A card the catalog has not published yet has none, but it can
+ * still have a price — read off Cardmarket by hand — and that is filed under set code and
+ * number, which is exactly the id the card will be given when the catalog catches up. So
+ * the figure is already on screen before TCGdex has ever heard of the card, and nothing
+ * has to be re-filed when it does.
+ */
+export function priceKey(item: {
+  cardId?: string;
+  setId?: string;
+  number?: string;
+  hint?: { setCode: string; number: string };
+}): string | null {
+  if (item.cardId) return item.cardId;
+  if (item.setId && item.number) return `${item.setId}-${item.number}`;
+  if (item.hint) return `${item.hint.setCode}-${item.hint.number}`;
+  return null;
+}
+
 /** How old the price data is, in whole days, or null when there is none. */
 export function stalenessDays(snapshot: PriceSnapshot | null): number | null {
   if (!snapshot) return null;

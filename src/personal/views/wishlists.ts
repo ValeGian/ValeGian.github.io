@@ -9,7 +9,7 @@
  */
 import { el, frag } from '../lib/dom.ts';
 import { money, quote } from '../lib/money.ts';
-import { displayName, subtitle, fullImage, type NameTable } from '../lib/data.ts';
+import { displayName, subtitle, fullImage, priceKey, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
 import { chartIcon } from './icons.ts';
 import { openLightbox } from './lightbox.ts';
@@ -59,8 +59,10 @@ export interface WishlistViewState {
   onToggleChart?(): void;
 }
 
-const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | undefined =>
-  item.cardId ? prices?.prices[item.cardId] : undefined;
+const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | undefined => {
+  const key = priceKey(item);
+  return key ? prices?.prices[key] : undefined;
+};
 
 /**
  * How much this one matters, on the row itself.

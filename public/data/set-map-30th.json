@@ -164,6 +164,21 @@
       "japanese": "046",
       "english": "052",
       "name": "Pikachu"
+    },
+    {
+      "japanese": "105",
+      "english": "130",
+      "name": "Moltres"
+    },
+    {
+      "japanese": "107",
+      "english": "132",
+      "name": "Articuno"
+    },
+    {
+      "japanese": "108",
+      "english": "133",
+      "name": "Zapdos"
     }
   ]
 }

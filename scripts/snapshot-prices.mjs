@@ -151,10 +151,32 @@ if (options['dry-run']) {
 await mkdir(`${DATA}/prices/daily`, { recursive: true });
 
 const dailyPath = `${DATA}/prices/daily/${options.date}.json`;
+
+/**
+ * Adds to the day rather than skipping it.
+ *
+ * A day used to be written once and never touched, which was right when this job was the
+ * only thing that wrote one. It is not any more: prices read by hand off Cardmarket are
+ * filed into the same day as they are taken, so by the time this runs the file usually
+ * exists already — and skipping it threw away that day's readings for every other card.
+ *
+ * Readings already on file win. A hand-read figure is better evidence than TCGdex's, and
+ * where the entry came from an earlier run of this job the first reading of the day is
+ * the honest one. So this only ever fills in cards the day does not yet have.
+ */
 if (existsSync(dailyPath)) {
-  console.log(`${dailyPath} already exists; leaving it alone`);
+  const existing = await readJson(dailyPath);
+  const added = Object.keys(prices).filter((cardId) => !existing.prices[cardId]);
+
+  if (added.length === 0) {
+    console.log(`${dailyPath} already has every card priced today`);
+  } else {
+    const merged = { ...existing, prices: { ...prices, ...existing.prices } };
+    await writeFile(dailyPath, `${JSON.stringify(merged)}\n`);
+    console.log(`${dailyPath} already existed; added ${added.length} card(s) it did not have`);
+  }
 } else {
-  // Compact on purpose: this file is written once and kept forever.
+  // Compact on purpose: this file is written once and then only ever added to.
   await writeFile(dailyPath, `${JSON.stringify(observed)}\n`);
 }
 

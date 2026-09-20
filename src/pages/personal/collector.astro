@@ -1,0 +1,121 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+
+/**
+ * The bookmarklet that collects a price off a Cardmarket page.
+ *
+ * Written here as readable source and squeezed into a `javascript:` URL at build time, so
+ * there is one copy to maintain and it is the legible one. It reads only what the page
+ * already shows, keeps a running list in that tab, and puts the list on the clipboard —
+ * it sends nothing anywhere, because it cannot: cardmarket.com shares no storage, no
+ * cookies and no origin with this site.
+ */
+const source = `
+(function () {
+  var title = document.title || '';
+  var m = title.match(/\\((\\d+)\\)/);
+  if (!m) { alert('This does not look like a card page — no number in the title.'); return; }
+
+  var path = location.pathname.split('/').filter(Boolean);
+  var expansion = path[path.length - 2] || '';
+  var text = document.body.innerText.replace(/\\s+/g, ' ');
+  var grab = function (label) {
+    var hit = text.match(new RegExp(label + '\\\\s*([\\\\d.,]+)\\\\s*\\u20ac'));
+    return hit ? hit[1] : null;
+  };
+
+  var card = {
+    name: title.split(' (')[0],
+    number: m[1],
+    expansion: expansion,
+    avg30: grab('30-days average price'),
+    avg7: grab('7-days average price'),
+    avg1: grab('1-day average price'),
+    trend: grab('Price Trend'),
+    low: grab('From'),
+    url: location.href
+  };
+
+  if (!card.avg30 && !card.trend) { alert('No prices on this page yet.'); return; }
+
+  var key = 'valegian.prices';
+  var list;
+  try { list = JSON.parse(sessionStorage.getItem(key) || '[]'); } catch (e) { list = []; }
+  list = list.filter(function (e) { return !(e.expansion === card.expansion && e.number === card.number); });
+  list.push(card);
+  try { sessionStorage.setItem(key, JSON.stringify(list)); } catch (e) {}
+
+  var payload = JSON.stringify(list);
+  var done = function () {
+    var note = document.createElement('div');
+    note.style.cssText = 'position:fixed;top:12px;right:12px;z-index:99999;background:#111;color:#fff;padding:10px 14px;border-radius:4px;font:13px sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.4)';
+    note.textContent = card.name + ' ' + card.number + ' \\u2713  (' + list.length + ' on the clipboard)';
+    document.body.appendChild(note);
+    setTimeout(function () { note.remove(); }, 2200);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(payload).then(done, function () { window.prompt('Copy this:', payload); });
+  } else {
+    window.prompt('Copy this:', payload);
+  }
+})();
+`;
+
+// Collapsed to one line; the readable version above is the one to edit.
+const bookmarklet = `javascript:${encodeURIComponent(source.replace(/\n\s*/g, ' ').trim())}`;
+---
+
+<BaseLayout title="Price collector" description="A bookmarklet for collecting Cardmarket prices.">
+  <div class="page">
+    <h1>Price collector</h1>
+
+    <p class="lede">
+      Drag the button to your bookmarks bar. Then, on any Cardmarket card page, click it —
+      it reads the prices already on the page and adds them to a list on your clipboard.
+    </p>
+
+    <p><a class="grab" href={bookmarklet}>Collect price</a></p>
+
+    <h2>How it goes</h2>
+    <ol>
+      <li>Open a card on Cardmarket and click <strong>Collect price</strong>. A tick appears with a running count.</li>
+      <li>Do the same on as many cards as you like — each one is added, and clicking the same card twice replaces it rather than duplicating it.</li>
+      <li>Back here, run <code>npm run price:paste</code>. Everything on the clipboard is recorded for today.</li>
+    </ol>
+
+    <p>
+      A card already read by hand today is skipped rather than overwritten, so the first
+      reading of a day stands. Both the 30-day average and the price trend are stored for
+      every card, whichever one you are currently valuing on.
+    </p>
+
+    <p class="ui muted">
+      The bookmarklet reads only what the page is already showing and sends nothing
+      anywhere — it has no way to, since Cardmarket shares no origin with this site. The
+      list lives in that browser tab until you paste it.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .page { padding-block: var(--space-12); }
+  h1 { font-size: var(--size-display); letter-spacing: -0.03em; margin-bottom: var(--space-4); }
+  h2 { font-size: var(--size-lg); margin: var(--space-8) 0 var(--space-3); }
+  .lede { font-size: var(--size-lg); max-width: 56ch; }
+  ol { max-width: 60ch; padding-left: var(--space-6); }
+  li { margin-bottom: var(--space-2); }
+  p { max-width: 60ch; }
+
+  /* Deliberately looks like something to drag, not something to click here. */
+  .grab {
+    display: inline-block;
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+    border: 1px solid var(--rule-strong);
+    border-radius: 999px;
+    padding: var(--space-2) var(--space-5);
+    text-decoration: none;
+    cursor: grab;
+  }
+</style>

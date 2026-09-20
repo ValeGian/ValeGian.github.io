@@ -126,6 +126,34 @@ nothing now and cannot be recovered later. Use `--dry-run` first if unsure.
 This writes into today's snapshot and into `latest.json`, marked `cardmarket/manual`, so
 the site and the history always say where the figure came from.
 
+### 3b. Collecting by hand in the browser, without a session
+
+There is a bookmarklet for this, and it is the better way when Valerio is reading pages
+himself rather than asking a session to. **`/personal/collector`** has the button to drag
+to a bookmarks bar.
+
+On any Cardmarket card page, clicking it reads the prices already on the page, adds the
+card to a running list held in that tab, and puts the list on the clipboard. A tick
+confirms it with a count. Clicking the same card twice replaces rather than duplicates.
+
+Then, in the repository:
+
+```bash
+npm run price:paste            # everything on the clipboard, recorded for today
+npm run price:paste -- --dry-run
+```
+
+Both the 30-day average and the trend are stored for every card. A card already read by
+hand today is skipped rather than overwritten, so the first reading of the day stands.
+
+The bookmarklet maps Cardmarket's expansion slug to a set code through a table in
+`scripts/paste-prices.mjs`. Only `30th-Celebration-JP` has been confirmed against a real
+page; an expansion that is not in the table is reported by name and skipped, so adding it
+is a one-line fix when it comes up.
+
+This costs no page loads beyond the ones a person was making anyway, which is the whole
+point: it does not touch the allowance described below.
+
 ### 3a. Do not harvest with `fetch()`
 
 Loading pages by navigating to them works. Running `fetch()` in a loop from the page does

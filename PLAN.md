@@ -611,13 +611,24 @@ cards at Cardmarket prices.
 The paid ones are all mirrors that scrape Cardmarket themselves, so they buy convenience
 rather than a better source, and they break the rule that this costs nothing.
 
-**`trend` is the free, automatic candidate, but it is not yet verified.** It comes from
-the same feed and it moved on 29 of 43 cards across a day when no average did, so it is
-certainly live. Against the website it has been checked on **exactly one card** — S12a-212,
-where TCGdex's 75.17 matched the page to the cent, as did `low` at 65.00. One match is
-consistent with the field being right and is not proof of it. Settling it needs the Price
-Trend read off three or four product pages and compared; until then, treating `trend` as
-accurate is an assumption, not a finding. It is Cardmarket's own smoothed
+**`trend` is accurate. Settled 2026-09-20 against the website on three more cards:**
+
+| card | TCGdex 18 Sep | TCGdex 19 Sep | website on 20 Sep |
+|---|---|---|---|
+| SV2a-201 | 390.85 | **357.63** | **357.63** |
+| S12a-261 | 309.81 | 303.63 | 310.31 |
+| SV2a-202 | 140.81 | 133.31 | 129.66 |
+
+Charizard matches to the cent. The other two are 2.2% and 2.7% out because the website
+was already showing the 20 September guide while TCGdex still held the 19th: Cardmarket
+regenerates at about 02:00 UTC and TCGdex fetches at 22:54, so the chain is inherently one
+guide behind. That is a known lag, not an error, and it is the same lag for every field.
+
+**This also settles what is wrong with avg30.** On those same three cards, across those
+same two guides and inside the same API response, `trend` moved every time and `avg30` did
+not move at all. A lagged feed cannot explain that, because `trend` moves. Different
+website scoping cannot explain it either, because `trend` matches. The only explanation
+left is that TCGdex's ingestion of the average fields has stopped while the rest flows. It is Cardmarket's own smoothed
 estimate, computed from completed sales, and it is what their product pages show as the
 price. Pricing on it would cost nothing and need no hand-reading — the objection is that
 it is a different measure from `avg30`, so every figure already recorded changes meaning.

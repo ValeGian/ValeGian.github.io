@@ -1,7 +1,7 @@
 {
   "version": 1,
   "date": "2026-09-20",
-  "generatedAt": "2026-09-20T07:30:52.883Z",
+  "generatedAt": "2026-09-20T07:42:33.230Z",
   "prices": {
     "S12a-212": {
       "source": "cardmarket/tcgdex",
@@ -1054,15 +1054,14 @@
       "avg": 68.08
     },
     "M6-110": {
-      "source": "cardmarket/tcgdex",
+      "source": "cardmarket/manual",
       "currency": "EUR",
-      "updated": "2026-09-19T22:54:58.163Z",
-      "avg30": 436.5,
-      "avg7": 326.71,
-      "avg1": 269.9,
-      "trend": 297.77,
-      "low": 218.95,
-      "avg": 409.34
+      "updated": "2026-09-20T07:42:33.227Z",
+      "avg30": 388.36,
+      "avg7": null,
+      "avg1": null,
+      "trend": null,
+      "low": null
     },
     "SV5K-080": {
       "source": "cardmarket/tcgdex",

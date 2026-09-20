@@ -849,6 +849,32 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 39 (what a card cost is asked for in the page) ✅
+
+Marking a wanted card bought used `prompt()`. One line of code, and wrong in three ways:
+it cannot be styled, it freezes the tab until it is answered, and on a phone it is a
+cramped grey box with no currency control — so the currency was guessed by looking for
+"eur" or "€" in whatever was typed, and everything else became yen.
+
+It is now an inline form in the row, the same shape as the edit form beside it: the
+amount, the currency as an actual choice, and a line saying what is about to be recorded.
+Confirm stays disabled until the amount parses.
+
+- **`parseAmount` reads a price the way it was written.** "1.200", "1,200" and "1 200" are
+  all twelve hundred yen on a shop tag, while "12,50" is a decimal in Italian, so the last
+  separator wins only when one or two digits follow it. A currency symbol pasted in with
+  the number is ignored. Anything that does not come out positive is refused rather than
+  guessed at — a mistyped price is what the gain column is built on. Eighteen cases.
+- **The note and the button answer every keystroke without a repaint.** Fields here report
+  their value silently, because rebuilding replaces the element the caret is in and turns
+  1200 into 1002 — so the two things that must react are held and written to directly.
+  Found by testing it: the first version left Confirm disabled no matter what was typed.
+
+Checked end to end in the browser: 1200 JPY on Articuno moved it off the wishlist and into
+the collection, 46 → 47 cards, paid €1,218.97 → €1,225.61 — €6.64, the correct conversion.
+Cancel writes nothing. At 386px the two fields sit side by side and the buttons are 41px
+tall.
+
 ### 2026-09-20 — rev 38 (the grid can act; a blank password cannot lock anyone out) ✅
 
 - **Grid view was read-only.** It showed the picture, the target and the market price —

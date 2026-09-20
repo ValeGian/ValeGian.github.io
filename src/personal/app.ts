@@ -8,13 +8,13 @@
 import { el, frag, need, rebuildPreservingFocus, revealAfterPaint } from './lib/dom.ts';
 import { createStore } from './lib/store.ts';
 import { emptyFilters, type Filters, type SortKey } from './lib/filters.ts';
-import { value, type Basis, type Valued } from './lib/money.ts';
+import { parseAmount, value, type Basis, type Valued } from './lib/money.ts';
 import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
 import { RANGES, cardSeries, daysNeeded, ensureDays, holdingsSeries, loadHistory, type HistorySource, type Range } from './lib/history.ts';
 import { renderChart, renderRangeTabs } from './views/chart.ts';
 import { renderCollection } from './views/collection.ts';
 import { renderDetail, type CardEdit } from './views/detail.ts';
-import { renderWishlists, type PriorityFilter, type WishlistEdit, type WishSort } from './views/wishlists.ts';
+import { renderWishlists, type BuyEdit, type PriorityFilter, type WishlistEdit, type WishSort } from './views/wishlists.ts';
 import { blankFields, renderAddCard, searchCards, type AddCardState, type AddMode } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
 import { usePublishedMarket } from './views/market.ts';
@@ -71,6 +71,8 @@ interface AppState {
   lastCommitUrl: string | null;
   askingForToken: boolean;
   editingWish: WishlistEdit | null;
+  /** The wanted card being marked bought, while its price is being typed. */
+  buyingWish: BuyEdit | null;
   editingCard: CardEdit | null;
   openWishCardId: string | null;
   history: HistorySource | null;
@@ -135,6 +137,7 @@ const store = createStore<AppState>({
   lastCommitUrl: null,
   askingForToken: false,
   editingWish: null,
+  buyingWish: null,
   editingCard: null,
   openWishCardId: null,
   history: null,
@@ -794,26 +797,38 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
             store.update({ editingWish: null });
             schedulePublish();
           },
-          onMarkBought: async (owner, itemId) => {
-            const paid = prompt('What did it cost? Enter the amount, then the currency.', '');
-            if (paid === null) return;
-            const amount = Number(paid.replace(/[^0-9.]/g, ''));
-            if (!Number.isFinite(amount) || amount <= 0) return;
-            const currency = /eur|€/i.test(paid) ? 'EUR' : 'JPY';
+          buying: state.buyingWish,
+          onStartBuy: (buyingWish) => store.update({ buyingWish, editingWish: null }),
+          // Silent, like every other field here: rebuilding replaces the element the
+          // caret is in, and on a price that turns 1200 into 1002.
+          onBuyField: (change) =>
+            store.set((current) => ({
+              buyingWish: current.buyingWish ? { ...current.buyingWish, ...change } : null,
+            })),
+          onCancelBuy: () => store.update({ buyingWish: null }),
+          onConfirmBuy: async () => {
+            const buying = store.get().buyingWish;
+            if (!buying) return;
+
+            // The button is disabled without a valid amount; this is the guard for the
+            // form being submitted some other way, by a stray Return or a restored page.
+            const amount = parseAmount(buying.amount);
+            if (amount === null) return;
+
             const date = new Date().toISOString().slice(0, 10);
             const { convert } = await import('./lib/fx');
-            const money = await convert(amount, currency, date);
-            const { writes } = await markBought(vault, owner, itemId, {
+            const converted = await convert(amount, buying.currency, date);
+            const { writes } = await markBought(vault, buying.owner, buying.itemId, {
               date,
               amount,
-              currency,
-              amountEur: money.amountEur,
-              fxRate: money.fxRate,
-              fxSource: currency === 'EUR' ? 'identity' : 'frankfurter',
+              currency: buying.currency,
+              amountEur: converted.amountEur,
+              fxRate: converted.fxRate,
+              fxSource: buying.currency === 'EUR' ? 'identity' : 'frankfurter',
             });
             await savePending(writes);
             await refreshPendingCount();
-            rerender();
+            store.update({ buyingWish: null });
             schedulePublish();
           },
         });

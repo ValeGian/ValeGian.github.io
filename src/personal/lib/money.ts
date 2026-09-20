@@ -81,6 +81,32 @@ export function quote(price: Price | undefined, want: Basis = 'avg30'): Quote | 
   return null;
 }
 
+/**
+ * What someone typed into a price field, as a number.
+ *
+ * Deliberately forgiving about how an amount is written and unforgiving about what it
+ * means: "1.200", "1,200" and "1 200" are all twelve hundred yen in a shop, and a comma
+ * is the decimal point in Italian, so both separators are accepted and the last one wins
+ * when it looks like a decimal fraction. Anything that does not come out as a positive
+ * number is rejected rather than guessed at — a mistyped price becomes a wrong purchase
+ * price, and those are what the whole gain column is built on.
+ */
+export function parseAmount(text: string): number | null {
+  // Checked before the sign is stripped away with everything else: "-5" is not 5.
+  if (text.includes('-')) return null;
+
+  const trimmed = text.trim().replace(/[^\d.,]/g, '');
+  if (!trimmed) return null;
+
+  // The last separator is the decimal point only when it leaves one or two digits after
+  // it; "1.200" is a thousands separator, "1.20" is not.
+  const match = trimmed.match(/^(.*)[.,](\d{1,2})$/);
+  const whole = (match ? match[1] : trimmed).replace(/[.,]/g, '');
+  const value = Number(match ? `${whole}.${match[2]}` : whole);
+
+  return Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : null;
+}
+
 export const marketValue = (price: Price | undefined, want: Basis = 'avg30'): number | null =>
   quote(price, want)?.value ?? null;
 

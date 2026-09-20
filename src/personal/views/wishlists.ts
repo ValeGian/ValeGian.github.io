@@ -8,13 +8,27 @@
  * bought, and its cost joins what they owe. Their cards are not my assets.
  */
 import { el, frag } from '../lib/dom.ts';
-import { money, quote, basisLabel } from '../lib/money.ts';
+import { money, parseAmount, quote, basisLabel } from '../lib/money.ts';
 import { displayName, subtitle, fullImage, priceKey, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
 import { chartIcon } from './icons.ts';
 import { artworkPanel } from './artwork.ts';
 import { marketRow } from './market.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
+
+/**
+ * A purchase being entered, before it is committed.
+ *
+ * The amount stays a string until it is confirmed, for the reason every other field here
+ * does: a number input that reformats while you are typing puts the caret somewhere else,
+ * and "1200" becomes "1002".
+ */
+export interface BuyEdit {
+  owner: string;
+  itemId: string;
+  amount: string;
+  currency: 'JPY' | 'EUR';
+}
 
 export interface WishlistEdit {
   owner: string;
@@ -43,9 +57,14 @@ export interface WishlistViewState {
   canEdit: boolean;
   /** The row currently open for editing, if any. */
   editing: WishlistEdit | null;
+  /** The row currently asking what a card cost, if any. */
+  buying?: BuyEdit | null;
   onToggleCombined(): void;
   onView?(view: 'list' | 'grid'): void;
-  onMarkBought?(owner: string, itemId: string): void;
+  onStartBuy?(edit: BuyEdit): void;
+  onBuyField?(change: Partial<BuyEdit>): void;
+  onCancelBuy?(): void;
+  onConfirmBuy?(): Promise<void>;
   onStartEdit?(edit: WishlistEdit): void;
   onEditField?(change: Partial<WishlistEdit>): void;
   onCancelEdit?(): void;
@@ -221,6 +240,106 @@ function targetMarker(item: WishlistItem, price: Price | undefined): HTMLElement
 }
 
 /**
+ * What a card cost, asked for in the page rather than by the browser.
+ *
+ * This used to be `prompt()`, which is one line of code and wrong in three ways: it
+ * cannot be styled, it freezes the tab until it is answered, and on a phone it is a
+ * cramped grey box with no currency control, so the currency had to be guessed from
+ * whatever was typed. Here the amount and the currency are two fields, and the currency
+ * is a choice rather than a guess.
+ */
+function buyRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
+  const buying = state.buying;
+  if (!buying) return el('li');
+
+  const set = (change: Partial<BuyEdit>) => state.onBuyField?.(change);
+
+  /**
+   * The note and the button are updated in place, not by rebuilding.
+   *
+   * Reporting a keystroke to the store on purpose does not repaint — rebuilding replaces
+   * the element the caret is in, which is how a price of 1200 became 1002. So the two
+   * things that have to answer every keystroke are held here and written to directly.
+   */
+  const note = el('p', { class: 'detail-note' });
+  const confirm = el('button', { type: 'submit', text: 'Confirm' });
+
+  const reflect = (typed: string, currency: BuyEdit['currency']) => {
+    const amount = parseAmount(typed);
+    confirm.disabled = amount === null;
+    note.textContent =
+      amount === null
+        ? 'Enter what you paid, in whichever currency you paid it.'
+        : `Recording ${amount.toLocaleString('en-GB')} ${currency}, converted at today's rate.`;
+  };
+
+  const amountField = el('input', {
+    id: 'buy-amount',
+    type: 'text',
+    inputmode: 'decimal',
+    autocomplete: 'off',
+    placeholder: '1200',
+    value: buying.amount,
+    onInput: (event: Event) => {
+      const typed = (event.target as HTMLInputElement).value;
+      set({ amount: typed });
+      reflect(typed, currencyField.value as BuyEdit['currency']);
+    },
+  });
+
+  const currencyField = el(
+    'select',
+    {
+      id: 'buy-currency',
+      onChange: (event: Event) => {
+        const currency = (event.target as HTMLSelectElement).value as BuyEdit['currency'];
+        set({ currency });
+        reflect(amountField.value, currency);
+      },
+    },
+    el('option', { value: 'JPY', text: 'JPY ¥', selected: buying.currency === 'JPY' }),
+    el('option', { value: 'EUR', text: 'EUR €', selected: buying.currency === 'EUR' }),
+  );
+
+  reflect(buying.amount, buying.currency);
+
+  return el(
+    'li',
+    { class: 'wish-row editing' },
+    el(
+      'form',
+      {
+        class: 'wish-edit',
+        onSubmit: (event: Event) => {
+          event.preventDefault();
+          void state.onConfirmBuy?.();
+        },
+      },
+      el('p', { class: 'wish-edit-title', text: `Bought ${displayName(item, state.names)}` }),
+      el(
+        'div',
+        { class: 'grid-fields' },
+        el(
+          'label',
+          { class: 'field', for: 'buy-amount' },
+          el('span', { text: 'What it cost' }),
+          amountField,
+        ),
+        el('label', { class: 'field', for: 'buy-currency' }, el('span', { text: 'Currency' }), currencyField),
+      ),
+      // Says what will be recorded before it is recorded, and why the button is off.
+      note,
+      el(
+        'div',
+        { class: 'form-actions' },
+        confirm,
+        el('button', { type: 'button', class: 'chip', text: 'Cancel', onClick: () => state.onCancelBuy?.() }),
+      ),
+    ),
+  );
+}
+
+/**
  * The row in edit mode.
  *
  * Fields report their value without rebuilding the view: rebuilding replaces the element
@@ -321,6 +440,10 @@ function wishRow(
     return editRow(item, state);
   }
 
+  if (state.buying?.owner === owner && state.buying.itemId === item.id) {
+    return buyRow(item, state);
+  }
+
   const price = priceFor(item, state.prices);
   const market = quote(price)?.value ?? null;
   const bought = item.status === 'bought';
@@ -384,12 +507,13 @@ function wishActions(item: WishlistItem, owner: string, state: WishlistViewState
   return el(
     'span',
     { class: 'wish-actions' },
-    state.onMarkBought
+    state.onStartBuy
       ? el('button', {
           type: 'button',
           class: 'mark-bought',
           text: 'Bought',
-          onClick: () => state.onMarkBought?.(owner, item.id),
+          // Yen by default: these are bought in Japan, and a shop is where this is used.
+          onClick: () => state.onStartBuy?.({ owner, itemId: item.id, amount: '', currency: 'JPY' }),
         })
       : null,
     state.onStartEdit
@@ -420,6 +544,10 @@ function wishActions(item: WishlistItem, owner: string, state: WishlistViewState
 function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, showOwner: boolean): HTMLElement {
   if (state.editing?.owner === owner && state.editing.itemId === item.id) {
     return editRow(item, state);
+  }
+
+  if (state.buying?.owner === owner && state.buying.itemId === item.id) {
+    return buyRow(item, state);
   }
 
   const market = quote(priceFor(item, state.prices))?.value ?? null;

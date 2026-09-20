@@ -156,3 +156,25 @@ test('a card with no usable figure is described as having no price, not as an av
   assert.equal(basisLabel({ basis: 'avg7' }), '7-day average, catalog — may be behind');
   assert.equal(basisLabel({ basis: 'avg1', handRead: true }), '1-day average, read by hand');
 });
+
+test('a price typed in a shop is read the way it was meant', async () => {
+  const { parseAmount } = await import('../src/personal/lib/money.ts');
+
+  // Plain numbers, and the separators a Japanese price tag and an Italian keyboard use.
+  assert.equal(parseAmount('1200'), 1200);
+  assert.equal(parseAmount('1.200'), 1200, 'a dot before three digits is a thousands separator');
+  assert.equal(parseAmount('1,200'), 1200);
+  assert.equal(parseAmount('1 200'), 1200);
+  assert.equal(parseAmount('12,50'), 12.5, 'a comma before two digits is the decimal point');
+  assert.equal(parseAmount('12.50'), 12.5);
+  assert.equal(parseAmount('¥1,200'), 1200, 'a currency symbol pasted in with it');
+  assert.equal(parseAmount(' 8.30 € '), 8.3);
+  assert.equal(parseAmount('1.234,56'), 1234.56, 'both separators, Italian style');
+
+  // A price that is not a price. Guessing here writes a wrong purchase into the ledger.
+  assert.equal(parseAmount(''), null);
+  assert.equal(parseAmount('   '), null);
+  assert.equal(parseAmount('free'), null);
+  assert.equal(parseAmount('0'), null, 'nothing was bought for nothing');
+  assert.equal(parseAmount('-5'), null);
+});

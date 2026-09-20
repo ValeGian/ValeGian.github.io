@@ -35,9 +35,24 @@ const FILES = [
   { id: 'lotad', source: `${LOCAL}/wishlists/lotad.json`, owner: 'lotad', blank: { owner: 'Lotad', items: [], settlements: [] } },
 ];
 
+/**
+ * An empty variable is a missing password, not a password.
+ *
+ * `??` treats one as supplied, which is how `PERSONAL_PASSWORD_LOTAD="$UNSET"` came to
+ * re-wrap two friends' files under the empty string: the old password no longer opened
+ * them, so the script did the reasonable thing and issued new keys, and those two people
+ * could no longer sign in. Nothing was lost — the plaintext lives in .local/ — but it is
+ * a quiet way to lock someone out, so a blank one now asks rather than being used.
+ */
 async function passwordFor(owner) {
   const variable = `PERSONAL_PASSWORD_${owner.toUpperCase()}`;
-  return process.env[variable] ?? askHidden(`Password for ${owner}: `);
+  const supplied = process.env[variable]?.trim();
+  if (supplied) return supplied;
+
+  if (process.env[variable] !== undefined) {
+    console.warn(`  ${variable} is set but empty — ignoring it and asking instead.`);
+  }
+  return askHidden(`Password for ${owner}: `);
 }
 
 const passwords = new Map();

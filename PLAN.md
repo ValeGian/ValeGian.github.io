@@ -849,6 +849,29 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 38 (the grid can act; a blank password cannot lock anyone out) ✅
+
+- **Grid view was read-only.** It showed the picture, the target and the market price —
+  everything needed to decide — and then offered no way to act on the decision, so buying
+  a card or changing a target meant switching back to the list first. The tile now carries
+  the same Bought and Edit buttons the rows do, and the edit form spans the full width of
+  the grid rather than being squeezed into one 9rem column. Both come from one
+  `wishActions`, so the two views cannot drift apart again.
+- **`PERSONAL_PASSWORD_*` set to an empty string was treated as a password.** `??` only
+  catches `undefined`, so `PERSONAL_PASSWORD_LOTAD="$UNSET"` re-wrapped two friends' files
+  under the empty string, and since the old password no longer opened them the script did
+  the reasonable thing and issued fresh keys — locking both of them out. Caught in the
+  same session and reverted from git, with the plaintext never at risk; a blank variable
+  now says so and asks instead.
+
+Also **ten Pikachus were missing from Lotad's list**. Page 5 of the wishlist PDF pictures
+ten of them at "tipo 2EURO tipo a testa"; Valerio already had all thirty of the set's
+Pikachus, so the worklist recorded them as covered — and they were skipped for Lotad too,
+who had none. The ten were identified twice over: the English numbers noted while reading
+the PDF (026, 031, 035, 036, 040, 043, 045, 048, 050, 051) and, independently, by hashing
+the ten page-5 images against all thirty English printings. Both agree, card for card.
+Their Japanese numbers come from the verified pairs in `set-map-30th.json`.
+
 ### 2026-09-20 — rev 37 (the rollups keep every figure; the chart can use any of them) ✅
 
 Your point about aggregation is right and the code did not reflect it. A thirty-day

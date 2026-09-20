@@ -809,6 +809,28 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     gap: var(--space-4);
   }
 
+  /*
+   * A tile is the card and then what you can do about it. Grid used to be read-only —
+   * picture, target and price, and no way to act on any of it without switching back to
+   * the list — so the same Bought and Edit buttons the rows carry now sit under the art.
+   */
+  .personal .tile {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  /* `grid-column: 2` places them in the row layout; in a tile they just follow the card. */
+  .personal .tile .wish-actions {
+    grid-column: auto;
+    margin-top: 0;
+  }
+
+  /* The edit form replaces one tile, and a form in a 9rem column is unusable. */
+  .personal .card-grid .wish-row.editing {
+    grid-column: 1 / -1;
+  }
+
   .personal .tile-open {
     display: grid;
     gap: var(--space-1);

@@ -364,35 +364,49 @@ function wishRow(
           })
         : targetMarker(item, price),
     ),
-    bought || !state.canEdit
-      ? null
-      : el(
-          'span',
-          { class: 'wish-actions' },
-          state.onMarkBought
-            ? el('button', {
-                type: 'button',
-                class: 'mark-bought',
-                text: 'Bought',
-                onClick: () => state.onMarkBought?.(owner, item.id),
-              })
-            : null,
-          state.onStartEdit
-            ? el('button', {
-                type: 'button',
-                class: 'chip',
-                text: 'Edit',
-                onClick: () =>
-                  state.onStartEdit?.({
-                    owner,
-                    itemId: item.id,
-                    target: item.targetPriceEur === null ? '' : String(item.targetPriceEur),
-                    priority: item.priority,
-                    notes: item.notes ?? '',
-                  }),
-              })
-            : null,
-        ),
+    wishActions(item, owner, state),
+  );
+}
+
+/**
+ * Marking a card bought, and changing what you would pay for it.
+ *
+ * Shared by the row and the tile. They had drifted: the grid showed the picture, the
+ * target and the market price — everything needed to decide — and then offered no way to
+ * act on the decision, so buying a card meant switching back to the list first.
+ *
+ * Never inside the button that opens the card: a button inside a button is not valid,
+ * and the browser's idea of which one was clicked is its own business.
+ */
+function wishActions(item: WishlistItem, owner: string, state: WishlistViewState): HTMLElement | null {
+  if (item.status === 'bought' || !state.canEdit) return null;
+
+  return el(
+    'span',
+    { class: 'wish-actions' },
+    state.onMarkBought
+      ? el('button', {
+          type: 'button',
+          class: 'mark-bought',
+          text: 'Bought',
+          onClick: () => state.onMarkBought?.(owner, item.id),
+        })
+      : null,
+    state.onStartEdit
+      ? el('button', {
+          type: 'button',
+          class: 'chip',
+          text: 'Edit',
+          onClick: () =>
+            state.onStartEdit?.({
+              owner,
+              itemId: item.id,
+              target: item.targetPriceEur === null ? '' : String(item.targetPriceEur),
+              priority: item.priority,
+              notes: item.notes ?? '',
+            }),
+        })
+      : null,
   );
 }
 
@@ -404,6 +418,10 @@ function wishRow(
  * whether this one is worth buying, not merely whether it is the right card.
  */
 function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, showOwner: boolean): HTMLElement {
+  if (state.editing?.owner === owner && state.editing.itemId === item.id) {
+    return editRow(item, state);
+  }
+
   const market = quote(priceFor(item, state.prices))?.value ?? null;
   const bought = item.status === 'bought';
   const under = market !== null && item.targetPriceEur !== null && market <= item.targetPriceEur;
@@ -442,6 +460,7 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
             : el('span', { class: under ? 'target under' : 'target over', text: under ? 'under target' : 'over target' }),
       ),
     ),
+    wishActions(item, owner, state),
   );
 }
 

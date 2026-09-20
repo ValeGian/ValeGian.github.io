@@ -416,15 +416,7 @@ function editRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
         { class: 'form-actions' },
         el('button', { type: 'submit', text: 'Save' }),
         el('button', { type: 'button', class: 'chip', text: 'Cancel', onClick: () => state.onCancelEdit?.() }),
-        el('button', {
-          type: 'button',
-          class: 'chip danger',
-          text: 'Remove',
-          onClick: () => {
-            const name = item.nameEn ?? item.nameJa ?? item.cardId;
-            if (confirm(`Remove ${name} from this list?`)) void state.onDeleteWish?.(edit.owner, edit.itemId);
-          },
-        }),
+        removeButton(item, edit.owner, state),
       ),
     ),
   );
@@ -491,6 +483,53 @@ function wishRow(
   );
 }
 
+/** How long an armed Remove stays armed before it forgets it was ever asked. */
+const ARMED_MS = 5000;
+
+/**
+ * Removing a card, in two taps rather than behind a dialog.
+ *
+ * The first tap arms the button and it says so; the second does it. That replaces a
+ * `confirm()`, which blocks the tab and, on a phone, is a grey box with two identical
+ * grey buttons — the least legible way to ask about the one action here that cannot be
+ * undone. A card removed by accident has to be searched for and added again, with its
+ * target and its notes retyped.
+ *
+ * It disarms itself after a few seconds so a button left armed on a pocketed phone is
+ * not still waiting later.
+ */
+function removeButton(item: WishlistItem, owner: string, state: WishlistViewState): HTMLElement | null {
+  if (!state.onDeleteWish) return null;
+
+  let armed = false;
+  let forget: ReturnType<typeof setTimeout> | undefined;
+
+  const button = el('button', {
+    type: 'button',
+    class: 'chip danger',
+    text: 'Remove',
+    title: `Remove ${displayName(item, state.names)} from this list`,
+    onClick: () => {
+      if (armed) {
+        clearTimeout(forget);
+        void state.onDeleteWish?.(owner, item.id);
+        return;
+      }
+
+      armed = true;
+      button.textContent = 'Remove?';
+      button.classList.add('armed');
+      forget = setTimeout(() => {
+        armed = false;
+        button.textContent = 'Remove';
+        button.classList.remove('armed');
+      }, ARMED_MS);
+    },
+  });
+
+  return button;
+}
+
 /**
  * Marking a card bought, and changing what you would pay for it.
  *
@@ -531,6 +570,7 @@ function wishActions(item: WishlistItem, owner: string, state: WishlistViewState
             }),
         })
       : null,
+    removeButton(item, owner, state),
   );
 }
 

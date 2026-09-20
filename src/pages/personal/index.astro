@@ -1000,6 +1000,12 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     border-color: var(--down);
   }
 
+  /* Armed: the next tap removes the card, so it stops being an outline and commits. */
+  .personal .chip.danger.armed {
+    background: var(--down);
+    color: var(--paper);
+  }
+
   .personal .mark-bought {
     justify-self: start;
     font-family: var(--font-ui);

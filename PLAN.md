@@ -849,6 +849,22 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 40 (Remove on the row, and no dialog behind it) ✅
+
+Removing a wanted card meant opening Edit first and then answering a `confirm()`. It sits
+beside Bought and Edit now, in red, on every row and every tile.
+
+That puts the one action here that cannot be undone a single tap from a thumb, so it asks
+first — **in two taps rather than behind a dialog**. The first arms the button and it says
+"Remove?" in solid red; the second does it. A `confirm()` would block the tab and, on a
+phone, is a grey box with two identical grey buttons: the least legible way to ask about
+the only irreversible thing on the screen. An armed button disarms itself after five
+seconds, so one left armed in a pocket is not still waiting later.
+
+The edit form's Remove uses the same button, so the wishlist has no blocking dialog left
+anywhere. `confirm()` still guards removing a card from the collection and discarding
+unpublished changes — the same treatment would suit both.
+
 ### 2026-09-20 — rev 39 (what a card cost is asked for in the page) ✅
 
 Marking a wanted card bought used `prompt()`. One line of code, and wrong in three ways:

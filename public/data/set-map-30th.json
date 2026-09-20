@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Verified card-for-card by comparing artwork and attack names. Only pairs actually checked are listed; the offset is not constant across the set and must never be extrapolated.",
+  "note": "Verified card for card by comparing artwork, attack names and printed numbers. The offset is NOT constant: it is 6 across the Pikachu run, 25 for English 129-138, 24 for 139-144 and 23 for 145-158. Never extrapolate.",
   "verifiedOn": "2026-09-20",
   "japanese": {
     "setCode": "M6a",
@@ -166,9 +166,19 @@
       "name": "Pikachu"
     },
     {
+      "japanese": "104",
+      "english": "129",
+      "name": "Alolan Exeggutor"
+    },
+    {
       "japanese": "105",
       "english": "130",
       "name": "Moltres"
+    },
+    {
+      "japanese": "106",
+      "english": "131",
+      "name": "Lapras"
     },
     {
       "japanese": "107",
@@ -179,6 +189,61 @@
       "japanese": "108",
       "english": "133",
       "name": "Zapdos"
+    },
+    {
+      "japanese": "113",
+      "english": "138",
+      "name": "Lycanroc"
+    },
+    {
+      "japanese": "115",
+      "english": "139",
+      "name": "Alolan Meowth"
+    },
+    {
+      "japanese": "122",
+      "english": "145",
+      "name": "Hisuian Zorua"
+    },
+    {
+      "japanese": "125",
+      "english": "148",
+      "name": "Greninja ex"
+    },
+    {
+      "japanese": "126",
+      "english": "149",
+      "name": "Pikachu ex"
+    },
+    {
+      "japanese": "127",
+      "english": "150",
+      "name": "Pikachu ex"
+    },
+    {
+      "japanese": "128",
+      "english": "151",
+      "name": "Mewtwo ex"
+    },
+    {
+      "japanese": "129",
+      "english": "152",
+      "name": "Mew ex"
+    },
+    {
+      "japanese": "131",
+      "english": "154",
+      "name": "Gengar ex"
+    },
+    {
+      "japanese": "132",
+      "english": "155",
+      "name": "Jirachi ex"
+    },
+    {
+      "japanese": "133",
+      "english": "156",
+      "name": "Salamence ex"
     }
   ]
 }

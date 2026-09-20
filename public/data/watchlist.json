@@ -1,7 +1,49 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-20T00:21:01.421Z",
+  "generatedAt": "2026-09-20T00:53:21.103Z",
   "cards": [
+    {
+      "cardId": "M2a-245"
+    },
+    {
+      "cardId": "M5-083"
+    },
+    {
+      "cardId": "M5-084"
+    },
+    {
+      "cardId": "M5-087"
+    },
+    {
+      "cardId": "M5-088"
+    },
+    {
+      "cardId": "M5-093"
+    },
+    {
+      "cardId": "M5-116"
+    },
+    {
+      "cardId": "M6-080"
+    },
+    {
+      "cardId": "M6-084"
+    },
+    {
+      "cardId": "M6-085"
+    },
+    {
+      "cardId": "M6-087"
+    },
+    {
+      "cardId": "M6-088"
+    },
+    {
+      "cardId": "M6-108"
+    },
+    {
+      "cardId": "M6-110"
+    },
     {
       "cardId": "S12a-211",
       "variantId": "jr7oetx1mqug9"
@@ -60,6 +102,9 @@
     },
     {
       "cardId": "SV10-127"
+    },
+    {
+      "cardId": "SV11W-171"
     },
     {
       "cardId": "SV1a-080",
@@ -150,6 +195,9 @@
       "variantId": "jr7oetx1mqug9"
     },
     {
+      "cardId": "SV5K-080"
+    },
+    {
       "cardId": "SV5M-073",
       "variantId": "jr7oetx1mqug9"
     },
@@ -168,6 +216,12 @@
     {
       "cardId": "SV7a-073",
       "variantId": "endfynwn4n10gzq"
+    },
+    {
+      "cardId": "SV8-131"
+    },
+    {
+      "cardId": "SV8a-218"
     },
     {
       "cardId": "SV9-102",

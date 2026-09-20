@@ -783,6 +783,27 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 32 (the wants list, and a verified 30th map) ✅
+- **44 cards read out of `wishlist-cards.pdf`** and added to both lists: 36 to Valerio's
+  (70 items), 38 to Lotad's (42). Skipped for Valerio what he already owns — Charizard
+  VSTAR `S12a-212` and Mewtwo VSTAR `S12a-221` — and for both the Crobat ex `SV10-127`
+  already on the list. Targets are the low end of every range the document gives.
+- **Every card identified against a catalog, none guessed.** The collector number was
+  cropped from each photograph at 5× and read, then checked against TCGdex: all twenty-one
+  catalogued cards matched. The sets the document names by nickname are M6 (ストームエメラルダ)
+  and M5 (アビスアイ).
+- **`set-map-30th.json` now holds 46 verified pairs.** The document mixes English and
+  Japanese photographs, so the English cards had to be mapped across. The offset is **not
+  one number**: 6 across the Pikachu run, then 25 for English 129–138, 24 for 139–144 and
+  23 for 145–158, because the Japanese set carries 176 products against 158. Each block was
+  confirmed by species agreement along its whole length and anchored by a card read
+  directly — Lycanroc 113/103 and Hisuian Zorua 122/103 off the photographs, Mewtwo EN 151
+  and Alolan Meowth EN 139 by comparing artwork side by side.
+- The eighteen new cards with real catalog ids all price from TCGdex, so the daily job's
+  loss guard still passes at 64 of 62 watched.
+- Still to do: the Cardmarket 30-day figure for every wishlist card, which is about
+  seventy product pages and wants pacing — see PRICES-BY-HAND.md.
+
 ### 2026-09-20 — rev 31 (reading prices by hand, when TCGdex cannot) ✅
 - **`PRICES-BY-HAND.md`**, a procedure for a local session with a browser: what the
   Cardmarket fields mean, how to be sure it is the right card before recording anything,

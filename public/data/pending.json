@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-20T00:21:01.421Z",
+  "generatedAt": "2026-09-20T00:53:21.103Z",
   "items": [
     {
       "id": "lotad/wish_0002",
@@ -29,6 +29,186 @@
         "setName": "30th Anniversary",
         "number": "107",
         "nameEn": "Articuno"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0005",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "104",
+        "nameEn": "Alolan Exeggutor"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0006",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "106",
+        "nameEn": "Lapras"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0007",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "113",
+        "nameEn": "Lycanroc"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0008",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "115",
+        "nameEn": "Alolan Meowth"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0009",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "122",
+        "nameEn": "Hisuian Zorua"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0010",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "125",
+        "nameEn": "Greninja ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0011",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "126",
+        "nameEn": "Pikachu ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0012",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "127",
+        "nameEn": "Pikachu ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0013",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "128",
+        "nameEn": "Mewtwo ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0014",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "129",
+        "nameEn": "Mew ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0015",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "131",
+        "nameEn": "Gengar ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0016",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "132",
+        "nameEn": "Jirachi ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0017",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "133",
+        "nameEn": "Salamence ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0018",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "137",
+        "nameEn": "Charizard"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0019",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "140",
+        "nameEn": "Shining Celebi"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0020",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "142",
+        "nameEn": "Lugia"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0021",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "146",
+        "nameEn": "Metagross"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0022",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "165",
+        "nameEn": "Magikarp"
       },
       "pendingSince": "2026-09-20"
     },
@@ -359,6 +539,186 @@
         "setName": "30th Anniversary",
         "number": "046",
         "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0035",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "104",
+        "nameEn": "Alolan Exeggutor"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0036",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "106",
+        "nameEn": "Lapras"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0037",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "113",
+        "nameEn": "Lycanroc"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0038",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "115",
+        "nameEn": "Alolan Meowth"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0039",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "122",
+        "nameEn": "Hisuian Zorua"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0040",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "125",
+        "nameEn": "Greninja ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0041",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "126",
+        "nameEn": "Pikachu ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0042",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "127",
+        "nameEn": "Pikachu ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0043",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "128",
+        "nameEn": "Mewtwo ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0044",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "129",
+        "nameEn": "Mew ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0045",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "131",
+        "nameEn": "Gengar ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0046",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "132",
+        "nameEn": "Jirachi ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0047",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "133",
+        "nameEn": "Salamence ex"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0048",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "137",
+        "nameEn": "Charizard"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0049",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "140",
+        "nameEn": "Shining Celebi"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0050",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "142",
+        "nameEn": "Lugia"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0051",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "146",
+        "nameEn": "Metagross"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "valerio/wish_0052",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "165",
+        "nameEn": "Magikarp"
       },
       "pendingSince": "2026-09-20"
     }

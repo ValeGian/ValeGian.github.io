@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-20T06:57:54.787Z",
+  "generatedAt": "2026-09-20T18:18:11.989Z",
   "items": [
     {
       "id": "lotad/wish_0002",
@@ -209,6 +209,106 @@
         "setName": "30th Anniversary",
         "number": "165",
         "nameEn": "Magikarp"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0043",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "020",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0044",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "025",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0045",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "029",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0046",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "030",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0047",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "034",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0048",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "037",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0049",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "039",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0050",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "042",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0051",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "044",
+        "nameEn": "Pikachu"
+      },
+      "pendingSince": "2026-09-20"
+    },
+    {
+      "id": "lotad/wish_0052",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "045",
+        "nameEn": "Pikachu"
       },
       "pendingSince": "2026-09-20"
     },

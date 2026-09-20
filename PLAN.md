@@ -597,16 +597,27 @@ loads the pages fine, which is what the hand-checked override path already exist
 | Official Cardmarket API | Closed. *"Currently, we are not accepting applications for access to the Cardmarket API."* |
 | tcggo via RapidAPI | The Japanese catalog needs the ULTRA tier; the key on hand is BASIC (§4.5) |
 | cardmarketapi.com | 10 requests a day free, paid above that |
-| CardMarket API on RapidAPI | 100 a day free, then about 10 USD a month |
-| PokemonPriceTracker, Poketrace | Free tiers of 100–250 a day, paid above |
+| CardMarket API on RapidAPI | Published by **tcggopro** — the same vendor as the tcggo listing above, so the same tier wall |
+| PokemonPriceTracker | Japanese cards, but **TCGplayer** prices: US market in dollars, not Cardmarket |
+| Poketrace | Free tier is *"US market and raw-only access"* — Cardmarket is not in it |
 | pokemontcg.io | Free and generous, but English sets only |
+
+Checked 2026-09-20 and none of them is interesting. The two that looked closest fail on
+the same point in different ways: the RapidAPI Cardmarket listing is tcggopro, already
+rejected because the Japanese catalog sits behind ULTRA, and the ones with Japanese
+coverage price against TCGplayer rather than Cardmarket. Nothing free gives Japanese
+cards at Cardmarket prices.
 
 The paid ones are all mirrors that scrape Cardmarket themselves, so they buy convenience
 rather than a better source, and they break the rule that this costs nothing.
 
-**What is free, automatic and verified accurate is `trend`.** It comes from the same
-feed, it moved on 29 of 43 cards across a day when no average did, and it matched the
-website to the cent on the card checked directly. It is Cardmarket's own smoothed
+**`trend` is the free, automatic candidate, but it is not yet verified.** It comes from
+the same feed and it moved on 29 of 43 cards across a day when no average did, so it is
+certainly live. Against the website it has been checked on **exactly one card** — S12a-212,
+where TCGdex's 75.17 matched the page to the cent, as did `low` at 65.00. One match is
+consistent with the field being right and is not proof of it. Settling it needs the Price
+Trend read off three or four product pages and compared; until then, treating `trend` as
+accurate is an assumption, not a finding. It is Cardmarket's own smoothed
 estimate, computed from completed sales, and it is what their product pages show as the
 price. Pricing on it would cost nothing and need no hand-reading — the objection is that
 it is a different measure from `avg30`, so every figure already recorded changes meaning.

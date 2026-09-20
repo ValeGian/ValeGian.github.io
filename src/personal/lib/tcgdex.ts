@@ -9,6 +9,38 @@
 import { toEnglish } from '../../lib/card-name.mjs';
 import type { NameTable } from './data.ts';
 
+/**
+ * How long to wait before asking the catalog a second time.
+ *
+ * Long enough for a radio to come back, short enough that nobody standing at a counter
+ * decides the app has hung.
+ */
+const RETRY_AFTER_MS = 800;
+
+const isServerHiccup = (response: Response): boolean => response.status >= 500 || response.status === 429;
+
+/**
+ * Fetches once, and once more when the first attempt looks like a bad moment rather than
+ * an answer.
+ *
+ * A 404 is an answer — the card is not in the catalog, and asking twice will not change
+ * that. A rejected fetch is the connection dropping, which on mobile data in a shop is
+ * the ordinary way for a request to fail, and a 5xx or a 429 is the server having a
+ * moment. Both are worth one more ask before a person is told to try again themselves.
+ */
+async function getWithOneRetry(url: string): Promise<Response> {
+  try {
+    const response = await fetch(url);
+    if (!isServerHiccup(response)) return response;
+  } catch {
+    // Swallowed deliberately: if the second attempt fails too its error says the same
+    // thing, and that is the one worth showing.
+  }
+
+  await new Promise((resolve) => setTimeout(resolve, RETRY_AFTER_MS));
+  return fetch(url);
+}
+
 const JA = 'https://api.tcgdex.net/v2/ja';
 const EN = 'https://api.tcgdex.net/v2/en';
 /** How many catalog results one page of the search asks for. */
@@ -349,8 +381,14 @@ async function searchCatalog(
   return [...unique.values()];
 }
 
+/**
+ * One card in full.
+ *
+ * Retried once, unlike the searches: this is the call that stands between a person and
+ * their card being recorded, and it is made at the moment they press the button.
+ */
 export async function cardDetail(cardId: string, language: 'ja' | 'en' = 'ja'): Promise<CardDetail> {
-  const response = await fetch(`${language === 'en' ? EN : JA}/cards/${encodeURIComponent(cardId)}`);
+  const response = await getWithOneRetry(`${language === 'en' ? EN : JA}/cards/${encodeURIComponent(cardId)}`);
   if (!response.ok) throw new Error(`Could not load ${cardId} (${response.status})`);
   return (await response.json()) as CardDetail;
 }

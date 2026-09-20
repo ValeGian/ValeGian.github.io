@@ -17,6 +17,7 @@
 import { el, frag } from '../lib/dom.ts';
 import { convert } from '../lib/fx.ts';
 import { searchCards, cardDetail, pricedVariantId, looksLikeCardId, type CardHit } from '../lib/tcgdex.ts';
+import { saveErrorMessage } from '../lib/errors.ts';
 import { toEnglish } from '../../lib/card-name.mjs';
 import { cardThumb } from './thumb.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
@@ -171,7 +172,7 @@ async function submitWish(state: AddCardState): Promise<void> {
       imageBase: detail.image ?? '',
     });
   } catch (error) {
-    state.onChange({ saving: false, error: error instanceof Error ? error.message : String(error) });
+    state.onChange({ saving: false, error: saveErrorMessage(error) });
   }
 }
 
@@ -525,7 +526,7 @@ export function renderAddCard(state: AddCardState): HTMLElement {
         catalogSource: 'tcgdex',
       });
     } catch (error) {
-      state.onChange({ saving: false, error: error instanceof Error ? error.message : String(error) });
+      state.onChange({ saving: false, error: saveErrorMessage(error) });
     }
   });
 

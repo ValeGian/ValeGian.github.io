@@ -840,12 +840,36 @@ static lookup, never fetched at runtime.
 5. **Recording a sale.** There is no "sold" today — only Remove, which deletes the card and
    the gain with it. Needs a decision on whether a sold card stays visible and what it does
    to the totals (§13 rev 34).
-6. **Retry the catalog lookup when adding a card.** One transient "Failed to fetch" loses
-   the whole submission (§13 rev 34).
 
 ---
 
 ## 13. Progress log
+
+### 2026-09-20 — rev 35 (adding a card survives a bad moment) ✅
+
+Adding a card fetches the card from TCGdex at the instant the button is pressed, and that
+was a single `fetch`. One dropped packet — the ordinary way a request fails on mobile data
+in a shop — and the save failed with the browser's own words, `Failed to fetch`.
+
+The form never lost anything; rev 34 said it did, which was wrong. The error is merged
+into the add state, so the picked card, the price, the date, the photo and the notes all
+stay and the button re-enables. The cost was a wasted tap and a message that reads like
+the app is broken.
+
+- **`cardDetail` retries once, after 800ms.** Only for the failures that are the
+  connection rather than the answer: a rejected fetch, a 5xx, a 429. A 404 is an answer —
+  the card is not in the catalog — and is not asked for twice. The searches are left
+  alone; this is the call a person is waiting on.
+- **A connection failure now says what to do about it:** *"Could not reach the catalog.
+  Try again in a moment, or tick 'Not in the catalog yet' to record the card now — the
+  daily job matches it up later."* That path already existed and already works offline,
+  writing the card with a hint for the retry queue, but nothing on screen said so.
+  Anything that is not a connection failure is passed through word for word.
+
+Verified in the browser, not only in tests: with the first catalog call made to throw, the
+card was still added (46 → 47) and no error appeared; with every call throwing, the
+collection stayed at 47, the message appeared above the button, and the notes typed before
+the failure were still in the field.
 
 ### 2026-09-20 — rev 34 (a QA pass over the whole thing, and four defects) ✅
 

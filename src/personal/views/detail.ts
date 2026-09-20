@@ -12,6 +12,7 @@ import type { Condition, Currency } from '../lib/types.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import { chartIcon } from './icons.ts';
 import { artworkPanel } from './artwork.ts';
+import { armedButton } from './armed-button.ts';
 import { marketRow } from './market.ts';
 
 export interface CardEdit {
@@ -235,14 +236,14 @@ export function renderDetail(
           })
         : null,
       onDelete
-        ? el('button', {
-            type: 'button',
-            class: 'detail-delete',
-            text: 'Remove',
-            // Git history is the undo, so a single confirmation is enough friction.
-            onClick: () => {
-              if (confirm(`Remove ${displayName(item, names)} from the collection?`)) onDelete(item.id);
-            },
+        ? // Git history is the undo, so one question is enough friction — asked in the
+          // page rather than by the browser, like every other question here.
+          armedButton({
+            label: 'Remove',
+            armedLabel: 'Remove?',
+            className: 'detail-delete',
+            title: `Remove ${displayName(item, names)} from the collection`,
+            onConfirm: () => onDelete(item.id),
           })
         : null,
       el('button', { type: 'button', class: 'detail-close', text: 'Close', onClick: onClose }),

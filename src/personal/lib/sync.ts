@@ -1,3 +1,4 @@
+import { publishErrorMessage } from './errors.ts';
 /**
  * Publishing changes to GitHub.
  *
@@ -70,7 +71,9 @@ export async function publish(summary: string): Promise<PublishResult> {
     await clearPending();
     return { ok: true, url: commit.url };
   } catch (error) {
-    // The queue is deliberately left intact: a failed publish must not lose the work.
-    return { ok: false, reason: error instanceof Error ? error.message : String(error) };
+    // The queue is deliberately left intact: a failed publish must not lose the work,
+    // and the message says so rather than leaving the browser's wording next to a
+    // Discard button.
+    return { ok: false, reason: publishErrorMessage(error) };
   }
 }

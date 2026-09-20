@@ -38,3 +38,29 @@ test('a failure that is not a request at all is passed through', () => {
   assert.equal(saveErrorMessage(new Error('A target price has to be a number.')), 'A target price has to be a number.');
   assert.equal(saveErrorMessage('something threw a string'), 'something threw a string');
 });
+
+test('a publish that could not reach GitHub says the work is still here', async () => {
+  const { publishErrorMessage } = await import('../src/personal/lib/errors.ts');
+
+  // This message sits next to a Discard button. "Failed to fetch" beside Discard reads
+  // as though the changes are gone and the only thing left is to throw them away.
+  for (const wording of ['Failed to fetch', 'NetworkError when attempting to fetch resource.', 'Load failed']) {
+    const message = publishErrorMessage(new TypeError(wording));
+
+    assert.match(message, /Nothing was lost/);
+    assert.match(message, /still saved on this device/);
+    assert.match(message, /Try Publish again/);
+  }
+});
+
+test('a refusal from GitHub is passed through, because it needs a different answer', async () => {
+  const { publishErrorMessage } = await import('../src/personal/lib/errors.ts');
+
+  // A rejected token is not fixed by trying again, and saying so would send someone
+  // round a loop.
+  const rejected = 'GET  → 401: {"message":"Bad credentials"}';
+  assert.equal(publishErrorMessage(new Error(rejected)), rejected);
+
+  const moved = 'The branch moved during each of 4 attempts to save.';
+  assert.equal(publishErrorMessage(new Error(moved)), moved);
+});

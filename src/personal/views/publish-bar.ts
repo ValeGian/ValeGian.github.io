@@ -6,6 +6,7 @@
  * silently is the failure that costs real work.
  */
 import { el, frag } from '../lib/dom.ts';
+import { armedButton } from './armed-button.ts';
 
 export interface PublishBarState {
   pendingCount: number;
@@ -80,17 +81,15 @@ export function renderPublishBar(state: PublishBarState): HTMLElement | null {
           })
         : null,
       state.pendingCount > 0
-        ? el('button', {
-            type: 'button',
-            class: 'chip',
-            text: 'Discard',
-            onClick: () => {
-              // Unpublished work only exists here, so losing it is not recoverable from
-              // git the way a published mistake is.
-              if (confirm(`Throw away ${state.pendingCount} unpublished change(s)? They are only on this device.`)) {
-                void state.onDiscard();
-              }
-            },
+        ? // Unpublished work only exists here, so losing it is not recoverable from git
+          // the way a published mistake is — and this button sits next to the one you
+          // press when publishing has just failed, which is the worst moment to mistap.
+          armedButton({
+            label: 'Discard',
+            armedLabel: 'Discard for good?',
+            className: 'chip danger',
+            title: `Throw away ${state.pendingCount} unpublished change${state.pendingCount === 1 ? '' : 's'}, which exist only on this device`,
+            onConfirm: () => void state.onDiscard(),
           })
         : null,
       state.hasToken

@@ -849,6 +849,30 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 41 (a dropped request no longer fails a publish) ✅
+
+Reported from a real session: three changes queued, and publishing answered **"Failed to
+fetch"** beside a Discard button. Nothing was lost — `publish` keeps the queue on purpose
+— but the screen did not say so, and the fix for it was a manual retry.
+
+- **The cause.** `commitFiles` retries, but only when the branch moved under it (422/409).
+  A `fetch` that rejects — a phone losing signal mid-save — came straight back out, and a
+  commit is six or more requests, so there are six chances to hit one. Requests to GitHub
+  now retry once after 700ms on a rejected fetch, a 5xx or a 429, and never on a 4xx: a
+  rejected token does not improve by being asked twice.
+- **The wording.** A network failure now reads "Could not reach GitHub. Nothing was lost —
+  the changes are still saved on this device. Try Publish again." A refusal from GitHub is
+  passed through untouched, because it needs a different answer.
+
+**And the last two dialogs are gone.** Removing a card from the collection and discarding
+unpublished changes now ask the same way the wishlist does: one tap arms, the label says
+so, the second tap acts, and it forgets after five seconds. `armedButton` is one file that
+all three use; `confirm()` no longer appears anywhere in the personal area.
+
+Checked in the browser: the collection Remove took two taps to delete a card and queued
+three writes; Discard took two taps, cleared the queue and reloaded to 46 cards. At 386px
+the armed Discard grows from 73 to 127 points without overflowing the bar.
+
 ### 2026-09-20 — rev 40 (Remove on the row, and no dialog behind it) ✅
 
 Removing a wanted card meant opening Edit first and then answering a `confirm()`. It sits

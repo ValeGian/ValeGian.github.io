@@ -13,6 +13,7 @@ import { displayName, subtitle, fullImage, priceKey, type NameTable } from '../l
 import { cardThumb } from './thumb.ts';
 import { chartIcon } from './icons.ts';
 import { artworkPanel } from './artwork.ts';
+import { armedButton } from './armed-button.ts';
 import { marketRow } from './market.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
@@ -483,51 +484,22 @@ function wishRow(
   );
 }
 
-/** How long an armed Remove stays armed before it forgets it was ever asked. */
-const ARMED_MS = 5000;
-
 /**
  * Removing a card, in two taps rather than behind a dialog.
  *
- * The first tap arms the button and it says so; the second does it. That replaces a
- * `confirm()`, which blocks the tab and, on a phone, is a grey box with two identical
- * grey buttons — the least legible way to ask about the one action here that cannot be
- * undone. A card removed by accident has to be searched for and added again, with its
- * target and its notes retyped.
- *
- * It disarms itself after a few seconds so a button left armed on a pocketed phone is
- * not still waiting later.
+ * A card removed by accident has to be searched for and added again, with its target and
+ * its notes retyped, so the second tap is worth the moment it costs.
  */
 function removeButton(item: WishlistItem, owner: string, state: WishlistViewState): HTMLElement | null {
   if (!state.onDeleteWish) return null;
 
-  let armed = false;
-  let forget: ReturnType<typeof setTimeout> | undefined;
-
-  const button = el('button', {
-    type: 'button',
-    class: 'chip danger',
-    text: 'Remove',
+  return armedButton({
+    label: 'Remove',
+    armedLabel: 'Remove?',
+    className: 'chip danger',
     title: `Remove ${displayName(item, state.names)} from this list`,
-    onClick: () => {
-      if (armed) {
-        clearTimeout(forget);
-        void state.onDeleteWish?.(owner, item.id);
-        return;
-      }
-
-      armed = true;
-      button.textContent = 'Remove?';
-      button.classList.add('armed');
-      forget = setTimeout(() => {
-        armed = false;
-        button.textContent = 'Remove';
-        button.classList.remove('armed');
-      }, ARMED_MS);
-    },
+    onConfirm: () => void state.onDeleteWish?.(owner, item.id),
   });
-
-  return button;
 }
 
 /**

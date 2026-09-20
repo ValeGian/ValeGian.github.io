@@ -19,11 +19,29 @@
  */
 const NETWORK_FAILURE = /failed to fetch|networkerror|load failed|network request failed|\((?:5\d\d|429)\)/i;
 
+/** Whether a failure was the connection rather than an answer. Shared, so one list of wordings. */
+export const isNetworkFailure = (error: unknown): boolean =>
+  NETWORK_FAILURE.test(error instanceof Error ? error.message : String(error));
+
 const CANNOT_REACH_CATALOG =
   'Could not reach the catalog. Try again in a moment, or tick “Not in the catalog yet” to record ' +
   'the card now — the daily job matches it up later.';
 
 export function saveErrorMessage(error: unknown): string {
   const text = error instanceof Error ? error.message : String(error);
-  return NETWORK_FAILURE.test(text) ? CANNOT_REACH_CATALOG : text;
+  return isNetworkFailure(text) ? CANNOT_REACH_CATALOG : text;
+}
+
+/**
+ * What to say when publishing could not reach GitHub.
+ *
+ * Different from the catalog's message in the one way that matters: it says the work is
+ * still here. "Failed to fetch" beside a Discard button reads as though the changes are
+ * gone and there is nothing left to do but throw them away — and they are not gone.
+ */
+export function publishErrorMessage(error: unknown): string {
+  const text = error instanceof Error ? error.message : String(error);
+  return isNetworkFailure(text)
+    ? 'Could not reach GitHub. Nothing was lost — the changes are still saved on this device. Try Publish again.'
+    : text;
 }

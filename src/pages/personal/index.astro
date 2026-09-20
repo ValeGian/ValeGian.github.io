@@ -432,6 +432,12 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     cursor: pointer;
   }
 
+  /* Armed: the next tap removes the card, so it stops being an outline and commits. */
+  .personal .detail-delete.armed {
+    background: var(--down);
+    color: var(--paper);
+  }
+
   .personal .detail-close {
     font-family: var(--font-ui);
     font-size: var(--size-xs);

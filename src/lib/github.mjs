@@ -52,9 +52,36 @@ class GitHubError extends Error {
   }
 }
 
+/**
+ * A request that survives one bad moment on the way to GitHub.
+ *
+ * The retry loop below only ever caught a branch that moved. A `fetch` that rejects —
+ * what a phone does when the signal drops mid-save, and what the screen reports as the
+ * browser's bare "Failed to fetch" — came straight back out and failed the publish, on
+ * any one of the six or more requests a commit is made of. Nothing was lost, because the
+ * queue is kept, but it took a manual retry to get past a blip that had already passed.
+ *
+ * Retried once: a rejected fetch, a 5xx, and a 429. Never a 4xx that is an answer — a
+ * rejected token or a missing repository does not improve by being asked twice.
+ */
+const NETWORK_RETRY_MS = 700;
+
+async function fetchWithOneRetry(url, init) {
+  try {
+    const response = await fetch(url, init);
+    if (response.status < 500 && response.status !== 429) return response;
+  } catch {
+    // Kept quiet: if the second attempt fails too, its error says the same thing and is
+    // the one that reaches the screen.
+  }
+
+  await wait(NETWORK_RETRY_MS);
+  return fetch(url, init);
+}
+
 function createClient({ token, owner, repo }) {
   return async function request(path, { method = 'GET', body } = {}) {
-    const response = await fetch(`${API}/repos/${owner}/${repo}${path}`, {
+    const response = await fetchWithOneRetry(`${API}/repos/${owner}/${repo}${path}`, {
       method,
       // Never from the cache. GitHub marks these responses publicly cacheable for a
       // minute, and a commit built on a minute-old head is rejected as not a fast

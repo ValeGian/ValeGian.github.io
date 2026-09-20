@@ -1,6 +1,799 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-19T18:49:34.203Z",
+  "generatedAt": "2026-09-20T11:27:05.970Z",
   "resolved": [],
-  "stillWaiting": []
+  "stillWaiting": [
+    {
+      "id": "lotad/wish_0002",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "105",
+        "nameEn": "Moltres"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0003",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "108",
+        "nameEn": "Zapdos"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0004",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "107",
+        "nameEn": "Articuno"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0005",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "104",
+        "nameEn": "Alolan Exeggutor"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0006",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "106",
+        "nameEn": "Lapras"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0007",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "113",
+        "nameEn": "Lycanroc"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0008",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "115",
+        "nameEn": "Alolan Meowth"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0009",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "122",
+        "nameEn": "Hisuian Zorua"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0010",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "125",
+        "nameEn": "Greninja ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0011",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "126",
+        "nameEn": "Pikachu ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0012",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "127",
+        "nameEn": "Pikachu ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0013",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "128",
+        "nameEn": "Mewtwo ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0014",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "129",
+        "nameEn": "Mew ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0015",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "131",
+        "nameEn": "Gengar ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0016",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "132",
+        "nameEn": "Jirachi ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0017",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "133",
+        "nameEn": "Salamence ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0018",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "137",
+        "nameEn": "Charizard"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0019",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "141",
+        "nameEn": "Shining Celebi"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0020",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "142",
+        "nameEn": "Lugia"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0021",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "146",
+        "nameEn": "Metagross"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "lotad/wish_0022",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "165",
+        "nameEn": "Magikarp"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0002",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "105",
+        "nameEn": "Moltres"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0003",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "108",
+        "nameEn": "Zapdos"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0004",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "107",
+        "nameEn": "Articuno"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0005",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "017",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0006",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "018",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0007",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "019",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0008",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "020",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0009",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "021",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0010",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "022",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0011",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "023",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0012",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "024",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0013",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "025",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0014",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "026",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0015",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "027",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0016",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "028",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0017",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "029",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0018",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "030",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0019",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "031",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0020",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "032",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0021",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "033",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0022",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "034",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0023",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "035",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0024",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "036",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0025",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "037",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0026",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "038",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0027",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "039",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0028",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "040",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0029",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "041",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0030",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "042",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0031",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "043",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0032",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "044",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0033",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "045",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0034",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "046",
+        "nameEn": "Pikachu"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0035",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "104",
+        "nameEn": "Alolan Exeggutor"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0036",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "106",
+        "nameEn": "Lapras"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0037",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "113",
+        "nameEn": "Lycanroc"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0038",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "115",
+        "nameEn": "Alolan Meowth"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0039",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "122",
+        "nameEn": "Hisuian Zorua"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0040",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "125",
+        "nameEn": "Greninja ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0041",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "126",
+        "nameEn": "Pikachu ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0042",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "127",
+        "nameEn": "Pikachu ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0043",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "128",
+        "nameEn": "Mewtwo ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0044",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "129",
+        "nameEn": "Mew ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0045",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "131",
+        "nameEn": "Gengar ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0046",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "132",
+        "nameEn": "Jirachi ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0047",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "133",
+        "nameEn": "Salamence ex"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0048",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "137",
+        "nameEn": "Charizard"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0049",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "141",
+        "nameEn": "Shining Celebi"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0050",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "142",
+        "nameEn": "Lugia"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0051",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "146",
+        "nameEn": "Metagross"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    },
+    {
+      "id": "valerio/wish_0052",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "165",
+        "nameEn": "Magikarp"
+      },
+      "waitedDays": 0,
+      "needsAttention": false
+    }
+  ]
 }

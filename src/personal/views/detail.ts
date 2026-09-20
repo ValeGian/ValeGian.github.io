@@ -7,11 +7,12 @@
  */
 import { el, frag } from '../lib/dom.ts';
 import { money, signedMoney, percent, basisLabel, type Valued } from '../lib/money.ts';
-import { displayName, fullImage, type CatalogOverride, type NameTable } from '../lib/data.ts';
+import { displayName, fullImage, type NameTable } from '../lib/data.ts';
 import type { Condition, Currency } from '../lib/types.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import { chartIcon } from './icons.ts';
 import { artworkPanel } from './artwork.ts';
+import { marketRow } from './market.ts';
 
 export interface CardEdit {
   itemId: string;
@@ -187,14 +188,12 @@ export interface DetailHandlers {
 export function renderDetail(
   entry: Valued,
   names: NameTable,
-  overrides: Map<string, CatalogOverride>,
   handlers: DetailHandlers,
   editing: CardEdit | null = null,
 ): HTMLElement {
   const { onClose, onDelete, onStartEdit, onEditField, onSaveEdit, onCancelEdit, chart, chartOpen, onToggleChart } = handlers;
   const { item, price } = entry;
   const image = fullImage(item);
-  const override = item.cardId ? overrides.get(item.cardId) : undefined;
   const paidNative =
     item.purchase.currency === 'EUR'
       ? null
@@ -293,10 +292,9 @@ export function renderDetail(
                 entry.ratio === null ? null : el('span', { class: 'detail-note', text: percent(entry.ratio) }),
               ),
           item.notes ? line('Notes', item.notes) : null,
-          override?.cardmarketUrl
-            ? line('Cardmarket', el('a', { href: override.cardmarketUrl, target: '_blank', rel: 'noreferrer', text: 'Open product page' }))
-            : null,
         ),
+        // Both market sites, under the figures they explain.
+        marketRow(item),
       ),
       el('div', { class: 'detail-chart' }, chart ?? frag()),
     ),

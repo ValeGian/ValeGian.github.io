@@ -88,6 +88,20 @@ const day = existsSync(dailyPath)
 const latestPath = `${DATA}/prices/latest.json`;
 const latest = existsSync(latestPath) ? await readJson(latestPath) : { version: 1, date: options.date, prices: {} };
 
+/**
+ * The page each price was read from is worth keeping.
+ *
+ * Cardmarket cannot be crawled for product URLs — Cloudflare refuses non-browser clients
+ * — so the only way the site ever gets an exact link to a card is for someone to have
+ * stood on that page. The bookmarklet is already there and already sends the address, and
+ * throwing it away meant finding the same page again by hand every time.
+ */
+const marketPath = `${DATA}/market.json`;
+const market = existsSync(marketPath)
+  ? await readJson(marketPath)
+  : { version: 1, generatedAt: new Date().toISOString(), sets: {}, cards: {} };
+const linked = [];
+
 const amount = (text) => {
   if (text === null || text === undefined || text === '') return null;
   const value = Number(String(text).replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, ''));
@@ -131,6 +145,14 @@ for (const entry of collected) {
 
   day.prices[cardId] = reading;
   latest.prices[cardId] = reading;
+
+  // Only a product page, never a search or a listing: those change under you.
+  if (/^https:\/\/www\.cardmarket\.com\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/?#]+\/[^/?#]+$/.test(entry.url ?? '')) {
+    if (market.cards[cardId]?.cardmarket !== entry.url) {
+      market.cards[cardId] = { ...market.cards[cardId], cardmarket: entry.url };
+      linked.push(cardId);
+    }
+  }
   recorded.push(`${cardId.padEnd(11)} avg30 ${String(reading.avg30 ?? '—').padStart(8)}   trend ${String(reading.trend ?? '—').padStart(8)}   ${entry.name ?? ''}`);
 }
 
@@ -156,6 +178,13 @@ latest.generatedAt = new Date().toISOString();
 await mkdir(`${DATA}/prices/daily`, { recursive: true });
 await writeFile(dailyPath, `${JSON.stringify(day)}\n`);
 await writeFile(latestPath, `${JSON.stringify(latest, null, 2)}\n`);
+
+if (linked.length > 0) {
+  market.cards = Object.fromEntries(Object.entries(market.cards).sort(([a], [b]) => a.localeCompare(b)));
+  market.generatedAt = new Date().toISOString();
+  await writeFile(marketPath, `${JSON.stringify(market, null, 2)}\n`);
+  console.log(`\nkept the Cardmarket page for ${linked.length} card(s): ${linked.join(', ')}`);
+}
 
 console.log(`recorded ${recorded.length} card(s) on ${options.date}:`);
 for (const line of recorded) console.log(`  ${line}`);

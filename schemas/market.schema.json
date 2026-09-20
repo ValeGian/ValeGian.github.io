@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "market.schema.json",
+  "title": "Where each card can be seen on the market sites",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "generatedAt",
+    "sets",
+    "cards"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sets": {
+      "description": "Per set, how each site names it. Read off the sites themselves, never derived from a set name.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cardmarket": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "expansion",
+              "slug"
+            ],
+            "properties": {
+              "expansion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expansionId": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "slug": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9-]+$"
+              },
+              "checkedOn": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              }
+            }
+          },
+          "pricecharting": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "slug"
+            ],
+            "properties": {
+              "slug": {
+                "type": "string",
+                "minLength": 1
+              },
+              "checkedOn": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cards": {
+      "description": "A card's own page on each site, where one has been confirmed. Anything absent falls back to a search.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cardmarket": {
+            "type": "string",
+            "pattern": "^https://www\\.cardmarket\\.com/"
+          },
+          "pricecharting": {
+            "type": "string",
+            "pattern": "^https://www\\.pricecharting\\.com/"
+          },
+          "checkedOn": {
+            "type": "string",
+            "format": "date",
+            "description": "When a person confirmed this link by opening it."
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Why the automatic check disagrees, for a link a person has confirmed."
+          }
+        }
+      }
+    }
+  }
+}

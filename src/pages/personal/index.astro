@@ -531,6 +531,45 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     font-size: var(--size-xs);
   }
 
+  /*
+   * The two market links. Side by side and stretched, because on a phone this is a
+   * thumb landing on a moving bus, not a cursor: each one is at least 44px tall and
+   * takes half the width, and they wrap rather than overflow when the words are long.
+   */
+  .personal .market-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+
+  .personal .market-link {
+    flex: 1 1 9rem;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    font-family: var(--font-ui);
+    font-size: var(--size-sm);
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .personal .market-link:hover,
+  .personal .market-link:focus-visible {
+    border-color: var(--ink);
+  }
+
+  .personal .market-note {
+    color: var(--muted);
+    font-size: var(--size-xs);
+  }
+
   @media (min-width: 46rem) {
     .personal .detail {
       padding: var(--space-6);

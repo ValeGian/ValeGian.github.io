@@ -17,6 +17,7 @@ import { renderDetail, type CardEdit } from './views/detail.ts';
 import { renderWishlists, type PriorityFilter, type WishlistEdit, type WishSort } from './views/wishlists.ts';
 import { blankFields, renderAddCard, searchCards, type AddCardState, type AddMode } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
+import { usePublishedMarket } from './views/market.ts';
 import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markBought, newCardId, updateCard, updateWish, type Envelope, type Resolution, type Vault } from './lib/vault.ts';
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
@@ -373,6 +374,7 @@ type Opened =
  */
 async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void> {
   const data = await loadPublicData();
+  usePublishedMarket(data.market);
 
   if (opened.role === 'friend') {
     store.update({
@@ -832,7 +834,6 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
       ? renderDetail(
           open,
           names,
-          state.data?.overrides ?? new Map(),
           {
             chart: open.item.cardId ? cardHistory(state, open.item.cardId) : null,
             chartOpen: state.chartOpen,

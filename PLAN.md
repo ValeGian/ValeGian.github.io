@@ -840,10 +840,49 @@ static lookup, never fetched at runtime.
 5. **Recording a sale.** There is no "sold" today — only Remove, which deletes the card and
    the gain with it. Needs a decision on whether a sold card stays visible and what it does
    to the totals (§13 rev 34).
+6. **Nine Cardmarket expansion slugs still unconfirmed** — SV3a, SV4a, SV5K, SV5M, SV6,
+   SV7a, SV8, SV8a, SV9. Their links are built the same way as the fifteen that were
+   confirmed, so they are very likely right, but they have not been opened. `npm run
+   links:check` lists them; one page load each finishes it (§13 rev 36).
 
 ---
 
 ## 13. Progress log
+
+### 2026-09-20 — rev 36 (every card links to its own page on both markets) ✅
+
+Each card's detail panel now carries two links: Cardmarket and PriceCharting. The one
+thing that mattered was that they land on the **Japanese** card, because the English
+printing of the same Pokémon has a different number and a different price — the trap
+§8.3 is about. So nothing is derived from a name:
+
+- **PriceCharting links are harvested.** Its product URLs end in the Japanese collector
+  number, so `npm run links:resolve` reads each set's index once and matches on the
+  number **and** the English name. All 116 cards resolved, and `npm run links:check`
+  opened every one and read its title back: 116/116, no unexplained disagreement.
+- **Requiring the name is not pedantry.** Matching on the number alone gave Charmander a
+  link to Kakuna: PriceCharting numbers the 1996 Expansion Pack by the printed Pokédex
+  number, so their fourteenth card is not ours. Three cards need a human note and have
+  one — that one, Froslass (they spell it "Frosslass"), and M5 116, which is Gladion's
+  Showdown rather than the "Gladion" the wishlist calls it.
+- **Cardmarket cannot be crawled**, so its links come from the browser. Where a card has
+  been read by hand the product page is now kept and the link is exact; everywhere else
+  the link is a search of the right Japanese expansion for the card's own number. That
+  shape is Cardmarket's own — `?searchString=201&searchMode=v2` returns exactly one
+  product, `Charizard-ex-V3-sv2a201`, and **without `searchMode=v2` the same URL says "no
+  matches"**, which took a while to find.
+- **The expansion ids came from Cardmarket's own dropdown**, all 782 of them, rather than
+  from guessing at names. Just as well: the Japanese Storm Emerald is listed as *Storm
+  Emeralda*, and our two 1996 cards are in *Expansion Pack*, not the *Base Expansion
+  Pack* of the same era. 15 of 24 expansion slugs have since been confirmed by loading
+  the real page; the sweep stopped when Cloudflare challenged, as the runbook says.
+- **Reading a price now leaves a link behind.** Both the bookmarklet paste and
+  `price:record` keep the product page they read from, so the queue work already planned
+  fills in the exact Cardmarket links as it goes.
+
+On the phone the two links sit side by side, 154×61 points at 386px wide, with no
+horizontal overflow; a link that is a search says so, because "exact" and "finds it" are
+not the same promise.
 
 ### 2026-09-20 — rev 35 (adding a card survives a bad moment) ✅
 

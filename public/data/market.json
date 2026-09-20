@@ -1,0 +1,678 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-20T14:46:51.045Z",
+  "sets": {
+    "CLK": {
+      "cardmarket": {
+        "expansion": "Pokémon Card Game Classic: Blastoise & Suicune ex Deck",
+        "expansionId": null,
+        "slug": "Pokemon-Card-Game-Classic-Blastoise-Suicune-ex-Deck",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-classic-blastoise",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "M2a": {
+      "cardmarket": {
+        "expansion": "MEGA Dream ex",
+        "expansionId": 6380,
+        "slug": "MEGA-Dream-ex",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-mega-dream-ex",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "M5": {
+      "cardmarket": {
+        "expansion": "Abyss Eye",
+        "expansionId": 6556,
+        "slug": "Abyss-Eye",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-abyss-eye",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "M6": {
+      "cardmarket": {
+        "expansion": "Storm Emeralda",
+        "expansionId": 6636,
+        "slug": "Storm-Emeralda",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-storm-emeralda",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "M6a": {
+      "cardmarket": {
+        "expansion": "30th Celebration JP",
+        "expansionId": 6602,
+        "slug": "30th-Celebration-JP",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-30th-celebration",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "PMCG1": {
+      "cardmarket": {
+        "expansion": "Expansion Pack",
+        "expansionId": 4169,
+        "slug": "Expansion-Pack",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-expansion-pack",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "S12a": {
+      "cardmarket": {
+        "expansion": "VSTAR Universe",
+        "expansionId": 5198,
+        "slug": "VSTAR-Universe",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-vstar-universe",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "S8b": {
+      "cardmarket": {
+        "expansion": "VMAX Climax",
+        "expansionId": 4390,
+        "slug": "VMAX-Climax",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-vmax-climax",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV10": {
+      "cardmarket": {
+        "expansion": "The Glory of Team Rocket",
+        "expansionId": 6092,
+        "slug": "The-Glory-of-Team-Rocket",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-glory-of-team-rocket",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV11W": {
+      "cardmarket": {
+        "expansion": "White Flare JP",
+        "expansionId": 6131,
+        "slug": "White-Flare-JP",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-white-flare",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV1S": {
+      "cardmarket": {
+        "expansion": "Scarlet ex",
+        "expansionId": 5216,
+        "slug": "Scarlet-ex",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-scarlet-ex",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV1V": {
+      "cardmarket": {
+        "expansion": "Violet ex",
+        "expansionId": 5217,
+        "slug": "Violet-ex",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-violet-ex",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV1a": {
+      "cardmarket": {
+        "expansion": "Triplet Beat",
+        "expansionId": 5257,
+        "slug": "Triplet-Beat",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-triplet-beat",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV2D": {
+      "cardmarket": {
+        "expansion": "Clay Burst",
+        "expansionId": 5315,
+        "slug": "Clay-Burst",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-clay-burst",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV2P": {
+      "cardmarket": {
+        "expansion": "Snow Hazard",
+        "expansionId": 5314,
+        "slug": "Snow-Hazard",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-snow-hazard",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV2a": {
+      "cardmarket": {
+        "expansion": "Pokémon Card 151",
+        "expansionId": 5328,
+        "slug": "Pokemon-Card-151",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-scarlet-&-violet-151",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV3": {
+      "cardmarket": {
+        "expansion": "Ruler of the Black Flame",
+        "expansionId": 5409,
+        "slug": "Ruler-of-the-Black-Flame",
+        "checkedOn": "2026-09-20"
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-ruler-of-the-black-flame",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV3a": {
+      "cardmarket": {
+        "expansion": "Raging Surf",
+        "expansionId": 5432,
+        "slug": "Raging-Surf",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-raging-surf",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV4a": {
+      "cardmarket": {
+        "expansion": "Shiny Treasure ex",
+        "expansionId": 5519,
+        "slug": "Shiny-Treasure-ex",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-shiny-treasure-ex",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV5K": {
+      "cardmarket": {
+        "expansion": "Wild Force",
+        "expansionId": 5573,
+        "slug": "Wild-Force",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-wild-force",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV5M": {
+      "cardmarket": {
+        "expansion": "Cyber Judge",
+        "expansionId": 5574,
+        "slug": "Cyber-Judge",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-cyber-judge",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV6": {
+      "cardmarket": {
+        "expansion": "Mask of Change",
+        "expansionId": 5690,
+        "slug": "Mask-of-Change",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-mask-of-change",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV7a": {
+      "cardmarket": {
+        "expansion": "Paradise Dragona",
+        "expansionId": 5846,
+        "slug": "Paradise-Dragona",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-paradise-dragona",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV8": {
+      "cardmarket": {
+        "expansion": "Super Electric Breaker",
+        "expansionId": 5901,
+        "slug": "Super-Electric-Breaker",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-super-electric-breaker",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV8a": {
+      "cardmarket": {
+        "expansion": "Terastal Festival ex",
+        "expansionId": 5928,
+        "slug": "Terastal-Festival-ex",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-terastal-festival",
+        "checkedOn": "2026-09-20"
+      }
+    },
+    "SV9": {
+      "cardmarket": {
+        "expansion": "Battle Partners",
+        "expansionId": 5996,
+        "slug": "Battle-Partners",
+        "checkedOn": null
+      },
+      "pricecharting": {
+        "slug": "pokemon-japanese-battle-partners",
+        "checkedOn": "2026-09-20"
+      }
+    }
+  },
+  "cards": {
+    "CLK-001": {
+      "cardmarket": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-Game-Classic-Blastoise-Suicune-ex-Deck/Squirtle-CLK001",
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-classic-blastoise/squirtle-1"
+    },
+    "M2a-245": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-mega-dream-ex/steven%27s-metagross-ex-245"
+    },
+    "M5-083": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-abyss-eye/armarouge-83"
+    },
+    "M5-084": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-abyss-eye/goldeen-84"
+    },
+    "M5-087": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-abyss-eye/slowbro-87"
+    },
+    "M5-088": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-abyss-eye/dhelmise-88"
+    },
+    "M5-093": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-abyss-eye/silvally-93"
+    },
+    "M5-116": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-abyss-eye/gladion's-showdown-116",
+      "checkedOn": "2026-09-20",
+      "note": "The card at 116 is Gladion’s Showdown; the wishlist calls it \"Gladion\"."
+    },
+    "M6-080": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-storm-emeralda/kyogre-80"
+    },
+    "M6-084": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-storm-emeralda/groudon-84"
+    },
+    "M6-085": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-storm-emeralda/inkay-85"
+    },
+    "M6-087": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-storm-emeralda/altaria-87"
+    },
+    "M6-088": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-storm-emeralda/kecleon-88"
+    },
+    "M6-108": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-storm-emeralda/raikou-ex-108"
+    },
+    "M6-110": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-storm-emeralda/mega-rayquaza-ex-110"
+    },
+    "M6a-017": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-17"
+    },
+    "M6a-018": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-18"
+    },
+    "M6a-019": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-19"
+    },
+    "M6a-020": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-20"
+    },
+    "M6a-021": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-21"
+    },
+    "M6a-022": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-22"
+    },
+    "M6a-023": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-23"
+    },
+    "M6a-024": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-24"
+    },
+    "M6a-025": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-25"
+    },
+    "M6a-026": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-26"
+    },
+    "M6a-027": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-27"
+    },
+    "M6a-028": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-28"
+    },
+    "M6a-029": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-29"
+    },
+    "M6a-030": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-30"
+    },
+    "M6a-031": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-31"
+    },
+    "M6a-032": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-32"
+    },
+    "M6a-033": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-33"
+    },
+    "M6a-034": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-34"
+    },
+    "M6a-035": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-35"
+    },
+    "M6a-036": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-36"
+    },
+    "M6a-037": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-37"
+    },
+    "M6a-038": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-38"
+    },
+    "M6a-039": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-39"
+    },
+    "M6a-040": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-40"
+    },
+    "M6a-041": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-41"
+    },
+    "M6a-042": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-42"
+    },
+    "M6a-043": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-43"
+    },
+    "M6a-044": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-44"
+    },
+    "M6a-045": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-45"
+    },
+    "M6a-046": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-46"
+    },
+    "M6a-104": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/alolan-exeggutor-104"
+    },
+    "M6a-105": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/moltres-105"
+    },
+    "M6a-106": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/lapras-106"
+    },
+    "M6a-107": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/articuno-107"
+    },
+    "M6a-108": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/zapdos-108"
+    },
+    "M6a-113": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/lycanroc-113"
+    },
+    "M6a-115": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/alolan-meowth-115"
+    },
+    "M6a-122": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/hisuian-zorua-122"
+    },
+    "M6a-125": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/greninja-ex-125"
+    },
+    "M6a-126": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-ex-126"
+    },
+    "M6a-127": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/pikachu-ex-127"
+    },
+    "M6a-128": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/mewtwo-ex-128"
+    },
+    "M6a-129": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/mew-ex-129"
+    },
+    "M6a-131": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/gengar-ex-131"
+    },
+    "M6a-132": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/jirachi-ex-132"
+    },
+    "M6a-133": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/salamence-ex-133"
+    },
+    "M6a-137": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/charizard-137"
+    },
+    "M6a-141": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/shining-celebi-141"
+    },
+    "M6a-142": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/lugia-142"
+    },
+    "M6a-146": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/metagross-146"
+    },
+    "M6a-165": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/magikarp-165"
+    },
+    "PMCG1-001": {
+      "cardmarket": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Expansion-Pack/Bulbasaur",
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-expansion-pack/bulbasaur-1"
+    },
+    "PMCG1-014": {
+      "cardmarket": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Expansion-Pack/Charmander",
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-expansion-pack/charmander-4",
+      "checkedOn": "2026-09-20",
+      "note": "PriceCharting numbers the 1996 set by the printed Pokédex number, so Charmander is 4 there and 014 here."
+    },
+    "S12a-211": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/charizard-v-211"
+    },
+    "S12a-212": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/charizard-vstar-212"
+    },
+    "S12a-213": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/entei-v-213"
+    },
+    "S12a-215": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/suicune-v-215"
+    },
+    "S12a-218": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/raikou-v-218"
+    },
+    "S12a-221": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/mewtwo-vstar-221"
+    },
+    "S12a-228": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/darkrai-vstar-228"
+    },
+    "S12a-233": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/regigigas-vstar-233"
+    },
+    "S12a-234": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/hisuian-zoroark-vstar-234"
+    },
+    "S12a-259": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/origin-forme-palkia-vstar-259"
+    },
+    "S12a-260": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/origin-forme-dialga-vstar-260"
+    },
+    "S12a-261": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/giratina-vstar-261"
+    },
+    "S12a-262": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vstar-universe/arceus-vstar-262"
+    },
+    "S8b-195": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-vmax-climax/zekrom-195"
+    },
+    "SV10-127": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-glory-of-team-rocket/team-rocket%27s-crobat-ex-127"
+    },
+    "SV11W-171": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-white-flare/hydreigon-ex-171"
+    },
+    "SV1a-080": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-triplet-beat/magikarp-80"
+    },
+    "SV1S-083": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-ex/ralts-83"
+    },
+    "SV1S-084": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-ex/kirlia-84"
+    },
+    "SV1S-101": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-ex/gardevoir-ex-101"
+    },
+    "SV1V-086": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-violet-ex/drowzee-86"
+    },
+    "SV2a-166": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/bulbasaur-166"
+    },
+    "SV2a-167": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/ivysaur-167"
+    },
+    "SV2a-168": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/charmander-168"
+    },
+    "SV2a-169": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/charmeleon-169"
+    },
+    "SV2a-170": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/squirtle-170"
+    },
+    "SV2a-171": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/wartortle-171"
+    },
+    "SV2a-182": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/dragonair-182"
+    },
+    "SV2a-183": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/mewtwo-183"
+    },
+    "SV2a-200": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/venusaur-ex-200"
+    },
+    "SV2a-201": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/charizard-ex-201",
+      "cardmarket": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-151/Charizard-ex-V3-sv2a201"
+    },
+    "SV2a-202": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/blastoise-ex-202"
+    },
+    "SV2a-203": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-scarlet-&-violet-151/alakazam-ex-203"
+    },
+    "SV2D-092": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-clay-burst/chi-yu-ex-92"
+    },
+    "SV2P-077": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-snow-hazard/baxcalibur-77"
+    },
+    "SV3-110": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-ruler-of-the-black-flame/ninetales-110"
+    },
+    "SV3a-069": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-raging-surf/groudon-69"
+    },
+    "SV4a-339": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-shiny-treasure-ex/palafin-339"
+    },
+    "SV5K-080": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-wild-force/gastly-80"
+    },
+    "SV5M-073": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-cyber-judge/deerling-73"
+    },
+    "SV5M-074": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-cyber-judge/sawsbuck-74"
+    },
+    "SV6-104": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-mask-of-change/frosslass-104",
+      "checkedOn": "2026-09-20",
+      "note": "PriceCharting spells Froslass \"Frosslass\"."
+    },
+    "SV7a-070": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-paradise-dragona/latios-70"
+    },
+    "SV7a-073": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-paradise-dragona/skarmory-73"
+    },
+    "SV8-131": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-super-electric-breaker/milotic-ex-131"
+    },
+    "SV8a-218": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-terastal-festival/roaring-moon-ex-218"
+    },
+    "SV9-102": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-battle-partners/articuno-102"
+    },
+    "SV9-109": {
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-battle-partners/n%27s-reshiram-109"
+    }
+  }
+}

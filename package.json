@@ -19,6 +19,8 @@
     "data:snapshot": "node scripts/snapshot-prices.mjs",
     "price:todo": "node scripts/price-todo.mjs",
     "price:record": "node scripts/record-manual-price.mjs",
+    "links:resolve": "node scripts/resolve-links.mjs",
+    "links:check": "node scripts/check-market-links.mjs",
     "price:paste": "node scripts/paste-prices.mjs",
     "price:freeze": "node scripts/freeze-check.mjs",
     "data:resolve": "node scripts/resolve-pending.mjs",

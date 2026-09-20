@@ -5,6 +5,7 @@
  * arrive already decrypted from the unlock step. Nothing here needs a key.
  */
 import { toEnglish } from '../../lib/card-name.mjs';
+import type { Market } from './market.ts';
 import type { CollectionItem, PriceSnapshot, WishlistItem } from './types.ts';
 
 export interface NameTable {
@@ -27,6 +28,8 @@ export interface PublicData {
   overrides: Map<string, CatalogOverride>;
   /** Card id to artwork base, for cards the catalog had no picture for when they were added. */
   artwork: Map<string, string>;
+  /** Where each card can be seen on the two market sites. Null when the file is absent. */
+  market: Market | null;
 }
 
 /**
@@ -54,11 +57,12 @@ async function getJson<T>(path: string, fallback: T): Promise<T> {
 }
 
 export async function loadPublicData(): Promise<PublicData> {
-  const [prices, names, overrides, artwork] = await Promise.all([
+  const [prices, names, overrides, artwork, market] = await Promise.all([
     getJson<PriceSnapshot | null>('/data/prices/latest.json', null),
     getJson<NameTable>('/data/card-names.json', { species: {} }),
     getJson<{ cards: CatalogOverride[] }>('/data/catalog-overrides.json', { cards: [] }),
     getJson<{ cards: Record<string, string> }>('/data/artwork.json', { cards: {} }),
+    getJson<Market | null>('/data/market.json', null),
   ]);
 
   const found = new Map(Object.entries(artwork.cards));
@@ -69,6 +73,7 @@ export async function loadPublicData(): Promise<PublicData> {
     names,
     overrides: new Map(overrides.cards.map((card) => [card.cardId, card])),
     artwork: found,
+    market,
   };
 }
 

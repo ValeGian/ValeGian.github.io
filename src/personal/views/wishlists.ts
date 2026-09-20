@@ -13,6 +13,7 @@ import { displayName, subtitle, fullImage, priceKey, type NameTable } from '../l
 import { cardThumb } from './thumb.ts';
 import { chartIcon } from './icons.ts';
 import { artworkPanel } from './artwork.ts';
+import { marketRow } from './market.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
 export interface WishlistEdit {
@@ -201,6 +202,8 @@ function wishDetail(key: string, state: WishlistViewState): HTMLElement | null {
         ),
         el('p', { class: 'wanters-heading ui', text: wanters.length === 1 ? 'Wanted by' : `Wanted by ${wanters.length} people` }),
         el('div', { class: 'wanters' }, ...wanters.map(({ list, item }) => row(list, item))),
+        // Both market sites, for checking the asking price against the list's target.
+        marketRow(sample),
       ),
       el('div', { class: 'detail-chart' }, state.chartFor?.(key) ?? frag()),
     ),

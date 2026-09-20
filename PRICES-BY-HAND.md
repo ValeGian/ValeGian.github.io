@@ -126,6 +126,12 @@ nothing now and cannot be recovered later. Use `--dry-run` first if unsure.
 This writes into today's snapshot and into `latest.json`, marked `cardmarket/manual`, so
 the site and the history always say where the figure came from.
 
+**Pass `--url` and mean it.** A product page address is kept as that card's Cardmarket
+link in `market.json`, and the card's detail panel then opens its own page instead of a
+search. Cardmarket cannot be crawled for these, so standing on the page is the only way
+the site ever gets one — and reading a price means being on exactly that page. Only a
+product URL is kept; a search or a listing is ignored.
+
 ### 3b. Collecting by hand in the browser, without a session
 
 There is a bookmarklet for this, and it is the better way when Valerio is reading pages
@@ -145,6 +151,9 @@ npm run price:paste -- --dry-run
 
 Both the 30-day average and the trend are stored for every card. A card already read by
 hand today is skipped rather than overwritten, so the first reading of the day stands.
+
+The address of each page is kept too, as that card's Cardmarket link — see `--url` above.
+So working through the price queue quietly fills in the exact links as it goes.
 
 The list is held against the day in `localStorage`, so it is shared across tabs and a
 list left from yesterday is never pasted under today's date. Shift-click empties it.

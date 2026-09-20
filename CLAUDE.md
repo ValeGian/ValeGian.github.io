@@ -24,6 +24,10 @@ in the browser with a password.
   first leaves stale ciphertext in the output.
 - **Do not fetch Cardmarket from a script.** Cloudflare blocks non-browser clients, and
   getting around that is out of bounds. See PRICES-BY-HAND.md.
+- **A market link is harvested, never derived from a name.** `public/data/market.json`
+  holds what was read off the two sites; anything missing falls back to a search scoped to
+  the Japanese expansion and the card's number. A guessed product URL lands on the English
+  printing sooner or later, which is the same trap as guessing a card number.
 
 ## Commands
 
@@ -38,4 +42,6 @@ in the browser with a password.
 | `npm run data:snapshot` | take today's prices |
 | `npm run price:todo` | what needs a price read by hand |
 | `npm run price:record` | record one such reading |
+| `npm run links:resolve` | find each card's page on PriceCharting |
+| `npm run links:check` | open every harvested link and confirm it is that card |
 | `npm run audit` | semantic diff of an encrypted file across git history |

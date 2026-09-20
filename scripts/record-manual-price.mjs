@@ -87,6 +87,28 @@ await mkdir(`${DATA}/prices/daily`, { recursive: true });
 await writeFile(dailyPath, `${JSON.stringify(day)}\n`);
 await writeFile(latestPath, `${JSON.stringify(latest, null, 2)}\n`);
 
+/**
+ * The page the figure was read from becomes the card's Cardmarket link.
+ *
+ * Cardmarket cannot be crawled for product URLs, so someone standing on the page is the
+ * only way the site ever gets an exact one. Reading a price means being on exactly that
+ * page, so the link comes free — a search has to serve until then.
+ */
+const isProductPage = /^https:\/\/www\.cardmarket\.com\/[a-z]{2}\/Pokemon\/Products\/Singles\/[^/?#]+\/[^/?#]+$/.test(
+  options.url ?? '',
+);
+if (isProductPage) {
+  const marketPath = `${DATA}/market.json`;
+  const market = existsSync(marketPath)
+    ? await readJson(marketPath)
+    : { version: 1, generatedAt: new Date().toISOString(), sets: {}, cards: {} };
+
+  market.cards[options.card] = { ...market.cards[options.card], cardmarket: options.url };
+  market.cards = Object.fromEntries(Object.entries(market.cards).sort(([a], [b]) => a.localeCompare(b)));
+  market.generatedAt = new Date().toISOString();
+  await writeFile(marketPath, `${JSON.stringify(market, null, 2)}\n`);
+}
+
 console.log(`recorded ${options.card} on ${options.date}: avg30 ${reading.avg30} EUR (hand-read)`);
-if (options.url) console.log(`  from ${options.url}`);
+if (options.url) console.log(`  from ${options.url}${isProductPage ? ' — kept as this card\'s Cardmarket link' : ''}`);
 console.log(`  written to ${dailyPath} and ${latestPath}`);

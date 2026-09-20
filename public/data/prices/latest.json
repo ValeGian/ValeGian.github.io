@@ -1,7 +1,7 @@
 {
   "version": 1,
   "date": "2026-09-19",
-  "generatedAt": "2026-09-19T21:01:34.038Z",
+  "generatedAt": "2026-09-20T00:06:51.055Z",
   "prices": {
     "S12a-212": {
       "source": "cardmarket/tcgdex",
@@ -530,6 +530,16 @@
       "trend": 42.46,
       "low": 22,
       "avg": 40.94
+    },
+    "M6a-017": {
+      "source": "cardmarket/manual",
+      "currency": "EUR",
+      "updated": "2026-09-20T00:06:51.054Z",
+      "avg30": 5,
+      "avg7": 5,
+      "avg1": 5,
+      "trend": 5,
+      "low": 2.99
     }
   }
 }

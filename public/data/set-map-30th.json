@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "note": "Verified card-for-card by comparing artwork and attack names. Only pairs actually checked are listed; the offset is not constant across the set and must never be extrapolated.",
+  "verifiedOn": "2026-09-20",
+  "japanese": {
+    "setCode": "M6a",
+    "name": "30th Anniversary",
+    "cardmarketExpansion": "30th-Celebration-JP",
+    "cards": 176
+  },
+  "english": {
+    "setCode": "30th",
+    "name": "30th Celebration",
+    "tcgdexSet": "30th",
+    "cards": 158
+  },
+  "pairs": [
+    {
+      "japanese": "017",
+      "english": "023",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "018",
+      "english": "024",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "019",
+      "english": "025",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "020",
+      "english": "026",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "021",
+      "english": "027",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "022",
+      "english": "028",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "023",
+      "english": "029",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "024",
+      "english": "030",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "025",
+      "english": "031",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "026",
+      "english": "032",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "027",
+      "english": "033",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "028",
+      "english": "034",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "029",
+      "english": "035",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "030",
+      "english": "036",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "031",
+      "english": "037",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "032",
+      "english": "038",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "033",
+      "english": "039",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "034",
+      "english": "040",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "035",
+      "english": "041",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "036",
+      "english": "042",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "037",
+      "english": "043",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "038",
+      "english": "044",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "039",
+      "english": "045",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "040",
+      "english": "046",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "041",
+      "english": "047",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "042",
+      "english": "048",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "043",
+      "english": "049",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "044",
+      "english": "050",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "045",
+      "english": "051",
+      "name": "Pikachu"
+    },
+    {
+      "japanese": "046",
+      "english": "052",
+      "name": "Pikachu"
+    }
+  ]
+}

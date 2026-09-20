@@ -116,6 +116,17 @@ nothing now and cannot be recovered later. Use `--dry-run` first if unsure.
 This writes into today's snapshot and into `latest.json`, marked `cardmarket/manual`, so
 the site and the history always say where the figure came from.
 
+### 3a. Do not harvest with `fetch()`
+
+Loading pages by navigating to them works. Running `fetch()` in a loop from the page does
+not: it was tried on 2026-09-20 and Cloudflare started answering with `Just a moment…`
+after about a dozen calls. If that happens, **stop for the session and say so.** It clears
+on its own; forcing it does not.
+
+A set's card list can be walked a page at a time, and that is cheap. A price has to come
+from the product's own page, one navigation each — so reading thirty prices is thirty
+page loads, and is worth spreading over more than one sitting.
+
 ### 4. Identifying a card with no catalog entry
 
 These are cards added from an English stand-in. **The English set's numbering is not the
@@ -123,13 +134,23 @@ Japanese set's**: Cardmarket lists the Japanese Moltres as `m6a 105` and `m6a 00
 the English set has its two Moltres at `011` and `130`. There is no offset and no pattern,
 so the number has to be read off Cardmarket.
 
-`price-todo` prints the English card it stands in for, e.g. `M6a Pikachu 30th-023`. To
-identify it:
+For the 30th Anniversary set this is already done and written down:
+**`public/data/set-map-30th.json`** holds the pairs that have been checked card for card.
+Use it rather than repeating the work, and **never extrapolate from it** — the offset is
+6 across the Pikachu run and is demonstrably not 6 elsewhere in the set.
 
-1. Open the English card to see the artwork: `https://assets.tcgdex.net/en/me/30th/023/high.webp`
-2. Find the matching card in the Japanese expansion on Cardmarket and note its number.
-   **Match on the artwork, not the name** — the set has thirty different Pikachus.
-3. If you cannot tell them apart with confidence, **leave it and say which ones**. A wrong
+For a pair that is not in that file:
+
+1. Open the English card to see the artwork: `https://assets.tcgdex.net/en/me/30th/023/high.png`
+2. Find the matching card in the Japanese expansion on Cardmarket and compare. **Match on
+   the artwork and the attack names, not the species** — the set has thirty Pikachus.
+3. On a Cardmarket product page the carousel shows the previous and next products too.
+   The product's own image is the one whose `alt` matches its name and which appears
+   twice in the markup; the neighbours are marked `lazy`. Picking the wrong one showed a
+   Wishiwashi labelled as Pikachu 017.
+4. Product ids are **not** a reliable way to guess an image URL. They run in step with the
+   card numbers in the low range and drift later in the set.
+5. If you cannot tell them apart with confidence, **leave it and say which ones**. A wrong
    number attaches another card's price permanently.
 
 Once the number is known, set it on the item in `.local/`, then re-encrypt:

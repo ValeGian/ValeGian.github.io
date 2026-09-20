@@ -136,7 +136,10 @@ type Illustrated = {
  * path comes last, because it is a guess.
  */
 export function picture(item: Illustrated, size: 'low' | 'high'): string | null {
-  const found = item.cardId ? discoveredArtwork.get(item.cardId) : undefined;
+  // Keyed the same way a price is, so a card the catalog has not published yet picks up
+  // its real artwork the day the daily job finds it — see priceKey.
+  const key = priceKey(item);
+  const found = key ? discoveredArtwork.get(key) : undefined;
   if (found) return `${found}/${size}.webp`;
   if (item.imageBase) return `${item.imageBase}/${size}.webp`;
   if (item.photoUrl) return item.photoUrl;

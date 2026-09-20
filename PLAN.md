@@ -849,6 +849,38 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-20 — rev 42 (publishing was broken by a header I added this morning) 🔴→✅
+
+"Failed to fetch" was not a network blip and the retry in rev 41 did not help, because
+nothing was reaching GitHub at all. **Publishing from the browser had been broken since
+rev 29 (`85eb14f`), by a header added there.**
+
+That commit stopped a commit being built on a cached branch head, with two changes:
+`cache: 'no-store'` on the fetch, and a `Cache-Control: no-cache` **request header**. The
+option was the fix. The header is not CORS-safelisted, so it turns every call into a
+preflight, and GitHub does not list it in `Access-Control-Allow-Headers` — so the browser
+refused to send any request and reported it as `TypeError: Failed to fetch`, which reads
+as a connection problem and is not one.
+
+Bisected from the live origin, one header at a time:
+
+| request | result |
+|---|---|
+| plain GET | 200 |
+| `Accept` only | 200 |
+| `X-GitHub-Api-Version` only | 200 |
+| `Content-Type` only | 200 |
+| `cache: 'no-store'` option | 200 |
+| **`Cache-Control: no-cache` only** | **Failed to fetch** |
+
+And the production shape, side by side with a deliberately invalid token: without the
+header it reaches GitHub and is answered 401; with it, blocked. The header is gone, the
+fetch option stays, and `tests/github-headers.test.ts` asserts it never comes back.
+
+The lesson worth keeping: a browser reporting "Failed to fetch" is not evidence of a
+network problem. It is what a blocked preflight looks like, and the two need telling apart
+before anything is retried.
+
 ### 2026-09-20 — rev 41 (a dropped request no longer fails a publish) ✅
 
 Reported from a real session: three changes queued, and publishing answered **"Failed to

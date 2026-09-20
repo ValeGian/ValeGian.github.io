@@ -86,12 +86,19 @@ function createClient({ token, owner, repo }) {
       // Never from the cache. GitHub marks these responses publicly cacheable for a
       // minute, and a commit built on a minute-old head is rejected as not a fast
       // forward — which is exactly the failure this retries out of.
+      //
+      // `no-store` is the whole fix, and it must stay the whole fix: a `Cache-Control`
+      // *header* was added here alongside it and broke publishing outright. That header
+      // is not CORS-safelisted, so it turns every call into a preflight, and GitHub does
+      // not list it in Access-Control-Allow-Headers — the browser then blocks the request
+      // and reports it as "Failed to fetch", which reads as a network problem and is not
+      // one. Measured from the live origin: the same URL answers 200 with Accept and
+      // X-GitHub-Api-Version, and throws with Cache-Control alone.
       cache: 'no-store',
       headers: {
         Accept: 'application/vnd.github+json',
         Authorization: `Bearer ${token}`,
         'X-GitHub-Api-Version': '2022-11-28',
-        'Cache-Control': 'no-cache',
         ...(body ? { 'Content-Type': 'application/json' } : {}),
       },
       ...(body ? { body: JSON.stringify(body) } : {}),

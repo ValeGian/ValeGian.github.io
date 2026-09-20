@@ -146,6 +146,12 @@ npm run price:paste -- --dry-run
 Both the 30-day average and the trend are stored for every card. A card already read by
 hand today is skipped rather than overwritten, so the first reading of the day stands.
 
+The list is held against the day in `localStorage`, so it is shared across tabs and a
+list left from yesterday is never pasted under today's date. Shift-click empties it.
+
+**Changing the bookmarklet changes its URL, so the bookmark must be dragged again** — a
+saved one keeps whatever code it was created with.
+
 The bookmarklet maps Cardmarket's expansion slug to a set code through a table in
 `scripts/paste-prices.mjs`. Only `30th-Celebration-JP` has been confirmed against a real
 page; an expansion that is not in the table is reported by name and skipped, so adding it

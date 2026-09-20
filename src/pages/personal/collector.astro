@@ -6,9 +6,12 @@ import BaseLayout from '@layouts/BaseLayout.astro';
  *
  * Written here as readable source and squeezed into a `javascript:` URL at build time, so
  * there is one copy to maintain and it is the legible one. It reads only what the page
- * already shows, keeps a running list in that tab, and puts the list on the clipboard —
- * it sends nothing anywhere, because it cannot: cardmarket.com shares no storage, no
- * cookies and no origin with this site.
+ * already shows, keeps a running list against the day in localStorage, and puts that list
+ * on the clipboard — it sends nothing anywhere, because it cannot: cardmarket.com shares
+ * no storage, no cookies and no origin with this site.
+ *
+ * Changing anything here changes the `javascript:` URL, so the bookmark has to be dragged
+ * again. There is no way to update one already saved.
  */
 const source = `
 (function () {
@@ -38,12 +41,26 @@ const source = `
 
   if (!card.avg30 && !card.trend) { alert('No prices on this page yet.'); return; }
 
+  // localStorage, not sessionStorage: a session store is per tab, so opening the next
+  // card in a new tab silently started a fresh list and the clipboard ended up holding
+  // only the card just clicked.
   var key = 'valegian.prices';
-  var list;
-  try { list = JSON.parse(sessionStorage.getItem(key) || '[]'); } catch (e) { list = []; }
+  var today = new Date().toISOString().slice(0, 10);
+  var saved;
+  try { saved = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) { saved = {}; }
+  // A list left from an earlier day would be pasted in under today's date.
+  var list = saved.day === today && Array.isArray(saved.cards) ? saved.cards : [];
+
+  // Shift-click empties the list, for starting a fresh batch.
+  if (window.event && window.event.shiftKey) {
+    try { localStorage.removeItem(key); } catch (e) {}
+    alert('Collected list cleared.');
+    return;
+  }
+
   list = list.filter(function (e) { return !(e.expansion === card.expansion && e.number === card.number); });
   list.push(card);
-  try { sessionStorage.setItem(key, JSON.stringify(list)); } catch (e) {}
+  try { localStorage.setItem(key, JSON.stringify({ day: today, cards: list })); } catch (e) {}
 
   var payload = JSON.stringify(list);
   var done = function () {
@@ -80,7 +97,7 @@ const bookmarklet = `javascript:${encodeURIComponent(source.replace(/\n\s*/g, ' 
     <h2>How it goes</h2>
     <ol>
       <li>Open a card on Cardmarket and click <strong>Collect price</strong>. A tick appears with a running count.</li>
-      <li>Do the same on as many cards as you like — each one is added, and clicking the same card twice replaces it rather than duplicating it.</li>
+      <li>Do the same on as many cards as you like, in as many tabs as you like — each one is added, and clicking the same card twice replaces it rather than duplicating it.</li>
       <li>Back here, run <code>npm run price:paste</code>. Everything on the clipboard is recorded for today.</li>
     </ol>
 
@@ -90,10 +107,15 @@ const bookmarklet = `javascript:${encodeURIComponent(source.replace(/\n\s*/g, ' 
       every card, whichever one you are currently valuing on.
     </p>
 
+    <p>
+      The list is kept per day, so one left over from yesterday is never pasted in under
+      today's date. <strong>Shift-click</strong> the bookmarklet to empty it and start again.
+    </p>
+
     <p class="ui muted">
-      The bookmarklet reads only what the page is already showing and sends nothing
-      anywhere — it has no way to, since Cardmarket shares no origin with this site. The
-      list lives in that browser tab until you paste it.
+      It reads only what the page is already showing and sends nothing anywhere — it has no
+      way to, since Cardmarket shares no origin with this site. The list stays in your
+      browser until you paste it.
     </p>
   </div>
 </BaseLayout>

@@ -272,7 +272,14 @@ const previousDay = days
 
 if (previousDay) {
   const before = await readJson(`${DATA}/prices/daily/${previousDay}`);
-  const shared = Object.keys(prices).filter((cardId) => before.prices[cardId]);
+
+  // Only catalogue readings on both sides. A hand-read figure is a different measurement
+  // of the same card, so comparing one against a TCGdex reading would count as movement
+  // and quietly dilute the very signal this is looking for.
+  const shared = Object.keys(prices).filter(
+    (cardId) =>
+      prices[cardId].source === 'cardmarket/tcgdex' && before.prices[cardId]?.source === 'cardmarket/tcgdex',
+  );
 
   const unmoved = (fields) =>
     shared.filter((cardId) => fields.every((field) => prices[cardId][field] === before.prices[cardId][field]));

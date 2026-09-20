@@ -590,6 +590,27 @@ Scraping the site for the averages is not an option for the daily job: Cloudflar
 challenge to non-browser clients, and `robots.txt` itself cannot be fetched. A real browser
 loads the pages fine, which is what the hand-checked override path already exists for.
 
+**Every other route to Cardmarket's own figures was checked and none is open free:**
+
+| Route | Verdict |
+|---|---|
+| Official Cardmarket API | Closed. *"Currently, we are not accepting applications for access to the Cardmarket API."* |
+| tcggo via RapidAPI | The Japanese catalog needs the ULTRA tier; the key on hand is BASIC (§4.5) |
+| cardmarketapi.com | 10 requests a day free, paid above that |
+| CardMarket API on RapidAPI | 100 a day free, then about 10 USD a month |
+| PokemonPriceTracker, Poketrace | Free tiers of 100–250 a day, paid above |
+| pokemontcg.io | Free and generous, but English sets only |
+
+The paid ones are all mirrors that scrape Cardmarket themselves, so they buy convenience
+rather than a better source, and they break the rule that this costs nothing.
+
+**What is free, automatic and verified accurate is `trend`.** It comes from the same
+feed, it moved on 29 of 43 cards across a day when no average did, and it matched the
+website to the cent on the card checked directly. It is Cardmarket's own smoothed
+estimate, computed from completed sales, and it is what their product pages show as the
+price. Pricing on it would cost nothing and need no hand-reading — the objection is that
+it is a different measure from `avg30`, so every figure already recorded changes meaning.
+
 ### 8.5 Sets the catalog has not published yet
 
 TCGdex publishes the English side of a worldwide release first. Four days after the 30th

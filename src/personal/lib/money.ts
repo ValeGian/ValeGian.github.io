@@ -27,30 +27,31 @@ export interface Quote {
 }
 
 /**
- * Whether a 30-day average can be believed.
+ * Whether a 30-day average was read off Cardmarket rather than taken from the catalog.
  *
- * TCGdex stopped refreshing the average fields (PLAN.md §8.4): across two guide files its
- * `avg30` did not move on a single card while `trend` moved on most, and the figures it
- * serves disagree with Cardmarket's own pages by up to 12%. A figure read off the page by
- * hand is a real 30-day average; one from the catalog is whatever it froze at.
- *
- * Delete this the day the catalog starts moving again, and `avg30` becomes trustworthy
- * from either source.
+ * Only affects how the figure is described. Both are 30-day averages; the catalog's is
+ * the one that stopped being refreshed (PLAN.md §8.4) and so may be days behind.
  */
-const isTrustedAverage = (price: Price): boolean => price.source === 'cardmarket/manual';
+const isHandRead = (price: Price): boolean => price.source === 'cardmarket/manual';
 
 /**
- * What one card is worth, and where the figure came from.
+ * What one card is worth, on the measure the reader asked for.
  *
- * `avg30` is the better measure — a mean of completed sales over thirty days, against
- * `trend`, which is Cardmarket's own smoothed estimate. It is what this site preferred
- * from the start and what it still prefers **when it can be believed**.
+ * Asking for `avg30` gives a 30-day average — a hand-read one where it exists, otherwise
+ * the catalog's, which is stale but is still that measurement.
  *
- * It usually cannot. So asking for `avg30` gets a hand-read one where it exists and
- * `trend` otherwise, rather than a frozen number: `trend` tracks Cardmarket to the cent
- * with a lag of one daily guide, which is verified and small. Asking for `trend` gets it
- * everywhere. Either way the answer says which field it used, and the screen says so too,
- * because they are not the same measurement.
+ * It is worth saying why it is not replaced by `trend`, because that was tried and it was
+ * a mistake. TCGdex's averages have stopped moving, so the obvious fix looked like
+ * substituting the field that still moves. Measured against Cardmarket's real 30-day
+ * average on three cards, the stale average is far closer than the trend is:
+ *
+ *   SV2a-201   true 397.08   stale avg30 399.08  +0.5%   trend 357.63   -9.9%
+ *   M6-110     true 388.36   stale avg30 436.50 +12.4%   trend 297.77  -23.3%
+ *   S12a-212   true 104.46   stale avg30 109.69  +5.0%   trend  75.17  -28.0%
+ *
+ * A stale reading of the right measure beats a live reading of a different one. So the
+ * substitution is gone: `avg30` means `avg30`, the screen says when it came from the
+ * catalog, and `trend` is shown only when it is asked for.
  *
  * `low` is never used: it is the cheapest listing in any condition, which means a
  * damaged copy.
@@ -61,12 +62,9 @@ export function quote(price: Price | undefined, want: Basis = 'avg30'): Quote | 
   const average = typeof price.avg30 === 'number' ? price.avg30 : null;
   const trend = typeof price.trend === 'number' ? price.trend : null;
 
-  if (want === 'avg30' && average !== null && isTrustedAverage(price)) {
-    return { value: average, basis: 'avg30', handRead: true };
-  }
+  if (want === 'trend' && trend !== null) return { value: trend, basis: 'trend' };
+  if (average !== null) return { value: average, basis: 'avg30', handRead: isHandRead(price) };
   if (trend !== null) return { value: trend, basis: 'trend' };
-  // No trend to fall back on: a stale average still beats saying nothing, and it is labelled.
-  if (average !== null) return { value: average, basis: 'avg30', handRead: isTrustedAverage(price) };
   if (typeof price.avg7 === 'number') return { value: price.avg7, basis: 'avg7' };
   return null;
 }
@@ -84,7 +82,9 @@ export function basisLabel(reading: Quote | { basis: Quote['basis']; handRead?: 
   if (!reading) return 'no price';
   if (reading.basis === 'avg7') return '7-day average, all conditions';
   if (reading.basis === 'trend') return 'price trend';
-  return reading.handRead ? '30-day average, read by hand' : '30-day average, all conditions';
+  // Said plainly, because the catalog's averages stopped refreshing and a reader has no
+  // other way to know which of the two they are looking at.
+  return reading.handRead ? '30-day average, read by hand' : '30-day average, catalog — may be behind';
 }
 
 /**

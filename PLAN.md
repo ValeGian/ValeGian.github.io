@@ -569,6 +569,22 @@ numbers, so it cannot be used to detect this.
 and reports when the averages are unchanged on 95% of shared cards while `low`/`trend` are
 not; the workflow opens one issue. The day is still recorded — a gap cannot be backfilled.
 
+**Corrected 2026-09-20.** For a while the site answered a request for `avg30` with
+`trend` wherever the catalog's average was the frozen one, on the reasoning that a live
+figure beats a dead one. Measured against Cardmarket's real 30-day average, that was
+wrong — the stale average is much the closer estimate:
+
+| card | real avg30 | stale avg30 | trend |
+|---|---|---|---|
+| SV2a-201 | 397.08 | 399.08 (+0.5%) | 357.63 (−9.9%) |
+| M6-110 | 388.36 | 436.50 (+12.4%) | 297.77 (−23.3%) |
+| S12a-212 | 104.46 | 109.69 (+5.0%) | 75.17 (−28.0%) |
+
+A stale reading of the right measure beats a live reading of a different one, and the
+error in the stale average tracks how fast the card is moving rather than being unbounded.
+So `avg30` means `avg30` again; the screen says when a figure came from the catalog and
+may be behind; `trend` appears only when it is chosen.
+
 **Decided:** keep pricing on `avg30`. `avg1` is not a substitute — it is a mean of one
 day's completed sales, so it is zero-sample on a quiet card, and it is frozen in exactly
 the same way, so switching would trade a stable wrong number for a noisy one. `trend` is

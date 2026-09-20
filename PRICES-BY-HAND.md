@@ -127,6 +127,11 @@ A set's card list can be walked a page at a time, and that is cheap. A price has
 from the product's own page, one navigation each — so reading thirty prices is thirty
 page loads, and is worth spreading over more than one sitting.
 
+**Measured batch size: about a dozen.** On 2026-09-20 a run of six list pages followed by
+eleven product pages, each a real navigation roughly two seconds apart, was challenged on
+the twelfth. Plan for ten to twelve product pages per sitting and stop when challenged —
+the work already recorded is kept, and `price:todo` will not offer those cards again today.
+
 ### 4. Identifying a card with no catalog entry
 
 These are cards added from an English stand-in. **The English set's numbering is not the

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-21T12:52:01.761Z",
+  "generatedAt": "2026-09-22T11:41:54.614Z",
   "resolved": [],
   "stillWaiting": [
     {
@@ -11,7 +11,7 @@
         "number": "105",
         "nameEn": "Moltres"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -22,7 +22,7 @@
         "number": "108",
         "nameEn": "Zapdos"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -33,7 +33,7 @@
         "number": "107",
         "nameEn": "Articuno"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -44,7 +44,7 @@
         "number": "104",
         "nameEn": "Alolan Exeggutor"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -55,7 +55,7 @@
         "number": "106",
         "nameEn": "Lapras"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -66,7 +66,7 @@
         "number": "113",
         "nameEn": "Lycanroc"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -77,7 +77,7 @@
         "number": "115",
         "nameEn": "Alolan Meowth"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -88,7 +88,7 @@
         "number": "122",
         "nameEn": "Hisuian Zorua"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -99,7 +99,7 @@
         "number": "125",
         "nameEn": "Greninja ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -110,7 +110,7 @@
         "number": "126",
         "nameEn": "Pikachu ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -121,7 +121,7 @@
         "number": "127",
         "nameEn": "Pikachu ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -132,7 +132,7 @@
         "number": "128",
         "nameEn": "Mewtwo ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -143,7 +143,7 @@
         "number": "129",
         "nameEn": "Mew ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -154,7 +154,7 @@
         "number": "131",
         "nameEn": "Gengar ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -165,7 +165,7 @@
         "number": "132",
         "nameEn": "Jirachi ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -176,7 +176,7 @@
         "number": "133",
         "nameEn": "Salamence ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -187,7 +187,7 @@
         "number": "137",
         "nameEn": "Charizard"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -198,7 +198,7 @@
         "number": "141",
         "nameEn": "Shining Celebi"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -209,7 +209,7 @@
         "number": "142",
         "nameEn": "Lugia"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -220,7 +220,7 @@
         "number": "146",
         "nameEn": "Metagross"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -231,7 +231,7 @@
         "number": "165",
         "nameEn": "Magikarp"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -242,7 +242,7 @@
         "number": "020",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -253,7 +253,7 @@
         "number": "025",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -264,7 +264,7 @@
         "number": "029",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -275,7 +275,7 @@
         "number": "030",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -286,7 +286,7 @@
         "number": "034",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -297,7 +297,7 @@
         "number": "037",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -308,7 +308,7 @@
         "number": "039",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -319,7 +319,7 @@
         "number": "042",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -330,7 +330,7 @@
         "number": "044",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -341,7 +341,7 @@
         "number": "045",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -352,7 +352,7 @@
         "number": "105",
         "nameEn": "Moltres"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -363,7 +363,7 @@
         "number": "108",
         "nameEn": "Zapdos"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -374,7 +374,7 @@
         "number": "107",
         "nameEn": "Articuno"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -385,7 +385,7 @@
         "number": "017",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -396,7 +396,7 @@
         "number": "018",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -407,7 +407,7 @@
         "number": "019",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -418,7 +418,7 @@
         "number": "020",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -429,7 +429,7 @@
         "number": "021",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -440,7 +440,7 @@
         "number": "022",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -451,7 +451,7 @@
         "number": "023",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -462,7 +462,7 @@
         "number": "024",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -473,7 +473,7 @@
         "number": "025",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -484,7 +484,7 @@
         "number": "026",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -495,7 +495,7 @@
         "number": "027",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -506,7 +506,7 @@
         "number": "028",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -517,7 +517,7 @@
         "number": "029",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -528,7 +528,7 @@
         "number": "030",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -539,7 +539,7 @@
         "number": "031",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -550,7 +550,7 @@
         "number": "032",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -561,7 +561,7 @@
         "number": "033",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -572,7 +572,7 @@
         "number": "034",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -583,7 +583,7 @@
         "number": "035",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -594,7 +594,7 @@
         "number": "036",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -605,7 +605,7 @@
         "number": "037",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -616,7 +616,7 @@
         "number": "038",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -627,7 +627,7 @@
         "number": "039",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -638,7 +638,7 @@
         "number": "040",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -649,7 +649,7 @@
         "number": "041",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -660,7 +660,7 @@
         "number": "042",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -671,7 +671,7 @@
         "number": "043",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -682,7 +682,7 @@
         "number": "044",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -693,7 +693,7 @@
         "number": "045",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -704,7 +704,7 @@
         "number": "046",
         "nameEn": "Pikachu"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -715,7 +715,7 @@
         "number": "104",
         "nameEn": "Alolan Exeggutor"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -726,7 +726,7 @@
         "number": "106",
         "nameEn": "Lapras"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -737,7 +737,7 @@
         "number": "113",
         "nameEn": "Lycanroc"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -748,7 +748,7 @@
         "number": "115",
         "nameEn": "Alolan Meowth"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -759,7 +759,7 @@
         "number": "122",
         "nameEn": "Hisuian Zorua"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -770,7 +770,7 @@
         "number": "125",
         "nameEn": "Greninja ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -781,7 +781,7 @@
         "number": "126",
         "nameEn": "Pikachu ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -792,7 +792,7 @@
         "number": "127",
         "nameEn": "Pikachu ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -803,7 +803,7 @@
         "number": "128",
         "nameEn": "Mewtwo ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -814,7 +814,7 @@
         "number": "129",
         "nameEn": "Mew ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -825,7 +825,7 @@
         "number": "131",
         "nameEn": "Gengar ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -836,7 +836,7 @@
         "number": "132",
         "nameEn": "Jirachi ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     },
     {
@@ -847,7 +847,7 @@
         "number": "133",
         "nameEn": "Salamence ex"
       },
-      "waitedDays": 1,
+      "waitedDays": 2,
       "needsAttention": false
     }
   ]

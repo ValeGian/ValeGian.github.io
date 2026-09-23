@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-20T18:18:12.043Z",
+  "generatedAt": "2026-09-23T20:34:59.499Z",
   "sets": {
     "CLK": {
       "cardmarket": {
@@ -211,7 +211,7 @@
         "expansion": "Raging Surf",
         "expansionId": 5432,
         "slug": "Raging-Surf",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-raging-surf",
@@ -223,7 +223,7 @@
         "expansion": "Shiny Treasure ex",
         "expansionId": 5519,
         "slug": "Shiny-Treasure-ex",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-shiny-treasure-ex",
@@ -235,7 +235,7 @@
         "expansion": "Wild Force",
         "expansionId": 5573,
         "slug": "Wild-Force",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-wild-force",
@@ -247,7 +247,7 @@
         "expansion": "Cyber Judge",
         "expansionId": 5574,
         "slug": "Cyber-Judge",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-cyber-judge",
@@ -259,7 +259,7 @@
         "expansion": "Mask of Change",
         "expansionId": 5690,
         "slug": "Mask-of-Change",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-mask-of-change",
@@ -271,7 +271,7 @@
         "expansion": "Paradise Dragona",
         "expansionId": 5846,
         "slug": "Paradise-Dragona",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-paradise-dragona",
@@ -283,7 +283,7 @@
         "expansion": "Super Electric Breaker",
         "expansionId": 5901,
         "slug": "Super-Electric-Breaker",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-super-electric-breaker",
@@ -295,7 +295,7 @@
         "expansion": "Terastal Festival ex",
         "expansionId": 5928,
         "slug": "Terastal-Festival-ex",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-terastal-festival",
@@ -307,7 +307,7 @@
         "expansion": "Battle Partners",
         "expansionId": 5996,
         "slug": "Battle-Partners",
-        "checkedOn": null
+        "checkedOn": "2026-09-23"
       },
       "pricecharting": {
         "slug": "pokemon-japanese-battle-partners",
@@ -573,7 +573,8 @@
       "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-glory-of-team-rocket/team-rocket%27s-crobat-ex-127"
     },
     "SV11W-171": {
-      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-white-flare/hydreigon-ex-171"
+      "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-white-flare/hydreigon-ex-171",
+      "cardmarket": "https://www.cardmarket.com/en/Pokemon/Products/Singles/White-Flare-JP/Hydreigon-ex-V3-sv11W171"
     },
     "SV1a-080": {
       "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-triplet-beat/magikarp-80"

@@ -898,6 +898,24 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-23 — rev 45 (every market link confirmed, and the queue emptied) ✅
+
+- **All 26 Cardmarket expansion slugs are now confirmed against real pages**, the last
+  nine today: SV3a, SV4a, SV5K, SV5M, SV6, SV7a, SV8, SV8a, SV9. Each was checked by
+  loading the very link the site builds and seeing exactly one product whose code matched
+  the card — `sv3a069`, `sv4a339`, `sv5K080`, `sv5M074`, `sv6104`, `sv7a073`, `sv8131`,
+  `sv8a218`, `sv9102`. Nothing is derived from a set name any more.
+- **`SV11W-171` has a price.** It was the one card TCGdex could not price — its only
+  variant carries no Cardmarket pricing — but the card is listed there perfectly well, so
+  it was read by hand: avg30 41.04, avg7 38.06, avg1 36.00, trend 37.23, from 26.00. The
+  product page it was read from is now its exact Cardmarket link.
+- **The hand-reading queue is empty**: nothing outstanding for the first time since it was
+  built. What is left is the 79 cards with no catalog entry, which are waiting on TCGdex to
+  publish M6/M6a rather than on anything anyone can do.
+
+Cloudflare challenged on the eleventh page load and cleared itself after a wait, which is
+consistent with the allowance described in PRICES-BY-HAND.md.
+
 ### 2026-09-23 — rev 44 (the averages were never frozen; they move weekly) ✅
 
 Three more days of snapshots settled the question §8.4 had open, and the answer is that

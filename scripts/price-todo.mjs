@@ -26,22 +26,37 @@ const DATA = 'public/data';
 const STALE_MANUAL_DAYS = 90;
 
 /**
- * Days of identical avg30 before a card counts as frozen rather than quiet.
+ * Days of identical avg30 before a card counts as stale rather than simply not refreshed.
  *
- * Two readings the same is ordinary; a card can go a day without a sale. Three is where
- * it stops being a coincidence, and it is also the soonest this can be said at all, since
- * it needs three days on file.
+ * This was three, on the reasoning that three identical readings cannot be a coincidence.
+ * They can: **Cardmarket's averages are not recomputed daily.** Measured across five
+ * consecutive snapshots, avg1, avg7 and avg30 changed on 58 to 59 of 60 cards at one
+ * boundary — the data stamped Sunday 20 September — and on none at the other three, while
+ * `trend` and `low` moved every day. TCGdex's own `updated` stamp advances daily
+ * throughout, so it is re-reading Cardmarket; the averages behind it simply move about
+ * once a week.
+ *
+ * So three days of sameness is the normal midweek state of every card, and treating it as
+ * a fault put seventy-two of seventy-three cards in this queue. A week plus slack is the
+ * span over which sameness starts to mean something.
  */
-const FROZEN_AFTER_DAYS = 3;
+const FROZEN_AFTER_DAYS = 10;
 
 /**
- * How far avg30 may sit from TCGdex's own trend before it is worth re-reading.
+ * A gap this wide between avg30 and trend is printed beside a card. It is not a reason to
+ * read one.
  *
- * These come from the same feed and describe the same market, so a wide gap means one of
- * them is stale — and it is avg30, which is the field that stopped moving (PLAN.md §8.4).
- * This catches a card on the first day, where the frozen test needs three.
+ * It used to be a trigger, at 8%, on the reasoning that two figures from the same feed
+ * describing the same market should agree and the laggard would be avg30. Both halves
+ * were wrong. The median gap across the watchlist is 9.8% — a thirty-day mean and a live
+ * estimate simply differ by about that much here, so the trigger fired on 42 of 72 cards
+ * and said nothing. And on the three cards ever checked against Cardmarket by hand, the
+ * wide gap was trend being wrong, not avg30: M6-110's real thirty-day average was 388.36
+ * where avg30 said 436.50 (+12%) and trend said 297.77 (−23%).
+ *
+ * So it is shown, because it is worth seeing, and it triggers nothing.
  */
-const TREND_GAP = 0.08;
+const WIDE_TREND_GAP = 0.25;
 
 const { values: options } = parseArgs({
   options: {
@@ -82,7 +97,13 @@ const doneToday = new Set(
     .map(([cardId]) => cardId),
 );
 
-/** True when avg30 has not moved across the last few days on file. */
+/**
+ * True when avg30 has not moved for longer than the source takes to move it.
+ *
+ * Needs `FROZEN_AFTER_DAYS` readings before it will say anything at all: with less
+ * history than one refresh cycle, "unchanged" and "not yet refreshed" are the same
+ * picture, and guessing between them is how the whole watchlist ended up in this queue.
+ */
 function isFrozen(cardId) {
   const readings = days
     .map((day) => day.prices[cardId])
@@ -129,11 +150,20 @@ for (const entry of watchlist.cards) {
   if (doneToday.has(entry.cardId)) continue;
 
   const held = holdings.get(entry.cardId);
+  /** Shown beside a queued card when its two figures are far apart. Never a reason. */
+  const trendNote = (price) => {
+    if (!price?.trend || !price?.avg30) return null;
+    const gap = (price.trend - price.avg30) / price.avg30;
+    return Math.abs(gap) >= WIDE_TREND_GAP
+      ? `trend is ${gap > 0 ? '+' : ''}${Math.round(gap * 100)}% away, at ${price.trend}`
+      : null;
+  };
+
   const add = (reason, detail, price, url = null) =>
     work.push({
       cardId: entry.cardId,
       reason,
-      detail,
+      detail: [detail, trendNote(price)].filter(Boolean).join(' · '),
       url,
       // What the figure is worth being wrong about. A wanted card holds no copies, so it
       // is ranked on its unit price alone — it still has to be read, just later.
@@ -158,17 +188,10 @@ for (const entry of watchlist.cards) {
   }
 
   if (isFrozen(entry.cardId)) {
-    add('avg30 frozen', `unchanged at ${price.avg30} for ${FROZEN_AFTER_DAYS} readings`, price);
+    add('avg30 stale', `unchanged at ${price.avg30} for ${FROZEN_AFTER_DAYS} readings, longer than a refresh cycle`, price);
     continue;
   }
 
-  // Same feed, same market: a wide gap means avg30 is the stale one.
-  if (price.trend) {
-    const gap = (price.trend - price.avg30) / price.avg30;
-    if (Math.abs(gap) >= TREND_GAP) {
-      add('avg30 disagrees with trend', `avg30 ${price.avg30} vs trend ${price.trend} (${gap > 0 ? '+' : ''}${Math.round(gap * 100)}%)`, price);
-    }
-  }
 }
 
 // Most money first: the allowance for reading pages runs out before the list does.

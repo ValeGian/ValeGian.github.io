@@ -26,3 +26,9 @@ Thumbs.db
 # here is public forever — including after Phase 5 encrypts the served copies.
 # Migration inputs and decrypted working copies live here and are never committed.
 .local/
+
+# Per-run reports written by the daily job. They exist only to be read by the workflow
+# step that follows them; one left in the tree makes that step fire on every run.
+.frozen-prices.md
+.stale-prices.md
+.resolution-report.md

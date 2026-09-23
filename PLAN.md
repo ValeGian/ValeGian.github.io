@@ -532,7 +532,56 @@ a wanted card, which nobody is holding, is stored without one and stays out of t
 queue. A wrong match is worse than no match — it would attach another card's price
 silently, the day the set is published.
 
-### 8.4 TCGdex's averages are frozen; `low` and `trend` are not — open
+### 8.4 Cardmarket's averages move weekly, not daily — settled 2026-09-23
+
+**This section was wrong from 20 to 23 September and the correction is the point of it.**
+The averages are not frozen and TCGdex is not at fault: Cardmarket recomputes them about
+once a week, and everything below was three days of midweek readings mistaken for a dead
+field.
+
+Five consecutive snapshots, catalogue readings only:
+
+| boundary | cards | avg1 | avg7 | avg30 | trend | low |
+|---|---|---|---|---|---|---|
+| 19→20 Sep | 43 | 0 | 0 | 0 | 29 | 15 |
+| **20→21 Sep** | 60 | **58** | **59** | **59** | 50 | 13 |
+| 21→22 Sep | 72 | 0 | 0 | 0 | 51 | 18 |
+| 22→23 Sep | 72 | 0 | 0 | 0 | 46 | 10 |
+
+One boundary moved, and it moved properly: median 2.9%, largest −16.1% (`M6-088`
+16.43 → 13.78). The change arrived in data stamped **Sunday 20 September**. TCGdex's own
+`updated` stamp advanced every single day throughout — 18th, 19th, 20th, 21st, 22nd — so
+it was re-reading Cardmarket faithfully the whole time; the averages behind it simply had
+not changed.
+
+What that overturns:
+
+- **Nothing to report upstream.** The issue the daily job opened on 21 September
+  ("Cardmarket averages have stopped moving") was closed as a false alarm.
+- **The detector was measuring the wrong thing.** Comparing one day against the day before
+  meant it fired on every day that was not a Monday. It now asks whether the averages have
+  moved across a window longer than one refresh cycle, and refuses to answer at all with
+  less history than that — `scripts/lib/freeze.mjs`, seven tests.
+- **So was the hand-reading queue**, which called three identical days "frozen" and so
+  queued 72 of 73 cards. Same fix; the queue is now one card.
+- **And the trend-gap rule was worse than useless.** It queued a card when `avg30` sat 8%
+  or more from `trend`, on the reasoning that the laggard would be `avg30`. The median gap
+  across the watchlist is 9.8%, so it fired on 42 of 72 — and on the three cards ever
+  checked by hand against Cardmarket, the wide gap was **trend** being wrong: `M6-110`'s
+  real thirty-day average was 388.36 where `avg30` said 436.50 (+12%) and `trend` said
+  297.77 (−23%). It no longer queues anything; a gap over 25% is printed beside a card
+  that is queued for another reason.
+- **`avg30` stands as the basis.** It is refreshed weekly rather than continuously, which
+  is a property of the measure, not a defect.
+
+The prediction that follows, and is worth checking: the next move should appear in the
+**28 September** snapshot. Two more boundaries settle whether the cadence is weekly or
+merely irregular.
+
+The original measurements are kept below, because they were correct as measurements — it
+was the conclusion drawn from three days of them that was not.
+
+#### What was measured on 20 September (conclusion superseded)
 
 Measured 2026-09-20 on `S12a-212`, the same minute in both places:
 
@@ -848,6 +897,39 @@ static lookup, never fetched at runtime.
 ---
 
 ## 13. Progress log
+
+### 2026-09-23 — rev 44 (the averages were never frozen; they move weekly) ✅
+
+Three more days of snapshots settled the question §8.4 had open, and the answer is that
+the premise was wrong. Cardmarket recomputes its averages about once a week: across five
+boundaries they moved on 58–59 of 60 cards at exactly one of them, and on none at the
+other three, while `trend` and `low` moved daily and TCGdex's `updated` stamp advanced
+daily. The move was real — median 2.9%, largest −16.1%.
+
+Everything built on "the averages are dead" was therefore measuring against a cadence
+that does not exist:
+
+- **The daily detector** compared one day against the day before, so it fired on every day
+  that was not a Monday. Now in `scripts/lib/freeze.mjs` with seven tests: it judges a
+  window longer than one refresh cycle, and returns no verdict at all with less history
+  than that, because "unchanged" and "not yet refreshed" are the same picture.
+- **`.frozen-prices.md` was committed to the repository** by one of my `git add -A` runs on
+  the 20th. The workflow step that opens the issue is guarded by `hashFiles(…) != ''`, so
+  it ran on every build whatever the detector decided — that, not the detector, is what
+  opened issue #1. Untracked and gitignored now, with the other two per-run reports.
+- **The queue** called three identical days frozen and so listed 72 of 73 cards. Same fix.
+- **The trend-gap rule is gone.** It queued a card when `avg30` sat 8% or more from
+  `trend`; the median gap is 9.8%, so it fired on 42 of 72 and meant nothing. Worse, its
+  premise was backwards — on all three cards ever checked against Cardmarket the wide gap
+  was `trend` being wrong, not `avg30`. A gap over 25% is now printed beside a card queued
+  for another reason, and triggers nothing.
+
+The queue is **one card**: `SV11W-171`, which has no Cardmarket pricing on any variant.
+Issue #1 closed with the evidence; §8.4 rewritten, keeping the original measurements,
+which were sound — it was the conclusion drawn from three days of them that was not.
+
+**Prediction to check:** if the cadence is weekly the next move lands in the 28 September
+snapshot.
 
 ### 2026-09-20 — rev 43 (a wishlist grouped by set, and a layout that survives a reload) ✅
 
@@ -1225,6 +1307,9 @@ Cardmarket pricing at all — `price:todo` reports it correctly as "no price at 
 - Artwork borrowed from the English twin **by number** is removed for the same reason; it
   would have shown a different card's picture. Those cards get their artwork from
   `artwork.json` instead, which is keyed by the card's own id.
+- **Cardmarket's averages refresh weekly, which read as a dead feed for three days**
+  (§8.4). Settled 2026-09-23: not a fault, and the detectors that said otherwise were
+  measuring against a daily cadence that does not exist. Originally recorded as:
 - **TCGdex's price mirror appears to have stopped updating** (§8.4). Not yet fixed, and
   it affects every price on the site, so it is the next thing to decide.
 

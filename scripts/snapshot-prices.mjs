@@ -29,6 +29,7 @@ import { existsSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { card, chooseVariant, cardmarketPrice } from './lib/tcgdex.mjs';
 import { watchlistCoverage, isTooIncomplete } from './lib/coverage.mjs';
+import { CADENCE_DAYS, frozenVerdict } from './lib/freeze.mjs';
 
 const DATA = 'public/data';
 const FIELDS = ['avg30', 'avg7', 'avg1', 'trend', 'low', 'avg'];
@@ -251,66 +252,55 @@ if (stale.length > 0) {
   );
 }
 /**
- * Notices when the averages stop moving while the rest of the reading does.
+ * Notices when the averages stop moving for longer than the source takes to move them.
  *
- * Measured 2026-09-20: across 25 cards from sets 604 to 1752 days old, `low` changed on
- * 11 and `trend` on 20 between two refresh cycles, while `avg30`, `avg7` and `avg1`
- * changed on none — and the site's own figures for the same card disagreed with all three
- * averages while matching `low` and `trend` to the cent. A one-day average cannot be
- * identical on twenty-five mature cards a day apart, so that is a dead field, not a quiet
- * market.
+ * The first version of this compared one day against the day before and fired whenever
+ * the averages were identical, which sounded safe and was not: **Cardmarket's averages
+ * are not recomputed daily.** Across the five snapshots from 19 to 23 September, avg1,
+ * avg7 and avg30 changed on 58 to 59 of 60 cards at exactly one boundary — the data
+ * stamped Sunday 20 September, a real move with a median of 2.9% and a largest of −16% —
+ * and on none at the other three, while `trend` and `low` moved every single day.
+ * TCGdex's own `updated` stamp advances daily throughout, so it is re-reading Cardmarket
+ * faithfully; the averages behind it move about once a week.
  *
- * It matters because the headline value is `avg30`: a frozen field draws a flat line that
- * looks like a stable market. The day is still recorded — a reading is a reading, and
- * refusing would leave a hole that cannot be backfilled — but it is reported.
+ * So the old test fired on every day that was not a Monday, opened an issue saying the
+ * feed was dead, and put 72 of 73 cards into the hand-reading queue. What is worth
+ * knowing is the opposite: averages that have not moved for longer than a refresh cycle.
+ *
+ * It still matters, because the headline value is `avg30` and a genuinely dead field
+ * draws a flat line that reads as a stable market. The day is always recorded either way
+ * — a gap cannot be backfilled.
  */
-const FROZEN_SHARE = 0.95;
-const FROZEN_MINIMUM = 10;
+const window = days.filter((name) => name <= `${options.date}.json`).sort().slice(-(CADENCE_DAYS + 1));
 
-const previousDay = days
-  .filter((name) => name < `${options.date}.json`)
-  .sort()
-  .at(-1);
+const readings = [];
+for (const name of window.slice(0, -1)) readings.push((await readJson(`${DATA}/prices/daily/${name}`)).prices);
+readings.push(prices);
 
-if (previousDay) {
-  const before = await readJson(`${DATA}/prices/daily/${previousDay}`);
+const verdict = frozenVerdict(readings);
 
-  // Only catalogue readings on both sides. A hand-read figure is a different measurement
-  // of the same card, so comparing one against a TCGdex reading would count as movement
-  // and quietly dilute the very signal this is looking for.
-  const shared = Object.keys(prices).filter(
-    (cardId) =>
-      prices[cardId].source === 'cardmarket/tcgdex' && before.prices[cardId]?.source === 'cardmarket/tcgdex',
+if (verdict) {
+  const span = `${window[0].replace('.json', '')} to ${options.date}`;
+  const line = `${verdict.averages} of ${verdict.shared} cards have identical avg30, avg7 and avg1 across ${span}`;
+  console.warn(`\nWARNING: ${line}`);
+  console.warn(`         That is longer than the weekly cadence, and low and trend are unchanged on only ${verdict.spot}.`);
+
+  await writeFile(
+    '.frozen-prices.md',
+    [
+      `**${line}** — longer than the weekly refresh cycle — while \`low\` and \`trend\` moved on ${verdict.shared - verdict.spot} of them.`,
+      '',
+      "Cardmarket's averages normally move about once a week, so a few identical days are",
+      'expected and are not reported. This is longer than that: the averages appear to have',
+      'stopped being refreshed upstream, which matters because `avg30` is the headline value',
+      'and a dead field draws a flat line that reads as a stable market.',
+      '',
+      'The day was still recorded; a gap cannot be backfilled later. See PLAN.md §8.4.',
+      '',
+      `- unchanged averages: ${verdict.averages}/${verdict.shared} across ${span}`,
+      `- unchanged low+trend: ${verdict.spot}/${verdict.shared}`,
+    ].join('\n'),
   );
-
-  const unmoved = (fields) =>
-    shared.filter((cardId) => fields.every((field) => prices[cardId][field] === before.prices[cardId][field]));
-
-  const averages = unmoved(['avg30', 'avg7', 'avg1']);
-  const spot = unmoved(['low', 'trend']);
-
-  if (shared.length >= FROZEN_MINIMUM && averages.length / shared.length >= FROZEN_SHARE) {
-    const line = `${averages.length} of ${shared.length} cards have identical avg30, avg7 and avg1 since ${previousDay.replace('.json', '')}`;
-    console.warn(`\nWARNING: ${line}`);
-    console.warn(`         low and trend are unchanged on only ${spot.length} of ${shared.length}, so the feed is alive.`);
-
-    await writeFile(
-      '.frozen-prices.md',
-      [
-        `**${line}**, while \`low\` and \`trend\` moved on ${shared.length - spot.length} of them.`,
-        '',
-        'A one-day average cannot be identical on that many mature cards a day apart. The',
-        'averages are almost certainly not being refreshed upstream, which matters because',
-        '`avg30` is the headline value — a dead field draws a flat line that reads as a',
-        'stable market.',
-        '',
-        'The day was still recorded; a gap cannot be backfilled later. See PLAN.md §8.4.',
-        '',
-        `- unchanged averages: ${averages.length}/${shared.length}`,
-        `- unchanged low+trend: ${spot.length}/${shared.length}`,
-      ].join('\n'),
-    );
-  }
 }
 
 console.log(`sum of avg30  EUR ${total.toFixed(2)}`);

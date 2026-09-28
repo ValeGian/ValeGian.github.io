@@ -35,6 +35,21 @@ const DATA = 'public/data';
 const FIELDS = ['avg30', 'avg7', 'avg1', 'trend', 'low', 'avg'];
 
 /**
+ * The fields that can stand as a card's value, in the order `quote` prefers them.
+ *
+ * A reading is worth keeping when it has any one of these, not only when it has `avg30`.
+ * Requiring the thirty-day average threw away every card in a set Cardmarket had only
+ * just listed: M6a arrived with `avg`, `low` and `trend` populated and all three averages
+ * null, because there are no completed sales to average yet. Sixty-one of them dropped
+ * out, the loss guard called the day partial and refused to write it — and a day refused
+ * is a hole in the history that cannot be filled in later.
+ *
+ * `low` is deliberately absent: it is the cheapest listing in any condition, which is a
+ * damaged copy as often as not, and the site never values on it.
+ */
+const VALUATIONS = ['avg30', 'avg7', 'avg1', 'trend'];
+
+/**
  * Losing prices for a few cards is normal — Cardmarket delists products. Losing them for
  * a large share of the collection means something broke upstream, and writing that as a
  * day of history would corrupt the series. Fail instead.
@@ -87,7 +102,7 @@ for (const entry of watchlist.cards) {
     // still worth having.
     if (detail.image) artwork[entry.cardId] = detail.image;
 
-    if (!cardmarket || cardmarket.avg30 === null || cardmarket.avg30 === undefined) {
+    if (!cardmarket || !VALUATIONS.some((field) => typeof cardmarket[field] === 'number')) {
       if (previous.prices[entry.cardId]) lost.push(entry.cardId);
       continue;
     }

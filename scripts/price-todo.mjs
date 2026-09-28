@@ -25,6 +25,9 @@ const DATA = 'public/data';
 /** Past this, a hand-checked price is old enough that it is no longer evidence. */
 const STALE_MANUAL_DAYS = 90;
 
+/** What counts as a price. `low` is the cheapest listing, so it never stands as one. */
+const VALUATIONS = ['avg30', 'avg7', 'avg1', 'trend'];
+
 /**
  * Days of identical avg30 before a card counts as stale rather than simply not refreshed.
  *
@@ -181,8 +184,11 @@ for (const entry of watchlist.cards) {
     continue;
   }
 
+  // Any figure the site can value on, not just the thirty-day average. A set Cardmarket
+  // has only just listed has no completed sales to average, so it arrives with a trend
+  // and nothing else — which is a price, and is shown as one.
   const price = latest.prices[entry.cardId];
-  if (!price || price.avg30 === null || price.avg30 === undefined) {
+  if (!price || !VALUATIONS.some((field) => typeof price[field] === 'number')) {
     add('no price at all', 'TCGdex returns none', price);
     continue;
   }

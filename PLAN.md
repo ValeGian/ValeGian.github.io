@@ -898,6 +898,41 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-28 — rev 48 (a new set has no averages, and that nearly cost a day of history) ✅
+
+Resolving the 30th set put 65 M6a cards on the watchlist, which grew from 73 to 138. A dry
+run of the daily job then refused to write at all:
+
+    Only 76 of 138 watched cards priced. Refusing to write a partial day.
+
+The cause is a property of a newly listed set rather than a fault. M6a arrives from
+Cardmarket with `avg`, `low` and `trend` populated and **`avg1`, `avg7` and `avg30` all
+null** — there are no completed sales yet to average. The job kept a reading only when it
+had `avg30`, so sixty-one cards fell out, coverage dropped to 55%, and the loss guard did
+exactly what it was built to do. It would have done it every day until Cardmarket computed
+an average, and **a refused day is a hole that cannot be filled in later** — the one loss
+this project treats as unrecoverable.
+
+A reading is now kept when it carries any figure the site can value on — `avg30`, `avg7`,
+`avg1` or `trend`. Not `low`: that is the cheapest listing in any condition, which is a
+damaged copy as often as not, and nothing is ever valued on it. Coverage went from 76 to
+118 of 138 and the job writes again. `price:todo` uses the same rule, so a card with a
+trend and no average is no longer called unpriced.
+
+What this looks like on screen: those cards show their trend, labelled "price trend", and
+start showing an average the day Cardmarket computes one. Where a hand-read average exists
+from September it is replaced by the fresher catalog reading, which will move some M6a
+figures noticeably — `M6a-105` was read by hand at 10.29 on the 20th and the catalog now
+reports a trend of 5.00 with no average at all.
+
+Four cards still have no usable figure anywhere — `M6a-104`, `M6a-133`, `M6a-146` and
+`SV11W-171` — and keep their hand-read values through the carry-forward.
+
+**The staleness detector fired for the first time, on real evidence.** `SV1S-101` has had
+an identical `avg30` for ten readings, which is longer than any refresh cycle seen. It is
+the first card with ten days on file; the rest reach that in two days, and if they all fire
+together that is the answer to §8.4 rather than noise.
+
 ### 2026-09-28 — rev 47 (two Meowth that could never resolve, and a schema that forbade the truth) ✅
 
 Both reported from use. Neither was what it looked like.

@@ -898,6 +898,51 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-28 — rev 46 (TCGdex published the 30th set; resolving it must not blank the art) ✅
+
+**TCGdex now has M6a — "30th CELEBRATION", 176 cards** — published some time after today's
+06:20 run, which is why the wishlist still showed 79 cards awaiting the catalog and why
+searching for them failed until today. It also has M6 (ストームエメラルダ, 113), M5, M2a
+and M4. **None of them has artwork**: every one of the 176 M6a cards has a null image.
+
+That combination is a trap, and it was one line from being sprung. `applyResolutions` set
+`item.imageBase = found.imageBase ?? ''`, so the moment the retry queue matched these
+cards the browser would have replaced 77 working borrowed pictures — English stand-ins and
+the official-database scans — with empty strings. The catalog is authoritative about which
+card something is, not about what it looks like. It now keeps whatever picture the item
+already had until the catalog has one of its own.
+
+Verified in the browser rather than argued: with the fix, all 77 wishlist rows resolve to
+their M6a ids and all 77 keep their pictures.
+
+`resolutions.json` is published with the 77 matches, so the cards resolve on the next
+visit rather than waiting for tomorrow's run.
+
+**Search was never broken** — it was the catalog that was empty. Measured today against the
+live API: "Moltres" puts M6a-006 and M6a-105 ninth and tenth, "m6a pikachu" returns 24 M6a
+cards top-first, and "M6a 105" resolves exactly. Artwork-less cards sort last by design,
+which is right in general and is why the new set sits low in an unscoped search; scoping
+the query to the set is the way through, and is what PRICES-BY-HAND.md already says.
+
+**The weekly-cadence prediction failed.** Rev 44 predicted the next move in the 28
+September snapshot. Nine boundaries now, and the averages moved on exactly one of them:
+
+| boundary | avg30 | trend |
+|---|---|---|
+| 20→21 Sep | **59/60** | 50 |
+| 21→22 … 27→28 Sep | 0 every day | 46–68, except 0 on 23→24 |
+
+Sunday→Monday came round again and nothing moved, so it is not weekly. One refresh in
+nine days, cadence unknown. The detector added in rev 44 needs no change — it reports a
+run longer than ten days, which is now four days away and will be the real evidence. The
+23→24 boundary is its own oddity: a fresh upstream stamp and 72 cards, with *nothing*
+changed, not even trend.
+
+**Toolchain note:** `npm run check` and `npm test` cannot run on this machine — Claude
+Code's own native binary is missing, and both fork child processes through it. `npm run
+build` and the plain scripts work, so this change was verified by building and driving the
+real page. Repair: `npm install -g @anthropic-ai/claude-code`.
+
 ### 2026-09-23 — rev 45 (every market link confirmed, and the queue emptied) ✅
 
 - **All 26 Cardmarket expansion slugs are now confirmed against real pages**, the last

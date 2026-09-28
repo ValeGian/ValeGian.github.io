@@ -1,854 +1,854 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-28T13:59:03.516Z",
-  "resolved": [],
-  "stillWaiting": [
+  "generatedAt": "2026-09-28T19:18:41.838Z",
+  "resolved": [
     {
       "id": "lotad/wish_0002",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "105",
-        "nameEn": "Moltres"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-105",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "105",
+      "nameJa": "ファイヤー",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0003",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "108",
-        "nameEn": "Zapdos"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-108",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "108",
+      "nameJa": "サンダー",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0004",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "107",
-        "nameEn": "Articuno"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-107",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "107",
+      "nameJa": "フリーザー",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0005",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "104",
-        "nameEn": "Alolan Exeggutor"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-104",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "104",
+      "nameJa": "アローラ ナッシー",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0006",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "106",
-        "nameEn": "Lapras"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-106",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "106",
+      "nameJa": "ラプラス",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0007",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "113",
-        "nameEn": "Lycanroc"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-113",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "113",
+      "nameJa": "ルガルガン",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0008",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "115",
-        "nameEn": "Alolan Meowth"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-115",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "115",
+      "nameJa": "アローラ ニャース",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0009",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "122",
-        "nameEn": "Hisuian Zorua"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-122",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "122",
+      "nameJa": "ヒスイ ゾロア",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0010",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "125",
-        "nameEn": "Greninja ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-125",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "125",
+      "nameJa": "ゲッコウガex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0011",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "126",
-        "nameEn": "Pikachu ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-126",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "126",
+      "nameJa": "ピカチュウex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0012",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "127",
-        "nameEn": "Pikachu ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-127",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "127",
+      "nameJa": "ピカチュウex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0013",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "128",
-        "nameEn": "Mewtwo ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-128",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "128",
+      "nameJa": "ミュウツーex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0014",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "129",
-        "nameEn": "Mew ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-129",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "129",
+      "nameJa": "ミュウex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0015",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "131",
-        "nameEn": "Gengar ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-131",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "131",
+      "nameJa": "ゲンガーex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0016",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "132",
-        "nameEn": "Jirachi ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-132",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "132",
+      "nameJa": "ジラーチex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0017",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "133",
-        "nameEn": "Salamence ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-133",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "133",
+      "nameJa": "ボーマンダex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0018",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "137",
-        "nameEn": "Charizard"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-137",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "137",
+      "nameJa": "リザードン",
+      "rarity": "Classic Collection",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0019",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "141",
-        "nameEn": "Shining Celebi"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-141",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "141",
+      "nameJa": "ひかるセレビィ",
+      "rarity": "Classic Collection",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0020",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "142",
-        "nameEn": "Lugia"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-142",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "142",
+      "nameJa": "ルギア",
+      "rarity": "Classic Collection",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0021",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "146",
-        "nameEn": "Metagross"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-146",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "146",
+      "nameJa": "メタグロス",
+      "rarity": "Classic Collection",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0022",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "165",
-        "nameEn": "Magikarp"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-165",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "165",
+      "nameJa": "コイキング",
+      "rarity": "Classic Collection",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0043",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "020",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-020",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "020",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0044",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "025",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-025",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "025",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0045",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "029",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-029",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "029",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0046",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "030",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-030",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "030",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0047",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "034",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-034",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "034",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0048",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "037",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-037",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "037",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0049",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "039",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-039",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "039",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0050",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "042",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-042",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "042",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0051",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "044",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-044",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "044",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "lotad/wish_0052",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "045",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-045",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "045",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0002",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "105",
-        "nameEn": "Moltres"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-105",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "105",
+      "nameJa": "ファイヤー",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0003",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "108",
-        "nameEn": "Zapdos"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-108",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "108",
+      "nameJa": "サンダー",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0004",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "107",
-        "nameEn": "Articuno"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-107",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "107",
+      "nameJa": "フリーザー",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0005",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "017",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-017",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "017",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0006",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "018",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-018",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "018",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0007",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "019",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-019",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "019",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0008",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "020",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-020",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "020",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0009",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "021",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-021",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "021",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0010",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "022",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-022",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "022",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0011",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "023",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-023",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "023",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0012",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "024",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-024",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "024",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0013",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "025",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-025",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "025",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0014",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "026",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-026",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "026",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0015",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "027",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-027",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "027",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0016",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "028",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-028",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "028",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0017",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "029",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-029",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "029",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0018",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "030",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-030",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "030",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0019",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "031",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-031",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "031",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0020",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "032",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-032",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "032",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0021",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "033",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-033",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "033",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0022",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "034",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-034",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "034",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0023",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "035",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-035",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "035",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0024",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "036",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-036",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "036",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0025",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "037",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-037",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "037",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0026",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "038",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-038",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "038",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0027",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "039",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-039",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "039",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0028",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "040",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-040",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "040",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0029",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "041",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-041",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "041",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0030",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "042",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-042",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "042",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0031",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "043",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-043",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "043",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0032",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "044",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-044",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "044",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0033",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "045",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-045",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "045",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0034",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "046",
-        "nameEn": "Pikachu"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-046",
+      "variantId": "endfynwn4n10gzq",
+      "setId": "M6a",
+      "number": "046",
+      "nameJa": "ピカチュウ",
+      "rarity": "None",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0035",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "104",
-        "nameEn": "Alolan Exeggutor"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-104",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "104",
+      "nameJa": "アローラ ナッシー",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0036",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "106",
-        "nameEn": "Lapras"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-106",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "106",
+      "nameJa": "ラプラス",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0037",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "113",
-        "nameEn": "Lycanroc"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-113",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "113",
+      "nameJa": "ルガルガン",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0038",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "115",
-        "nameEn": "Alolan Meowth"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-115",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "115",
+      "nameJa": "アローラ ニャース",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0039",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "122",
-        "nameEn": "Hisuian Zorua"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-122",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "122",
+      "nameJa": "ヒスイ ゾロア",
+      "rarity": "Illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0040",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "125",
-        "nameEn": "Greninja ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-125",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "125",
+      "nameJa": "ゲッコウガex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0041",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "126",
-        "nameEn": "Pikachu ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-126",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "126",
+      "nameJa": "ピカチュウex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0042",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "127",
-        "nameEn": "Pikachu ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-127",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "127",
+      "nameJa": "ピカチュウex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0043",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "128",
-        "nameEn": "Mewtwo ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-128",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "128",
+      "nameJa": "ミュウツーex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0044",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "129",
-        "nameEn": "Mew ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-129",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "129",
+      "nameJa": "ミュウex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0045",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "131",
-        "nameEn": "Gengar ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-131",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "131",
+      "nameJa": "ゲンガーex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0046",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "132",
-        "nameEn": "Jirachi ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-132",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "132",
+      "nameJa": "ジラーチex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     },
     {
       "id": "valerio/wish_0047",
-      "hint": {
-        "setCode": "M6a",
-        "setName": "30th Anniversary",
-        "number": "133",
-        "nameEn": "Salamence ex"
-      },
-      "waitedDays": 8,
-      "needsAttention": false
+      "cardId": "M6a-133",
+      "variantId": "jr7oetx1mqug9",
+      "setId": "M6a",
+      "number": "133",
+      "nameJa": "ボーマンダex",
+      "rarity": "Special illustration rare",
+      "imageBase": "",
+      "resolvedOn": "2026-09-28"
     }
-  ]
+  ],
+  "stillWaiting": []
 }

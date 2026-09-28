@@ -126,15 +126,19 @@ export async function applyResolutions(vault: Vault, resolutions: Resolution[]):
     item.number = found.number;
     item.nameJa = found.nameJa;
     item.rarity = found.rarity ?? null;
-    item.imageBase = found.imageBase ?? '';
+    // The catalog is authoritative about which card this is, not about what it looks
+    // like. TCGdex publishes a set weeks before it scans it — every card in M6a has a
+    // null image today — so taking its picture would replace a borrowed one that works
+    // with an empty frame. Whatever we already had stands until the catalog has better.
+    item.imageBase = found.imageBase || item.imageBase || '';
     item.catalogSource = 'tcgdex';
     delete item.pendingSince;
     touched.add('collection');
   }
 
   // Wanted cards resolve the same way. The English stand-in the card was found under is
-  // overwritten here — its name and its artwork — so once the Japanese set is published
-  // the list shows the Japanese printing and starts being priced as one.
+  // overwritten here — its name, and its artwork once the catalog has any — so the list
+  // shows the Japanese printing and starts being priced as one.
   for (const [owner, list] of Object.entries(vault.wishlists)) {
     for (const item of list.items) {
       if (item.cardId || !item.hint) continue;
@@ -145,7 +149,9 @@ export async function applyResolutions(vault: Vault, resolutions: Resolution[]):
       item.setId = found.setId;
       item.number = found.number;
       item.nameJa = found.nameJa;
-      item.imageBase = found.imageBase ?? '';
+      // Same as above: a set is published weeks before it is scanned, so the borrowed
+      // picture stands until the catalog has one of its own.
+      item.imageBase = found.imageBase || item.imageBase || '';
       delete item.nameEn;
       delete item.pendingSince;
       touched.add(owner);

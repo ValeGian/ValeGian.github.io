@@ -169,11 +169,6 @@
           "if": {
             "required": [
               "hint"
-            ]
-          },
-          "then": {
-            "required": [
-              "pendingSince"
             ],
             "not": {
               "required": [
@@ -181,7 +176,12 @@
               ]
             }
           },
-          "$comment": "A hint is what stands in for a card id. Holding both would mean the retry job keeps resolving a card that is already resolved."
+          "then": {
+            "required": [
+              "pendingSince"
+            ]
+          },
+          "$comment": "A hint stands in for a card id until the catalog publishes the set, and a card still waiting has to say since when. Once it resolves the hint is kept on purpose — it is what was read off the physical card, and the only record if the match ever turns out wrong — so a resolved item carries both. The retry queue cannot loop on it: derivePublicFiles tests the card id first."
         }
       ]
     }

@@ -898,6 +898,44 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-28 — rev 47 (two Meowth that could never resolve, and a schema that forbade the truth) ✅
+
+Both reported from use. Neither was what it looked like.
+
+**Two Meowth were stuck for good.** `wish_0081` and `wish_0082` were added from an English
+stand-in, and that path deliberately stores no number and no hint — the English number is
+not the Japanese one (§8.3), and a wrong one attaches another card's price permanently. The
+cost is that such an item has no card id, no number *and* no hint, so it has no price, its
+row cannot be opened, and the retry queue cannot see it: it would have sat there for ever.
+
+Now that M6a is published they could be identified from the catalog itself. Each species
+appears twice in the set — once plainly and once in the alternate-art block — and in that
+block each appears exactly once, so the match is unambiguous: 30th-141 *Galarian Meowth* is
+**M6a-117 ガラル ニャース**, 30th-144 *Meowth* is **M6a-120 ニャース**. The artwork he had
+already picked was right; only the identity was missing.
+
+**The two blocks are not aligned, and this is the clearest evidence yet.** Side by side they
+look like they should be, but M6a-115 アローラ ニャース is verified as 30th-139 while the
+naive alignment gives 30th-135 (Morpeko). Pairing is by species name inside the block, never
+by position — §8.3 in one screenful.
+
+**Ten missing pictures borrowed, two refused.** The M6a cards he has just added have no
+artwork because TCGdex publishes a set before scanning it. Ten of them pair to an English
+alternate art by species and now show it. `M6a-114` (Nidorina) and `M6a-121` (Ditto) are
+refused: the English set has those species only as ordinary cards, which is a different
+illustration. They stay blank until the set is scanned, as does `S8b-193`, which TCGdex has
+never scanned either. Twelve pairs added to `set-map-30th.json`, which now holds 58.
+
+**And the wishlist schema forbade what resolving a card produces.** Its rule was "if an item
+has a hint it must have `pendingSince` and must not have a `cardId`", but `applyResolutions`
+keeps the hint on purpose — it is what was read off the physical card and the only record if
+a match turns out wrong — so every card resolved this week was invalid. The rule now applies
+only while the card is unresolved. The loop it was guarding against cannot happen anyway:
+`derivePublicFiles` tests the card id first.
+
+This went unnoticed because CI has no `.local/` to validate, so the daily job never checked
+a wishlist. Worth remembering when reading a green pipeline.
+
 ### 2026-09-28 — rev 46 (TCGdex published the 30th set; resolving it must not blank the art) ✅
 
 **TCGdex now has M6a — "30th CELEBRATION", 176 cards** — published some time after today's

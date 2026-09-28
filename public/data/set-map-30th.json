@@ -191,6 +191,26 @@
       "name": "Zapdos"
     },
     {
+      "japanese": "109",
+      "english": "134",
+      "name": "Toxtricity"
+    },
+    {
+      "japanese": "110",
+      "english": "135",
+      "name": "Morpeko"
+    },
+    {
+      "japanese": "111",
+      "english": "136",
+      "name": "Drifloon"
+    },
+    {
+      "japanese": "112",
+      "english": "137",
+      "name": "Chandelure"
+    },
+    {
       "japanese": "113",
       "english": "138",
       "name": "Lycanroc"
@@ -201,9 +221,44 @@
       "name": "Alolan Meowth"
     },
     {
+      "japanese": "116",
+      "english": "140",
+      "name": "Scraggy"
+    },
+    {
+      "japanese": "117",
+      "english": "141",
+      "name": "Galarian Meowth"
+    },
+    {
+      "japanese": "118",
+      "english": "142",
+      "name": "Gholdengo"
+    },
+    {
+      "japanese": "119",
+      "english": "143",
+      "name": "Kommo-o"
+    },
+    {
+      "japanese": "120",
+      "english": "144",
+      "name": "Meowth"
+    },
+    {
       "japanese": "122",
       "english": "145",
       "name": "Hisuian Zorua"
+    },
+    {
+      "japanese": "123",
+      "english": "146",
+      "name": "Maushold"
+    },
+    {
+      "japanese": "124",
+      "english": "147",
+      "name": "Fuecoco ex"
     },
     {
       "japanese": "125",
@@ -229,6 +284,11 @@
       "japanese": "129",
       "english": "152",
       "name": "Mew ex"
+    },
+    {
+      "japanese": "130",
+      "english": "153",
+      "name": "Sylveon ex"
     },
     {
       "japanese": "131",

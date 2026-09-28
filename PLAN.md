@@ -898,6 +898,33 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-28 — rev 49 (a picture you choose, for the cards no catalog has scanned) ✅
+
+The wishlist edit form now takes a picture, the way the collection's add form always has.
+It exists because two cards proved there is no other route: `M6a-114` and `M6a-121` are
+illustration rares in a set TCGdex published without scanning any of its 176 cards, the
+English printing has those species only as commons — a different artwork entirely — and
+the publisher's own database has not posted the 104–137 block.
+
+**Cardmarket has the scans and they cannot be used.** Their pages gave the right images —
+`907879.jpg` and `907886.jpg`, each confirmed by the product title and the rule in
+PRICES-BY-HAND.md §4 — but `product-images.s3.cardmarket.com` answers **403 to anything
+off their site**, with or without a referer. Hotlinking would put a broken frame on the
+page, and copying a deliberately protected scan into a public repository is not something
+to do to the people every price here depends on.
+
+- The file is written to `public/data/photos/wish-<owner>-<id>.jpg`. The owner is in the
+  name because wish ids restart on every list, so Valerio's `wish_0007` and Lotad's would
+  otherwise be the same photograph.
+- **A chosen picture now outranks `imageBase`.** It used to lose to it, which would have
+  made the field useless on exactly the cards it is for — most of the 30th set shows an
+  illustration borrowed from the English printing. A real scan in `artwork.json` still
+  wins over both, so the day a catalog publishes one it takes over by itself.
+
+Driven in the browser rather than argued: the field appears, a 220×300 image is prepared
+to a 2 KB JPEG and previewed, saving queues both the vault write and the photo at the
+right path, and once that file is served the row and the detail panel both show it.
+
 ### 2026-09-28 — rev 48 (a new set has no averages, and that nearly cost a day of history) ✅
 
 Resolving the 30th set put 65 M6a cards on the watchlist, which grew from 73 to 138. A dry

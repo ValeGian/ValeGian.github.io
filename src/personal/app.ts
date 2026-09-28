@@ -805,13 +805,30 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
             if (!edit) return;
             const target = edit.target.trim() === '' ? null : Number(edit.target);
             if (target !== null && (!Number.isFinite(target) || target <= 0)) return;
-            await savePending(
-              await updateWish(vault, edit.owner, edit.itemId, {
-                targetPriceEur: target,
-                priority: edit.priority,
-                notes: edit.notes,
-              }),
-            );
+
+            // The owner is in the file name because wish ids restart on every list, so
+            // Valerio's wish_0007 and Lotad's would otherwise be the same photograph.
+            const photoPath = `data/photos/wish-${edit.owner}-${edit.itemId}.jpg`;
+
+            const writes = await updateWish(vault, edit.owner, edit.itemId, {
+              targetPriceEur: target,
+              priority: edit.priority,
+              notes: edit.notes,
+              ...(edit.photo ? { photoUrl: `/${photoPath}` } : {}),
+            });
+
+            if (edit.photo) {
+              // Public, like the card art it stands in for. It is a picture of a trading
+              // card, and the vault holds nothing about who wants it.
+              writes.push({
+                path: `public/${photoPath}`,
+                content: edit.photo.base64,
+                encoding: 'base64',
+                savedAt: new Date().toISOString(),
+              });
+            }
+
+            await savePending(writes);
             await refreshPendingCount();
             store.update({ editingWish: null });
             schedulePublish();

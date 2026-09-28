@@ -59,6 +59,14 @@ export interface WishlistItem {
   nameJa?: string;
   nameEn?: string;
   imageBase?: string;
+  /**
+   * A photograph, for a card no catalog has a picture of yet.
+   *
+   * Wanted cards are not owned, so this is usually a picture found rather than taken —
+   * but it is supplied by hand either way, and it outranks a borrowed illustration
+   * because someone chose it deliberately.
+   */
+  photoUrl?: string;
   targetPriceEur: number | null;
   priority: 'high' | 'normal' | 'low';
   notes?: string;

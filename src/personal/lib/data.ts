@@ -135,13 +135,14 @@ type Illustrated = {
  * Artwork the daily job has found comes first, because it is the most recent thing anyone
  * has actually checked: a Japanese set is listed with prices long before its cards are
  * scanned, so a card added on release day is stored with no picture, or with a stand-in
- * from the English printing, and this is what replaces it. Then what was stored when the
- * card was added.
+ * from the English printing, and this is what replaces it.
  *
- * Then a photograph, which only exists because someone looked and found nothing — TCGdex
- * has never digitised the 1996 Japanese base set and carries no Pokémon Card Game Classic
- * at all, so for those cards a photo is the only picture there will ever be. A guessed
- * path comes last, because it is a guess.
+ * Then a picture supplied by hand, which exists because someone looked and found nothing
+ * or found the wrong thing — TCGdex has never digitised the 1996 Japanese base set,
+ * carries no Pokémon Card Game Classic at all, and published the 30th Anniversary set
+ * with none of its 176 cards scanned. It comes before what was stored when the card was
+ * added, because that is frequently an illustration borrowed from another printing and
+ * this is a deliberate choice about this card. A guessed path comes last, being a guess.
  */
 export function picture(item: Illustrated, size: 'low' | 'high'): string | null {
   // Keyed the same way a price is, so a card the catalog has not published yet picks up
@@ -151,8 +152,11 @@ export function picture(item: Illustrated, size: 'low' | 'high'): string | null 
   if (found) return `${found}/${size}.webp`;
   // TCGdex serves a base path and wants a size appended; the official Japanese card
   // database serves one finished file. A value that already names a file is used as it is.
-  if (item.imageBase) return isCompleteImage(item.imageBase) ? item.imageBase : `${item.imageBase}/${size}.webp`;
+  // Before `imageBase`, which is often an illustration borrowed from another printing:
+  // someone supplying a picture by hand has looked at the card and at what was on screen,
+  // and chosen. Only a scan of this exact card, above, outranks that.
   if (item.photoUrl) return item.photoUrl;
+  if (item.imageBase) return isCompleteImage(item.imageBase) ? item.imageBase : `${item.imageBase}/${size}.webp`;
   const derived = derivedBase(item);
   return derived ? `${derived}/${size}.webp` : null;
 }

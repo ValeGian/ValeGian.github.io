@@ -14,6 +14,7 @@ import { cardThumb } from './thumb.ts';
 import { chartIcon } from './icons.ts';
 import { artworkPanel } from './artwork.ts';
 import { armedButton } from './armed-button.ts';
+import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import { marketRow, setName } from './market.ts';
 import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
 
@@ -32,6 +33,8 @@ export interface BuyEdit {
 }
 
 export interface WishlistEdit {
+  /** A picture chosen by hand, kept until the edit is saved. */
+  photo?: PreparedPhoto | null;
   owner: string;
   itemId: string;
   target: string;
@@ -341,6 +344,62 @@ function buyRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
 }
 
 /**
+ * A picture for a card the catalogs have not scanned.
+ *
+ * The 30th Anniversary set arrived in the catalog with none of its 176 cards scanned, and
+ * some of those cards have no English printing to borrow from either — so for a while the
+ * only picture there will be is one a person supplies. It replaces whatever was borrowed,
+ * because someone chose it on purpose; the day a catalog publishes a real scan, that wins
+ * again, since `artwork.json` outranks both.
+ */
+function photoField(item: WishlistItem, edit: WishlistEdit, state: WishlistViewState): HTMLElement {
+  const chosen = edit.photo;
+
+  return el(
+    'div',
+    { class: 'photo-field' },
+    el(
+      'label',
+      { class: 'field', for: 'wish-photo' },
+      el('span', { text: chosen || item.photoUrl ? 'Replace the picture' : 'Picture of the card (optional)' }),
+      el('input', {
+        id: 'wish-photo',
+        type: 'file',
+        accept: 'image/*',
+        // `onStartEdit` rather than the silent `onEditField`: the preview has to appear,
+        // and a file input has no caret to lose to a repaint.
+        onChange: async (event: Event) => {
+          const file = (event.target as HTMLInputElement).files?.[0];
+          if (!file) return;
+          try {
+            state.onStartEdit?.({ ...edit, photo: await preparePhoto(file) });
+          } catch {
+            state.onStartEdit?.({ ...edit, photo: null });
+          }
+        },
+      }),
+    ),
+    chosen
+      ? el(
+          'div',
+          { class: 'photo-preview' },
+          el('img', { src: chosen.dataUrl, alt: 'The picture you chose', width: 60 }),
+          el('span', {
+            class: 'ui muted',
+            text: `${chosen.width}×${chosen.height}, ${Math.round(chosen.bytes / 1024)} KB`,
+          }),
+          el('button', {
+            type: 'button',
+            class: 'chip',
+            text: 'Remove',
+            onClick: () => state.onStartEdit?.({ ...edit, photo: null }),
+          }),
+        )
+      : null,
+  );
+}
+
+/**
  * The row in edit mode.
  *
  * Fields report their value without rebuilding the view: rebuilding replaces the element
@@ -412,6 +471,7 @@ function editRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
           onInput: (event: Event) => set({ notes: (event.target as HTMLInputElement).value }),
         }),
       ),
+      photoField(item, edit, state),
       el(
         'div',
         { class: 'form-actions' },

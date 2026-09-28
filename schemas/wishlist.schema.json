@@ -123,6 +123,10 @@
         },
         "pendingSince": {
           "$ref": "common.schema.json#/$defs/isoDate"
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "A picture supplied by hand, for a card no catalog has scanned."
         }
       },
       "allOf": [

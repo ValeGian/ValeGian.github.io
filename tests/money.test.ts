@@ -178,3 +178,27 @@ test('a price typed in a shop is read the way it was meant', async () => {
   assert.equal(parseAmount('0'), null, 'nothing was bought for nothing');
   assert.equal(parseAmount('-5'), null);
 });
+
+test('a picture chosen by hand beats a borrowed one, and a real scan beats both', async () => {
+  const { picture, usePublishedArtwork } = await import('../src/personal/lib/data.ts');
+
+  // Most of the 30th Anniversary set shows an illustration borrowed from the English
+  // printing, so a photo that lost to it would be useless on exactly the cards it is for.
+  const card = { cardId: 'M6a-114', setId: 'M6a', number: '114' };
+  usePublishedArtwork(new Map());
+
+  assert.equal(picture({ ...card, imageBase: 'https://example.test/borrowed' }, 'low'), 'https://example.test/borrowed/low.webp');
+  assert.equal(
+    picture({ ...card, imageBase: 'https://example.test/borrowed', photoUrl: '/data/photos/wish-valerio-wish_0007.jpg' }, 'low'),
+    '/data/photos/wish-valerio-wish_0007.jpg',
+    'the chosen picture wins',
+  );
+
+  // Until the catalog scans the card itself, which is the one thing that outranks it.
+  usePublishedArtwork(new Map([['M6a-114', 'https://assets.tcgdex.net/ja/M/M6a/114']]));
+  assert.equal(
+    picture({ ...card, imageBase: 'https://example.test/borrowed', photoUrl: '/data/photos/wish-valerio-wish_0007.jpg' }, 'low'),
+    'https://assets.tcgdex.net/ja/M/M6a/114/low.webp',
+  );
+  usePublishedArtwork(new Map());
+});

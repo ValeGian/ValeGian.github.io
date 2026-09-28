@@ -200,5 +200,12 @@ test('a picture chosen by hand beats a borrowed one, and a real scan beats both'
     picture({ ...card, imageBase: 'https://example.test/borrowed', photoUrl: '/data/photos/wish-valerio-wish_0007.jpg' }, 'low'),
     'https://assets.tcgdex.net/ja/M/M6a/114/low.webp',
   );
+
+  // Artwork found elsewhere is a finished file, not a base to append a size to. A set can
+  // be listed for months before it is scanned, and M6a is: 176 cards, none of them.
+  usePublishedArtwork(new Map([['M6a-114', 'https://example.test/found/1600.jpg']]));
+  assert.equal(picture(card, 'low'), 'https://example.test/found/1600.jpg');
+  assert.equal(picture(card, 'high'), 'https://example.test/found/1600.jpg', 'one file serves both sizes');
+
   usePublishedArtwork(new Map());
 });

@@ -898,6 +898,27 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-28 — rev 50 (the last two pictures, from a source that serves them openly) ✅
+
+`M6a-114` and `M6a-121` have their artwork. Not from Cardmarket, whose image host answers
+403 to anything off their own site — that is a deliberate measure and copying a protected
+scan into a public repository is not the answer to it. **PriceCharting serves its images
+openly**, from Google Cloud Storage, 200 with our own referer and nothing to work around,
+and we already hold verified deep links to both cards from rev 45.
+
+Both were checked by eye against the card itself before being used, not merely by which
+page they came from: the first reads **M6a 114/103 AR**, ニドリーナ, HP 90, illus. Taiga
+Kasai; the second **M6a 121/103 AR**, メタモン, HP 70, illus. Ounishi — each with the 30th
+anniversary Pikachu stamp. Right cards, right rarity, right set.
+
+They live in `artwork.json`, which is the correct home for exactly this: the daily job
+merges rather than replaces it and only overwrites a card when it finds a scan of its own,
+so these stand until TCGdex publishes M6a and step aside the moment it does. `picture()`
+now accepts a finished file there as well as an asset base, the same distinction
+`imageBase` has always made.
+
+That leaves `S8b-193` as the only card on either list with no picture anywhere.
+
 ### 2026-09-28 — rev 49 (a picture you choose, for the cards no catalog has scanned) ✅
 
 The wishlist edit form now takes a picture, the way the collection's add form always has.

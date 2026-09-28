@@ -149,7 +149,10 @@ export function picture(item: Illustrated, size: 'low' | 'high'): string | null 
   // its real artwork the day the daily job finds it — see priceKey.
   const key = priceKey(item);
   const found = key ? discoveredArtwork.get(key) : undefined;
-  if (found) return `${found}/${size}.webp`;
+  // Usually a TCGdex asset base, which wants a size appended. Sometimes a finished file:
+  // a set can be listed for months before it is scanned, and a picture found elsewhere is
+  // better than an empty frame — it is replaced the day the catalog publishes its own.
+  if (found) return isCompleteImage(found) ? found : `${found}/${size}.webp`;
   // TCGdex serves a base path and wants a size appended; the official Japanese card
   // database serves one finished file. A value that already names a file is used as it is.
   // Before `imageBase`, which is often an illustration borrowed from another printing:

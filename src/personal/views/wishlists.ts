@@ -122,6 +122,26 @@ function arrange(items: WishlistItem[], state: WishlistViewState): WishlistItem[
   return [...kept].sort(by[state.sort]);
 }
 
+/**
+ * What the cards still wanted would cost at the prices they are wanted at.
+ *
+ * The targets, not the market: this answers "what am I setting aside", and a target is the
+ * only figure on a wanted card that is a decision rather than an observation. Cards with
+ * no target are counted separately rather than treated as free — "any price" is the one
+ * answer a budget cannot absorb.
+ *
+ * Computed over whatever is being shown, so filtering to high priority gives the budget
+ * for the high-priority cards. A figure that ignored the filter above it would be read as
+ * belonging to the list below it.
+ */
+export function targetBudget(items: WishlistItem[]): { total: number; priced: number; open: number } {
+  const wanted = items.filter((item) => item.status !== 'bought');
+  const priced = wanted.filter((item) => item.targetPriceEur !== null);
+  const total = priced.reduce((sum, item) => sum + (item.targetPriceEur ?? 0), 0);
+
+  return { total: Math.round(total * 100) / 100, priced: priced.length, open: wanted.length - priced.length };
+}
+
 /** Balance is computed from the purchases behind it, never stored, so it cannot drift. */
 export function balance(list: Wishlist): { bought: number; settled: number; owed: number } {
   const bought = list.items
@@ -736,6 +756,25 @@ function rowsBySet(
   );
 }
 
+/** The budget figure, worded so "at target" is never mistaken for a market value. */
+function budgetFigures(items: WishlistItem[]): HTMLElement {
+  const budget = targetBudget(items);
+
+  return el(
+    'div',
+    {},
+    el('dt', { text: 'Budget at target' }),
+    el('dd', { class: 'numeric', text: money(budget.total) }),
+    el('span', {
+      class: 'summary-note',
+      text:
+        budget.open === 0
+          ? `${budget.priced} card${budget.priced === 1 ? '' : 's'}`
+          : `${budget.priced} card${budget.priced === 1 ? '' : 's'}, ${budget.open} at any price`,
+    }),
+  );
+}
+
 function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTMLElement {
   const wanted = arrange(list.items.filter((item) => item.status !== 'bought'), state);
   // Bought cards keep their own order and sit at the end: the list is for shopping, and
@@ -748,15 +787,16 @@ function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTM
     'section',
     { class: 'wish-list' },
     el('h3', { text: list.owner }),
-    isFriend
-      ? el(
-          'dl',
-          { class: 'summary' },
-          el('div', {}, el('dt', { text: 'Bought so far' }), el('dd', { class: 'numeric', text: money(figures.bought) })),
-          el('div', {}, el('dt', { text: 'Settled' }), el('dd', { class: 'numeric', text: money(figures.settled) })),
-          el('div', {}, el('dt', { text: 'Owes me' }), el('dd', { class: 'numeric', text: money(figures.owed) })),
-        )
-      : null,
+    // Shown for every list, not only a friend's: what the cards would cost at the prices
+    // they are wanted at is the question a wishlist is kept to answer.
+    el(
+      'dl',
+      { class: 'summary' },
+      budgetFigures(wanted),
+      isFriend ? el('div', {}, el('dt', { text: 'Bought so far' }), el('dd', { class: 'numeric', text: money(figures.bought) })) : null,
+      isFriend ? el('div', {}, el('dt', { text: 'Settled' }), el('dd', { class: 'numeric', text: money(figures.settled) })) : null,
+      isFriend ? el('div', {}, el('dt', { text: 'Owes me' }), el('dd', { class: 'numeric', text: money(figures.owed) })) : null,
+    ),
     list.items.length === 0
       ? el('p', { class: 'empty', text: 'Nothing on this list yet.' })
       : wanted.length + purchased.length === 0
@@ -781,7 +821,7 @@ function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTM
   );
 }
 
-function combinedView(state: WishlistViewState): HTMLElement {
+function combinedView(state: WishlistViewState): HTMLElement | DocumentFragment {
   // Arranged as one list, then matched back to owners: the same card wanted by two people
   // has to stay next to itself, which sorting each list separately would not do.
   const owners = new Map<WishlistItem, string>();
@@ -801,11 +841,18 @@ function combinedView(state: WishlistViewState): HTMLElement {
     });
   }
 
-  if (state.sort === 'set') return rowsBySet(wanted, state, true);
+  // The same card wanted by two people is two targets, and buying it twice is what the
+  // combined view is for — so it counts twice here, as it appears twice below.
+  const budget = el('dl', { class: 'summary' }, budgetFigures(wanted.map(({ item }) => item)));
 
-  return state.view === 'grid'
-    ? el('ul', { class: 'card-grid' }, ...wanted.map(({ owner, item }) => gridTile(item, owner, state, true)))
-    : el('ul', { class: 'wish-rows' }, ...wanted.map(({ owner, item }) => wishRow(item, owner, state, true)));
+  return frag(
+    budget,
+    state.sort === 'set'
+      ? rowsBySet(wanted, state, true)
+      : state.view === 'grid'
+        ? el('ul', { class: 'card-grid' }, ...wanted.map(({ owner, item }) => gridTile(item, owner, state, true)))
+        : el('ul', { class: 'wish-rows' }, ...wanted.map(({ owner, item }) => wishRow(item, owner, state, true))),
+  );
 }
 
 /**

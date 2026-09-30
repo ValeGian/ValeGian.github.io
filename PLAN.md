@@ -898,6 +898,28 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-30 — rev 52 (what each list would cost at the prices it wants) ✅
+
+Every wishlist now carries **Budget at target**: the sum of the target prices of the cards
+still wanted on it. Valerio €1,227.00 over 84 cards, Tommy €792.00 over 19, Lotad €1,605.00
+over 53, and €3,624.00 across the combined view — which is the sum of the three, because a
+card two people want is two cards to buy and appears twice in that view.
+
+Three decisions worth stating:
+
+- **Targets, not market prices.** A target is the only figure on a wanted card that is a
+  decision rather than an observation, so it is the one that answers "what am I setting
+  aside". The market value is already on every row beside it.
+- **A card wanted at any price is counted apart, never as zero.** The line reads "19 cards"
+  or "17 cards, 2 at any price". Treating an open target as free would understate a budget
+  by exactly the cards most likely to be expensive.
+- **It follows the filter.** Filtering to high priority gives the high-priority budget —
+  €15.00 of Valerio's €1,227.00. A figure that ignored the control directly above it would
+  be read as belonging to the list below it. The parts add back: 1,212 + 15 = 1,227.
+
+A bought card is no longer something to pay for and drops out. Five tests cover the
+arithmetic, including that 0.1 + 0.2 does not reach the screen as 0.30000000000000004.
+
 ### 2026-09-30 — rev 51 (every card has a picture; Dark Espeon, which no catalog has) ✅
 
 **Seventeen cards had no picture and now none do** — nothing on either list or in the

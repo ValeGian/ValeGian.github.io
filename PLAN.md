@@ -898,6 +898,44 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-09-30 — rev 51 (every card has a picture; Dark Espeon, which no catalog has) ✅
+
+**Seventeen cards had no picture and now none do** — nothing on either list or in the
+collection is blank. Each was identified by the number printed on the card itself, never
+by name alone, because every one of them shares its name with another card in the same
+set:
+
+- **Nine from the publisher's own database**, whose page states "141 / 103", "188 / 184"
+  and so on: M6a 141/142/165, S8b 188/189/193/195/210, M1L 068/088, SV5M 073/074.
+- **Five from PriceCharting** — M6a 127/129/131/132/133 — which sit in the 104–137 block
+  the publisher has still not posted. Each confirmed by its page title.
+
+Two things worth recording. The id-in-step rule holds only inside a block: `050718` is
+card 141 and `050719` is 142, but `050742` is card **101**, not 165. Every id was checked
+rather than extrapolated. And **PriceCharting is behind Cloudflare now** — 403 to curl even
+on a product page, where a week ago it served plain HTML. The links resolver can no longer
+run unattended; the browser still works, at a human pace.
+
+**Dark Espeon is on Tommy's list at €145.** It could not be found in the search because it
+is not in the catalog: TCGdex's Japanese `neo4` is machine-translated from the English set
+— its cards read *軽いサンフロラ*, *暗いforretress*, and one is still called *Pineco* — and
+it contains no Dark Espeon at all. Cardmarket has the Japanese print, in an expansion it
+tracks **without collector numbers**: the product title is literally `Dark Espeon ()`.
+
+So it is a catalog override, like the 1996 cards: id `neo4-DL` after Cardmarket's own slug
+rather than a number that does not exist, artwork borrowed from the English print — the
+same illustration with translated text — and the price transcribed from the page. **avg30
+€194.15**, avg7 €249.41, avg1 €249.95, trend €289.62, from €80. A €145 target is well under
+the thirty-day average, which is the point of a target.
+
+The override price schema kept only `avg30`, `trend` and `low`, from before rev 37 decided
+every figure was worth keeping. A hand reading sees all of them and they cannot be
+recovered later, so it now accepts `avg7`, `avg1` and `avg` too.
+
+**"No. 196" is Espeon's Pokédex number**, which Neo-era Japanese cards print on the face —
+the same way the Nidorina card read "No.030". It is not a collector number, and that is
+recorded in the item's notes so it is not mistaken for one later.
+
 ### 2026-09-28 — rev 50 (the last two pictures, from a source that serves them openly) ✅
 
 `M6a-114` and `M6a-121` have their artwork. Not from Cardmarket, whose image host answers

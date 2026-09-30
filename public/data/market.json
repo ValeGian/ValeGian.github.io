@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-28T19:38:19.199Z",
+  "generatedAt": "2026-09-30T19:09:04.038Z",
   "sets": {
     "CLK": {
       "cardmarket": {
@@ -11,7 +11,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-classic-blastoise",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "M2a": {
@@ -23,7 +23,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-mega-dream-ex",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "M5": {
@@ -35,7 +35,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-abyss-eye",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "M6": {
@@ -47,7 +47,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-storm-emeralda",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "M6a": {
@@ -59,7 +59,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-30th-celebration",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "PMCG1": {
@@ -71,7 +71,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-expansion-pack",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "S12a": {
@@ -83,7 +83,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-vstar-universe",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "S8b": {
@@ -95,7 +95,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-vmax-climax",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV10": {
@@ -107,7 +107,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-glory-of-team-rocket",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV11W": {
@@ -119,7 +119,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-white-flare",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV1S": {
@@ -131,7 +131,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-scarlet-ex",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV1V": {
@@ -143,7 +143,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-violet-ex",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV1a": {
@@ -155,7 +155,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-triplet-beat",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV2D": {
@@ -167,7 +167,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-clay-burst",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV2P": {
@@ -179,7 +179,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-snow-hazard",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV2a": {
@@ -191,7 +191,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-scarlet-&-violet-151",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV3": {
@@ -203,7 +203,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-ruler-of-the-black-flame",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV3a": {
@@ -215,7 +215,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-raging-surf",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV4a": {
@@ -227,7 +227,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-shiny-treasure-ex",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV5K": {
@@ -239,7 +239,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-wild-force",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV5M": {
@@ -251,7 +251,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-cyber-judge",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV6": {
@@ -263,7 +263,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-mask-of-change",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV7a": {
@@ -275,7 +275,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-paradise-dragona",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV8": {
@@ -287,7 +287,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-super-electric-breaker",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV8a": {
@@ -299,7 +299,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-terastal-festival",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     },
     "SV9": {
@@ -311,7 +311,7 @@
       },
       "pricecharting": {
         "slug": "pokemon-japanese-battle-partners",
-        "checkedOn": "2026-09-28"
+        "checkedOn": "2026-09-30"
       }
     }
   },
@@ -558,6 +558,9 @@
     },
     "M6a-165": {
       "pricecharting": "https://www.pricecharting.com/game/pokemon-japanese-30th-celebration/magikarp-165"
+    },
+    "neo4-DL": {
+      "cardmarket": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Darkness-and-to-Light/Dark-Espeon-DL"
     },
     "PMCG1-001": {
       "cardmarket": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Expansion-Pack/Bulbasaur",

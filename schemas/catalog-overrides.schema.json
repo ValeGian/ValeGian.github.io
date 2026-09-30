@@ -97,8 +97,27 @@
                   "number",
                   "null"
                 ]
+              },
+              "avg7": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "avg1": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "avg": {
+                "type": [
+                  "number",
+                  "null"
+                ]
               }
-            }
+            },
+            "description": "A price read off Cardmarket by hand. Every figure the page showed is kept, not only the one the site values on: a reading is taken once and the rest cannot be recovered later."
           }
         }
       }

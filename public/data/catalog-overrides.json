@@ -12,19 +12,61 @@
       "imageBase": null,
       "reason": "TCGdex carries no Pokémon Card Game Classic set in any language, so there is no catalog entry to merge with. Everything here is transcribed from Cardmarket, which is also where the CLK code in the original spreadsheet came from.",
       "cardmarketUrl": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Pokemon-Card-Game-Classic-Blastoise-Suicune-ex-Deck/Squirtle-CLK001",
-      "price": { "source": "manual", "currency": "EUR", "checkedOn": "2026-09-19", "avg30": 19.53, "trend": 20.64, "low": 10.0 }
+      "price": {
+        "source": "manual",
+        "currency": "EUR",
+        "checkedOn": "2026-09-19",
+        "avg30": 19.53,
+        "trend": 20.64,
+        "low": 10.0
+      }
     },
     {
       "cardId": "PMCG1-001",
       "reason": "TCGdex has the card but no Cardmarket link for the 1996 拡張パック set, so the daily job finds nothing to price. Catalog fields come from TCGdex; only the price is transcribed.",
       "cardmarketUrl": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Expansion-Pack/Bulbasaur",
-      "price": { "source": "manual", "currency": "EUR", "checkedOn": "2026-09-19", "avg30": 5.3, "trend": 2.55, "low": 0.34 }
+      "price": {
+        "source": "manual",
+        "currency": "EUR",
+        "checkedOn": "2026-09-19",
+        "avg30": 5.3,
+        "trend": 2.55,
+        "low": 0.34
+      }
     },
     {
       "cardId": "PMCG1-014",
       "reason": "Same as PMCG1-001. This is the card the spreadsheet recorded as \"Charmander #4\": 1996 Japanese cards print the National Pokédex number, and Charmander is dex #4 while sitting fourteenth in the set.",
       "cardmarketUrl": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Expansion-Pack/Charmander",
-      "price": { "source": "manual", "currency": "EUR", "checkedOn": "2026-09-19", "avg30": 12.32, "trend": 4.7, "low": 0.45 }
+      "price": {
+        "source": "manual",
+        "currency": "EUR",
+        "checkedOn": "2026-09-19",
+        "avg30": 12.32,
+        "trend": 4.7,
+        "low": 0.45
+      }
+    },
+    {
+      "cardId": "neo4-DL",
+      "setId": "neo4",
+      "setName": "闇、そして光へ… (Neo 4)",
+      "nameJa": "ダークエーフィ",
+      "nameEn": "Dark Espeon",
+      "rarity": null,
+      "imageBase": null,
+      "reason": "TCGdex's Japanese neo4 is machine-translated from the English set — its names read \"軽いサンフロラ\" and \"暗いforretress\", and it has no Dark Espeon at all — so there is no catalog entry to merge with. Cardmarket tracks this expansion without collector numbers (the product title reads \"Dark Espeon ()\"), so the id here carries its slug suffix rather than a number that does not exist. Everything is transcribed from the page below.",
+      "cardmarketUrl": "https://www.cardmarket.com/en/Pokemon/Products/Singles/Darkness-and-to-Light/Dark-Espeon-DL",
+      "price": {
+        "source": "manual",
+        "currency": "EUR",
+        "checkedOn": "2026-09-30",
+        "avg30": 194.15,
+        "avg7": 249.41,
+        "avg1": 249.95,
+        "trend": 289.62,
+        "low": 80.0
+      }
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-30T18:50:41.903Z",
+  "generatedAt": "2026-09-30T18:50:51.704Z",
   "cards": [
     {
       "cardId": "M1L-088"
@@ -306,6 +306,9 @@
     {
       "cardId": "S8b-195",
       "variantId": "jr7oetx1mqug9"
+    },
+    {
+      "cardId": "S8b-210"
     },
     {
       "cardId": "SV10-127"

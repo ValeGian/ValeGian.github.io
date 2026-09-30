@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-30T18:52:44.182Z",
+  "generatedAt": "2026-09-30T18:53:40.725Z",
   "cards": [
     {
       "cardId": "M1L-068"
@@ -457,6 +457,9 @@
     {
       "cardId": "SV6-104",
       "variantId": "jr7oetx1mqug9"
+    },
+    {
+      "cardId": "SV7a-067"
     },
     {
       "cardId": "SV7a-070",

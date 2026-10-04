@@ -111,14 +111,14 @@ export async function sessionKeys(saved: SavedSession): Promise<Map<string, Cryp
 }
 
 /**
- * How the wishlist is laid out: per person or combined, list or grid, and the order.
+ * How the wishlist is laid out: which list is open, list or grid, and the order.
  *
  * Kept for the same reason the open tab is. Someone standing in a shop with the list set
  * to their friend's cards, grouped by set, should not have to set it up again because the
  * connection dropped and they pulled to refresh — which is exactly when they reload.
  */
 export interface WishView {
-  combined: boolean;
+  wishTab: string;
   view: 'list' | 'grid';
   sort: string;
   priority: string;

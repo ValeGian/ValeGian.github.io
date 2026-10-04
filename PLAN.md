@@ -898,6 +898,28 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-10-04 — rev 53 (a tab per person, instead of every list at once) ✅
+
+The wishlists had a pair of chips reading "One shopping list" and "By person", and *By
+person* stacked all three lists on one page: three names, three budgets and a hundred and
+fifty rows to scroll past to reach the third. They are tabs now — **Everyone · Valerio ·
+Tommy · Lotad** — in a second strip below Collection and Wishlists, smaller and with a
+lighter rule, because the strip above chooses what you are looking at and this only
+chooses whose.
+
+The combined list keeps its place as the first tab: walking a shop with every wanted card
+on one page is what it is for, and it is still the default. Which tab is open is
+remembered for the session like the sort and the view, and opening a different list closes
+any card detail belonging to the one being left.
+
+**Three uses of `--space-5`, a token that does not exist.** An undefined custom property
+makes the whole declaration invalid, so the new tab strip rendered as
+"EveryoneValerioTommyLotad" with no gap at all — caught by looking at the page rather than
+by any check, since it is valid CSS referring to a name nobody defined. The other two were
+mine from earlier revisions: `.market-links` has had **no top margin since rev 36**, and a
+button's padding only worked because it carried a fallback. The scale runs 1, 2, 3, 4, 6,
+8, 12, 16, 24 — there is no 5.
+
 ### 2026-09-30 — rev 52 (what each list would cost at the prices it wants) ✅
 
 Every wishlist now carries **Budget at target**: the sum of the target prices of the cards

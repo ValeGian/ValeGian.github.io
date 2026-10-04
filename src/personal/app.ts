@@ -14,7 +14,7 @@ import { RANGES, cardSeries, daysNeeded, ensureDays, holdingsSeries, loadHistory
 import { renderChart, renderRangeTabs } from './views/chart.ts';
 import { renderCollection } from './views/collection.ts';
 import { renderDetail, type CardEdit } from './views/detail.ts';
-import { renderWishlists, type BuyEdit, type PriorityFilter, type WishlistEdit, type WishSort } from './views/wishlists.ts';
+import { EVERYONE, renderWishlists, type BuyEdit, type PriorityFilter, type WishlistEdit, type WishSort } from './views/wishlists.ts';
 import { blankFields, renderAddCard, searchCards, type AddCardState, type AddMode } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
 import { usePublishedMarket } from './views/market.ts';
@@ -44,7 +44,8 @@ interface AppState {
   filters: Filters;
   sortKey: SortKey;
   sortDescending: boolean;
-  combined: boolean;
+  /** Which wishlist is open: an owner id, or `everyone` for the combined shopping list. */
+  wishTab: string;
   /** Wishlist tabs only; the collection has its own filters. */
   wishPriority: PriorityFilter;
   wishSort: WishSort;
@@ -126,7 +127,7 @@ const store = createStore<AppState>({
   sortDescending: true,
   // Whatever the wishlist was last set to in this session, so a refresh in a shop does
   // not undo it. See session.ts.
-  combined: loadWishView()?.combined ?? true,
+  wishTab: loadWishView()?.wishTab ?? EVERYONE,
   wishPriority: (loadWishView()?.priority as PriorityFilter) ?? 'all',
   wishSort: (loadWishView()?.sort as WishSort) ?? 'priority',
   openItemId: null,
@@ -426,7 +427,7 @@ async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void
 function rememberWishView(): void {
   const state = store.get();
   saveWishView({
-    combined: state.combined,
+    wishTab: state.wishTab,
     view: state.view,
     sort: state.wishSort,
     priority: state.wishPriority,
@@ -765,7 +766,7 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           lists: vault.wishlists,
           prices: state.data?.prices ?? null,
           names,
-          combined: state.combined,
+          wishTab: state.wishTab,
           view: state.view,
           onView: (view) => {
             store.update({ view });
@@ -788,8 +789,9 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
           chartFor: (cardId) => cardHistory(state, cardId),
           chartOpen: state.chartOpen,
           onToggleChart: () => store.update({ chartOpen: !state.chartOpen }),
-          onToggleCombined: () => {
-            store.update((current) => ({ combined: !current.combined }));
+          onWishTab: (wishTab) => {
+            // The open card belongs to the list being left, so it closes with it.
+            store.update({ wishTab, openWishCardId: null });
             rememberWishView();
           },
           onStartEdit: (edit) => store.update({ editingWish: edit }),
@@ -925,7 +927,7 @@ function friendView(state: AppState, friend: Friend): DocumentFragment {
     lists: { [friend.owner]: friend.wishlist },
     prices: state.data?.prices ?? null,
     names: state.data?.names ?? emptyNames,
-    combined: false,
+    wishTab: friend.owner,
     view: state.view,
     onView: (view) => store.update({ view }),
     priority: state.wishPriority,
@@ -936,7 +938,7 @@ function friendView(state: AppState, friend: Friend): DocumentFragment {
     editing: null,
     openCardId: state.openWishCardId,
     onOpenCard: (cardId) => store.update({ openWishCardId: cardId, reveal: cardId ? '.detail' : null }),
-    onToggleCombined: () => undefined,
+    onWishTab: () => undefined,
   });
 }
 

@@ -52,7 +52,8 @@ export interface WishlistViewState {
   lists: Record<string, Wishlist>;
   prices: PriceSnapshot | null;
   names: NameTable;
-  combined: boolean;
+  /** Which list is open: an owner id, or `everyone` for the combined shopping list. */
+  wishTab: string;
   view: 'list' | 'grid';
   priority: PriorityFilter;
   sort: WishSort;
@@ -63,7 +64,7 @@ export interface WishlistViewState {
   editing: WishlistEdit | null;
   /** The row currently asking what a card cost, if any. */
   buying?: BuyEdit | null;
-  onToggleCombined(): void;
+  onWishTab(tab: string): void;
   onView?(view: 'list' | 'grid'): void;
   onStartBuy?(edit: BuyEdit): void;
   onBuyField?(change: Partial<BuyEdit>): void;
@@ -916,34 +917,52 @@ function priorityControls(state: WishlistViewState): DocumentFragment {
   );
 }
 
+/** The combined shopping list, which is a tab like a person is. */
+export const EVERYONE = 'everyone';
+
+/**
+ * One tab per list, and one for all of them at once.
+ *
+ * This replaced a pair of chips reading "One shopping list" and "By person", which showed
+ * every list stacked on one page: three names, three budgets and a hundred and fifty rows
+ * to scroll past to reach the third. A tab shows one list, which is what a person reads at
+ * a time, and the combined list keeps its place as the first of them because walking a
+ * shop with every wanted card on one page is what it is for.
+ */
+function wishTabs(state: WishlistViewState, owners: string[]): HTMLElement {
+  const tabs: [string, string][] = [[EVERYONE, 'Everyone'], ...owners.map((owner): [string, string] => [owner, state.lists[owner].owner ?? owner])];
+
+  return el(
+    'div',
+    { class: 'tabs wish-tabs', role: 'tablist' },
+    ...tabs.map(([tab, label]) =>
+      el('button', {
+        type: 'button',
+        role: 'tab',
+        'aria-selected': String(state.wishTab === tab),
+        class: state.wishTab === tab ? 'tab on' : 'tab',
+        text: label,
+        onClick: () => state.onWishTab(tab),
+      }),
+    ),
+  );
+}
+
 export function renderWishlists(state: WishlistViewState): DocumentFragment {
   const owners = Object.keys(state.lists);
-  // With one list there is nothing to combine, so the toggle would only be noise.
-  const showToggle = owners.length > 1;
+  // With one list there is nothing to choose between, so tabs would only be noise.
+  const showTabs = owners.length > 1;
+  // A tab naming a list that is no longer there falls back rather than showing nothing.
+  const open = state.wishTab !== EVERYONE && owners.includes(state.wishTab) ? state.wishTab : null;
 
   const detail = state.openCardId ? wishDetail(state.openCardId, state) : null;
 
   return frag(
     detail,
+    showTabs ? wishTabs(state, owners) : null,
     el(
       'div',
       { class: 'chips' },
-      ...(showToggle
-        ? [
-            el('button', {
-              type: 'button',
-              class: state.combined ? 'chip on' : 'chip',
-              text: 'One shopping list',
-              onClick: state.onToggleCombined,
-            }),
-            el('button', {
-              type: 'button',
-              class: state.combined ? 'chip' : 'chip on',
-              text: 'By person',
-              onClick: state.onToggleCombined,
-            }),
-          ]
-        : []),
       state.onView
         ? el(
             'span',
@@ -964,8 +983,10 @@ export function renderWishlists(state: WishlistViewState): DocumentFragment {
         : null,
     ),
     priorityControls(state),
-    state.combined && showToggle
-      ? combinedView(state)
-      : frag(...owners.map((owner) => listBlock(owner, state.lists[owner], state))),
+    !showTabs
+      ? frag(...owners.map((owner) => listBlock(owner, state.lists[owner], state)))
+      : open
+        ? listBlock(open, state.lists[open], state)
+        : combinedView(state),
   );
 }

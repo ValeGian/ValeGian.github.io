@@ -76,6 +76,20 @@ jobs:
           fi
 
       # A frozen upstream average is invisible in the data: it looks like a calm market.
+      # A thin day is written rather than refused, so it no longer fails the job — but it
+      # still has to be seen, because one set vanishing from the catalog looks like silence.
+      - name: Report a day that could not be fully priced
+        if: success() && hashFiles('.partial-day.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh issue list --label pipeline --state open --search 'could not be fully priced in:title' --json number --jq '.[0].number')
+          if [ -z "$existing" ]; then
+            gh issue create --title 'A day could not be fully priced' --body-file .partial-day.md --label pipeline
+          else
+            gh issue comment "$existing" --body-file .partial-day.md
+          fi
+
       - name: Report averages that have stopped moving
         if: success() && hashFiles('.frozen-prices.md') != ''
         env:

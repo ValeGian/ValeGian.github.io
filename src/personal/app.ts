@@ -148,7 +148,9 @@ const store = createStore<AppState>({
   reveal: null,
   basis: 'avg30',
   range: RANGES[0],
-  view: loadWishView()?.view ?? 'list',
+  // Grid by default: the picture is what matches a card to the one in the rack, which is
+  // what this is used for.
+  view: loadWishView()?.view ?? 'grid',
   tick: 0,
 });
 

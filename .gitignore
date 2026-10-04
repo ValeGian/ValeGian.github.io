@@ -32,3 +32,6 @@ Thumbs.db
 .frozen-prices.md
 .stale-prices.md
 .resolution-report.md
+
+# Written by the daily job when a day could not be fully priced.
+.partial-day.md

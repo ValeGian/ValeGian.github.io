@@ -549,11 +549,17 @@ function wishRow(
     el(
       'span',
       { class: 'wish-figures' },
+      // The target leads, because it is the decision; the market price follows, named, as
+      // the thing being judged against it. Unlabelled they were two numbers side by side
+      // and nothing said which was which.
       el('span', {
         class: 'target-price numeric',
-        text: item.targetPriceEur === null ? 'no target' : `target ${money(item.targetPriceEur)}`,
+        text: item.targetPriceEur === null ? 'any price' : money(item.targetPriceEur),
       }),
-      el('span', { class: 'value numeric', text: market === null ? '—' : money(market) }),
+      el('span', {
+        class: 'value numeric ui',
+        text: market === null ? 'market —' : `market ${money(market)}`,
+      }),
       bought
         ? el('span', {
             class: 'bought-badge ui',
@@ -667,7 +673,7 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
           class: 'target-price numeric',
           text: item.targetPriceEur === null ? 'any price' : money(item.targetPriceEur),
         }),
-        el('span', { class: 'numeric', text: market === null ? '—' : money(market) }),
+        el('span', { class: 'value numeric', text: market === null ? 'market —' : `market ${money(market)}` }),
       ),
       el(
         'span',

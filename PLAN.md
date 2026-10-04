@@ -898,6 +898,40 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-10-04 — rev 54 (six days of prices lost to a guard doing its job) 🔴→✅
+
+**The daily job has failed every day since 29 September.** It ran each morning, said
+
+    Only 78 of 146 watched cards priced. Refusing to write a partial day.
+
+and wrote nothing. Six days of history are gone and cannot be recovered — TCGdex serves
+only today. It did report itself: issue #2, commented on daily. Nobody was reading issues.
+
+**The cause is that TCGdex's servers disagree about whether M6a exists.** It was published
+on 28 September; from the 29th, every M6a card returns **404 to GitHub's runners** while
+the same request from this laptop returns 200 — twenty-six consecutive 200s here against
+sixty-eight 404s in CI on the same morning. §8.4 already recorded that `eu` is served by
+three machines; this is the same split, with a new set on some of them and not others.
+
+Nothing was wrong with the other seventy-eight cards, and refusing the day threw those
+away too. **The guard no longer vetoes.** A thin day is written with whatever was read —
+which is exactly what a daily file expresses, a card that could not be read being simply
+absent — and `latest.json` carries the rest forward at their old timestamps. The shortfall
+writes `.partial-day.md`, and a new workflow step opens or comments on an issue. Only a
+total failure, nothing priced at all, still refuses: an empty file records nothing.
+
+The lesson is about the guard, not the catalog: it was built to stop a corrupt day being
+written, and instead it stopped six good-enough days from being written at all. A rule
+that refuses data should be surer that refusing costs less than accepting.
+
+Two things asked for while this was being traced:
+
+- **Grid is the default view.** The picture is what matches a card to the one in the rack.
+- **The target price now leads.** It was the grey one and the market price was at full
+  strength and unlabelled, so the eye landed on the figure that is not the decision. The
+  target is ink and semibold, the market price muted, smaller and named — "€5.00  market
+  €10.29". Weight and colour only; nothing boxed.
+
 ### 2026-10-04 — rev 53 (a tab per person, instead of every list at once) ✅
 
 The wishlists had a pair of chips reading "One shopping list" and "By person", and *By

@@ -139,9 +139,48 @@ if (failed.length > 0) {
   for (const message of failed) console.error(`  ${message}`);
 }
 
+/**
+ * A thin day is reported, not refused.
+ *
+ * This used to exit non-zero and write nothing, and that cost six days of history. On 28
+ * September TCGdex published M6a; from the 29th every run died here, because the replica
+ * GitHub's runners reach **404s the whole set** while the one this laptop reaches serves
+ * it — 26 requests from here, 26 answers of 200, and sixty-eight 404s in CI on the same
+ * minute. Nothing was wrong with the other seventy-eight cards, and refusing the day threw
+ * those away too.
+ *
+ * A day cannot be backfilled; TCGdex only serves today. So the reading is always kept,
+ * because a partial day is exactly what a daily file is built to express — a card that
+ * could not be read is simply absent from it — and `latest.json` carries the missing ones
+ * forward at their old timestamps. The shortfall is reported instead, loudly, and the
+ * workflow raises it.
+ */
 if (isTooIncomplete(coverage, MAX_LOSS_RATIO)) {
-  console.error(`\nOnly ${got} of ${expected} watched cards priced. Refusing to write a partial day.`);
-  console.error(`missing: ${coverage.missing.join(', ')}`);
+  const line = `Only ${got} of ${expected} watched cards could be priced`;
+  console.warn(`\nWARNING: ${line}. Writing the day anyway — a gap cannot be backfilled.`);
+  console.warn(`missing: ${coverage.missing.join(', ')}`);
+
+  await writeFile(
+    '.partial-day.md',
+    [
+      `**${line}** on ${options.date}, and the day was written with what there was.`,
+      '',
+      'A missing day cannot be recovered — TCGdex only serves today — so a thin reading is',
+      'kept rather than refused. The cards below have no figure for this date; `latest.json`',
+      'still carries their previous reading, with its original timestamp.',
+      '',
+      'If this persists for one set, suspect the catalog rather than the job: its servers do',
+      'not all carry a new set at the same time, and the one GitHub reaches is not the one a',
+      'laptop in Europe reaches.',
+      '',
+      ...coverage.missing.map((cardId) => `- \`${cardId}\``),
+    ].join('\n'),
+  );
+}
+
+// Nothing at all means the catalog is unreachable, and an empty file records nothing.
+if (got === 0) {
+  console.error('\nNot one card could be priced; the catalog looks unreachable. Nothing written.');
   process.exit(1);
 }
 

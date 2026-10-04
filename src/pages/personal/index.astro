@@ -668,8 +668,21 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     font-size: var(--size-sm);
   }
 
+  /*
+   * The target is the figure on a wanted card: it is the decision, and the market price
+   * is what it is being judged against. They used to be the other way round — the target
+   * grey, the market price at full strength and unlabelled — so the eye landed on the
+   * number that was not the point. Weight and colour do the work; nothing is boxed.
+   */
   .personal .target-price {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .personal .wish-figures .value,
+  .personal .tile-figures .value {
     color: var(--muted);
+    font-size: var(--size-xs);
   }
 
   .personal .target {

@@ -14,12 +14,30 @@ let sets;
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * How many times a 404 is asked again before it is believed.
+ *
+ * A 404 is normally an answer, and asking twice only wastes time. TCGdex is the exception:
+ * `eu` is served by several machines and they do not all carry a new set at the same
+ * moment. M6a was published on 28 September 2026, and from the 29th every card in it
+ * answered 404 to GitHub's runners while the same request from a laptop in Europe
+ * answered 200 — sixty-eight 404s in CI against twenty-six consecutive 200s here. That
+ * cost five days of history before the guard above it stopped refusing thin days.
+ *
+ * So a 404 is tried once more, after a pause long enough to stand a chance of landing on
+ * a different machine. Twice is the whole budget: if a card genuinely does not exist,
+ * every run would otherwise pay the delay for it forever.
+ */
+const NOT_FOUND_RETRIES = 1;
+const NOT_FOUND_PAUSE_MS = 1200;
+
+/**
  * A 5xx from TCGdex is usually a blip, and the daily job must not lose a day of history
- * to one. Retries those with exponential backoff; a 4xx is a real answer and is not
- * retried.
+ * to one. Retries those with exponential backoff. A 404 gets one second chance, for the
+ * reason above; any other 4xx is a real answer and is taken at its word.
  */
 async function get(path) {
   let lastError;
+  let notFound = 0;
 
   for (let attempt = 0; attempt <= RETRIES; attempt += 1) {
     if (attempt > 0) await pause(2 ** attempt * 250);
@@ -29,6 +47,14 @@ async function get(path) {
         headers: { 'User-Agent': 'valegian.github.io collection tooling' },
       });
       if (response.ok) return response.json();
+
+      if (response.status === 404 && notFound < NOT_FOUND_RETRIES) {
+        notFound += 1;
+        lastError = new Error(`TCGdex ${path} responded 404`);
+        await pause(NOT_FOUND_PAUSE_MS);
+        continue;
+      }
+
       if (response.status < 500) {
         throw new Error(`TCGdex ${path} responded ${response.status}`);
       }

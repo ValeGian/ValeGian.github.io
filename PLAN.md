@@ -898,6 +898,25 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-10-04 — rev 55 (a 404 from TCGdex gets one second chance) ✅
+
+Following rev 54: the daily job now asks again when TCGdex answers 404, once, after
+1.2 seconds. A 404 is normally an answer and asking twice is waste — but TCGdex's `eu`
+is several machines that do not all carry a new set at the same moment, which is what
+cost five days of history, so here it is worth doubting exactly once.
+
+Twice is the whole budget. Without a cap every run would pay the delay for every card
+that genuinely does not exist, for ever. Any other 4xx is still taken at its word on the
+first answer.
+
+Three tests: a 404 followed by a 200 recovers in two requests, a permanent 404 gives up
+after two rather than five, and a 400 costs one.
+
+Note the deliberate difference from the browser's `cardDetail`, which does **not** retry a
+404: there the id came from a person who may have typed a card that does not exist, while
+here it came from the watchlist, so the card is known to exist and a 404 is more likely to
+be the catalog than the truth.
+
 ### 2026-10-04 — rev 54 (six days of prices lost to a guard doing its job) 🔴→✅
 
 **The daily job has failed every day since 29 September.** It ran each morning, said

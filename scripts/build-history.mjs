@@ -4,7 +4,7 @@
  *
  * Two outputs:
  *
- *   prices/index.json    which days exist, so the client knows what it can ask for
+ *   prices/index.json    which days exist, and when the catalog's averages last moved
  *   prices/rollups.json  weekly and monthly averages per card
  *
  * Only per-card prices go in. What a collection is worth at a point in time is the
@@ -19,6 +19,7 @@
  */
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { averagesChanged } from './lib/freeze.mjs';
 
 const DAILY = 'public/data/prices/daily';
 const OUT = 'public/data/prices';
@@ -42,6 +43,16 @@ const month = (date) => date.slice(0, 7);
 
 const files = (await readdir(DAILY)).filter((name) => name.endsWith('.json')).sort();
 const days = [];
+
+/**
+ * When the catalog's rolling averages last actually changed.
+ *
+ * Published because the site values on `trend` and shows the 30-day average beside it as
+ * a second opinion, and a second opinion that stopped being refreshed three weeks ago is
+ * worth knowing about. One snapshot is held at a time; see scripts/lib/freeze.mjs.
+ */
+let averagesLastMoved = null;
+let previous = null;
 
 /** cardId -> period -> running mean */
 const weekly = new Map();
@@ -84,6 +95,9 @@ for (const name of files) {
   const snapshot = JSON.parse(await readFile(`${DAILY}/${name}`, 'utf8'));
   days.push(snapshot.date);
 
+  if (previous && averagesChanged(previous, snapshot.prices)) averagesLastMoved = snapshot.date;
+  previous = snapshot.prices;
+
   for (const [cardId, price] of Object.entries(snapshot.prices)) {
     // avg7 stands in for a card too new to have a thirty-day average, as it does
     // everywhere else; the real avg7 is kept alongside it either way.
@@ -116,7 +130,18 @@ days.sort();
 
 await writeFile(
   `${OUT}/index.json`,
-  `${JSON.stringify({ version: 1, generatedAt: new Date().toISOString(), firstDay: days[0] ?? null, lastDay: days.at(-1) ?? null, days }, null, 2)}\n`,
+  `${JSON.stringify(
+    {
+      version: 1,
+      generatedAt: new Date().toISOString(),
+      firstDay: days[0] ?? null,
+      lastDay: days.at(-1) ?? null,
+      averagesLastMoved,
+      days,
+    },
+    null,
+    2,
+  )}\n`,
 );
 
 await writeFile(
@@ -126,4 +151,5 @@ await writeFile(
 
 console.log(`days indexed   ${days.length}`);
 console.log(`cards rolled   ${weekly.size}`);
+console.log(`averages moved ${averagesLastMoved ?? 'never, in the days on record'}`);
 console.log(`written to     ${OUT}/index.json, ${OUT}/rollups.json`);

@@ -18,6 +18,16 @@ export const percent = (ratio: number): string => PERCENT.format(ratio);
 /** Which figure the reader asked to see. Not necessarily the one they get — see quote. */
 export type Basis = 'avg1' | 'avg7' | 'avg30' | 'trend';
 
+/**
+ * What everything is valued and charted on unless the reader picks otherwise.
+ *
+ * `trend` since 5 October 2026, and the reasoning is on `quote` below. One constant
+ * rather than a default repeated at every call site, because the whole point of the
+ * previous arrangement going wrong was that the basis is a decision, not a parameter
+ * each function happens to have an opinion about.
+ */
+export const DEFAULT_BASIS: Basis = 'trend';
+
 export interface Quote {
   value: number;
   /** Which field the figure actually came from, so the screen can say when it is not the one asked for. */
@@ -51,26 +61,43 @@ const FALLBACKS: Record<Basis, Basis[]> = {
 /**
  * What one card is worth, on the measure the reader asked for.
  *
- * Asking for `avg30` gives a 30-day average — a hand-read one where it exists, otherwise
- * the catalog's, which is stale but is still that measurement.
+ * The default is `trend`, and that reverses a decision taken on 20 September. It is worth
+ * setting out both measurements, because neither reading on its own settles it.
  *
- * It is worth saying why it is not replaced by `trend`, because that was tried and it was
- * a mistake. TCGdex's averages have stopped moving, so the obvious fix looked like
- * substituting the field that still moves. Measured against Cardmarket's real 30-day
- * average on three cards, the stale average is far closer than the trend is:
+ * In September, with the catalog's averages a few days old, the stale average was much
+ * the closer estimate of Cardmarket's real 30-day figure and `trend` was far below it:
  *
  *   SV2a-201   true 397.08   stale avg30 399.08  +0.5%   trend 357.63   -9.9%
  *   M6-110     true 388.36   stale avg30 436.50 +12.4%   trend 297.77  -23.3%
  *   S12a-212   true 104.46   stale avg30 109.69  +5.0%   trend  75.17  -28.0%
  *
- * A stale reading of the right measure beats a live reading of a different one. So the
- * substitution is gone: `avg30` means `avg30`, the screen says when it came from the
- * catalog, and `trend` is shown only when it is asked for.
+ * By 4 October the averages had not moved for thirteen days, and the same comparison on
+ * the four most valuable cards in the collection came out level:
+ *
+ *   SV2a-201   true 373.34   stale avg30 397.08  +6.4%   trend 332.49  -10.9%
+ *   S12a-261   true 256.84   stale avg30 258.62  +0.7%   trend 256.68   -0.1%
+ *   SV1a-080   true 150.19   stale avg30 168.03 +11.9%   trend 145.70   -3.0%
+ *   SV1S-101   true 157.87   stale avg30 158.27  +0.3%   trend 165.36   +4.7%
+ *   total      true 938.24   stale avg30 982.00  +4.7%   trend 900.23   -4.1%
+ *
+ * So the error in the stale average is not bounded by how fast a card moves after all —
+ * it is bounded by how long the catalog has been dead, and that is outside our control
+ * and has only grown. `trend` is wrong by about as much today and its error does not
+ * accumulate. The deciding argument is not accuracy, which is a draw: it is that a dead
+ * field draws a flat line, and a flat line reads as a stable market rather than as a
+ * broken feed.
+ *
+ * What this costs, stated plainly: `trend` is a different measure, not a fresher avg30.
+ * The median gap between them across the watchlist is 9.8%, the switch itself moved the
+ * collection's headline by -5.7% with no market behind it, and on the single most
+ * valuable card trend sits 10.9% under the real 30-day average. The 30-day average is
+ * still kept, still charted on request, and shown beside the headline with the date it
+ * last moved, so the second opinion is one tap away and its staleness is on screen.
  *
  * `low` is never used: it is the cheapest listing in any condition, which means a
  * damaged copy.
  */
-export function quote(price: Price | undefined, want: Basis = 'avg30'): Quote | null {
+export function quote(price: Price | undefined, want: Basis = DEFAULT_BASIS): Quote | null {
   if (!price) return null;
 
   for (const basis of FALLBACKS[want] ?? FALLBACKS.avg30) {
@@ -107,7 +134,7 @@ export function parseAmount(text: string): number | null {
   return Number.isFinite(value) && value > 0 ? Math.round(value * 100) / 100 : null;
 }
 
-export const marketValue = (price: Price | undefined, want: Basis = 'avg30'): number | null =>
+export const marketValue = (price: Price | undefined, want: Basis = DEFAULT_BASIS): number | null =>
   quote(price, want)?.value ?? null;
 
 /**
@@ -116,21 +143,26 @@ export const marketValue = (price: Price | undefined, want: Basis = 'avg30'): nu
  * Said in full wherever a price appears, because the site now mixes three measures and a
  * reader should never have to guess which one a number is.
  */
-const WINDOW: Record<Exclude<Basis, 'trend'>, string> = {
+const NAMES: Record<Basis, string> = {
   avg1: '1-day average',
   avg7: '7-day average',
   avg30: '30-day average',
+  trend: 'price trend',
 };
+
+/** The measure's own name, with nothing said about where the figure came from. */
+export const basisName = (basis: Basis): string => NAMES[basis];
 
 export function basisLabel(reading: { basis: Basis | null; handRead?: boolean } | null): string {
   // A reading can exist with no usable figure in it — a catalog entry whose averages and
   // trend are all null — and calling that a 30-day average would be a lie on the screen.
   if (!reading || reading.basis === null) return 'no price';
-  if (reading.basis === 'trend') return 'price trend';
+  // Live for every card, so there is no freshness to qualify.
+  if (reading.basis === 'trend') return NAMES.trend;
 
   // Which of the two an average is matters: the catalog's stopped refreshing, and a
   // reader has no other way to tell a fresh figure from one that is days behind.
-  return `${WINDOW[reading.basis]}, ${reading.handRead ? 'read by hand' : 'catalog — may be behind'}`;
+  return `${NAMES[reading.basis]}, ${reading.handRead ? 'read by hand' : 'catalog — may be behind'}`;
 }
 
 /**
@@ -154,7 +186,7 @@ export interface Valued {
   ratio: number | null;
 }
 
-export function value(item: CollectionItem, snapshot: PriceSnapshot | null, want: Basis = 'avg30'): Valued {
+export function value(item: CollectionItem, snapshot: PriceSnapshot | null, want: Basis = DEFAULT_BASIS): Valued {
   // Also finds a hand-read price for a card the catalog has not published — see priceKey.
   const key = priceKey(item);
   const price = key ? snapshot?.prices[key] : undefined;

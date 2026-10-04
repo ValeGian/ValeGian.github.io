@@ -17,6 +17,9 @@ export const CADENCE_DAYS = 10;
 /** Below this share of the cards, it is a few quiet cards rather than a dead field. */
 export const FROZEN_SHARE = 0.95;
 
+/** The three rolling averages, which refresh together and have stopped together. */
+export const AVERAGES = ['avg30', 'avg7', 'avg1'];
+
 /** Under this many cards there is no share worth taking. */
 export const FROZEN_MINIMUM = 10;
 
@@ -59,9 +62,54 @@ export function frozenVerdict(readings) {
   const shared = comparableCards(readings);
   if (shared.length < FROZEN_MINIMUM) return null;
 
-  const averages = unmovedAcross(readings, shared, ['avg30', 'avg7', 'avg1']);
+  const averages = unmovedAcross(readings, shared, AVERAGES);
   const spot = unmovedAcross(readings, shared, ['low', 'trend']);
   if (averages.length / shared.length < FROZEN_SHARE) return null;
 
   return { shared: shared.length, averages: averages.length, spot: spot.length };
+}
+
+const fromCatalog = (price) => price?.source === 'cardmarket/tcgdex';
+
+/**
+ * Whether any card the catalog priced on both days carries a different average.
+ *
+ * Catalog readings only, for the same reason `comparableCards` exists: a hand-read figure
+ * is a different measurement of the same card and would show up as movement.
+ *
+ * Exposed on its own so a caller walking years of daily files can keep one snapshot in
+ * memory rather than all of them.
+ */
+export function averagesChanged(before, after) {
+  return Object.keys(after).some((cardId) => {
+    if (!fromCatalog(before[cardId]) || !fromCatalog(after[cardId])) return false;
+    return AVERAGES.some((field) => before[cardId][field] !== after[cardId][field]);
+  });
+}
+
+/**
+ * The last date on which the catalog's averages actually changed.
+ *
+ * `frozenVerdict` answers "are they dead right now" over a fixed window of readings, and
+ * that window is counted in files rather than days. On 4 October 2026 that made it blind
+ * to the very thing it exists to catch: the averages had not moved since 21 September,
+ * but a five-day hole in the history (the TCGdex 404 outage) meant the last eleven files
+ * still reached back to the 19th and so still contained one refresh — 1 of 43 cards
+ * unmoved, far under the threshold, no report.
+ *
+ * This asks a question a gap cannot dodge: when did any card last move? It needs no
+ * window, no share and no cadence assumption, and the answer is a date a reader can
+ * judge for themselves. It is what the screen shows beside the collection's value.
+ *
+ * @param {{ date: string, prices: Record<string, any> }[]} snapshots oldest first
+ * @returns {string | null} the date of the last change, or null with nothing to compare
+ */
+export function averagesLastMoved(snapshots) {
+  let moved = null;
+  for (let index = 1; index < snapshots.length; index += 1) {
+    if (averagesChanged(snapshots[index - 1].prices, snapshots[index].prices)) {
+      moved = snapshots[index].date;
+    }
+  }
+  return moved;
 }

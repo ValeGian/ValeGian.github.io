@@ -2,7 +2,7 @@
  * The collection: what is owned, what it cost, what it is worth now.
  */
 import { el, frag } from '../lib/dom.ts';
-import { money, signedMoney, percent, totals, type Valued } from '../lib/money.ts';
+import { basisName, money, signedMoney, percent, totals, type Basis, type Valued } from '../lib/money.ts';
 import { apply, sort, type Filters, type SortKey } from '../lib/filters.ts';
 import { displayName, subtitle, type NameTable } from '../lib/data.ts';
 import { cardThumb } from './thumb.ts';
@@ -55,20 +55,34 @@ function gainCell(entry: Valued): HTMLElement {
   );
 }
 
+/**
+ * The measure behind the total, when there is one answer to give.
+ *
+ * A total can mix measures — a card with no trend falls back to an average — and calling
+ * the sum by the name of the commonest one would be a small lie on the headline figure.
+ * So it is named only when every priced card agrees.
+ */
+function sharedBasis(rows: Valued[]): Basis | null {
+  const used = new Set(rows.map((entry) => entry.basis).filter((basis): basis is Basis => basis !== null));
+  return used.size === 1 ? [...used][0] : null;
+}
+
 function summary(rows: Valued[]): HTMLElement {
   const figures = totals(rows);
   // With nothing priced there is no value to state. Printing 0,00 would say these cards
   // are worth nothing, which is the opposite of what an absent price means.
   const nothingPriced = figures.ratio === null && figures.valued === 0;
+  const basis = sharedBasis(rows);
+
+  const valueNotes = [
+    basis ? basisName(basis) : null,
+    figures.unpriced > 0 ? `${figures.unpriced} without a price` : null,
+  ].filter(Boolean);
 
   const cells: [string, string, string?][] = [
     ['Cards', String(figures.cards)],
     ['Paid', money(figures.paid)],
-    [
-      'Value now',
-      nothingPriced ? '—' : money(figures.valued),
-      figures.unpriced > 0 ? `${figures.unpriced} without a price` : undefined,
-    ],
+    ['Value now', nothingPriced ? '—' : money(figures.valued), valueNotes.join(' · ') || undefined],
     [
       'Gain',
       nothingPriced ? '—' : signedMoney(figures.gain),

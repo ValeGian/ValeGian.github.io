@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { value, totals } from '../src/personal/lib/money.ts';
+import { DEFAULT_BASIS, basisName, value, totals } from '../src/personal/lib/money.ts';
 import type { CollectionItem, PriceSnapshot } from '../src/personal/lib/types.ts';
 
 const card = (over: Partial<CollectionItem> = {}): CollectionItem => ({
@@ -208,4 +208,61 @@ test('a picture chosen by hand beats a borrowed one, and a real scan beats both'
   assert.equal(picture(card, 'high'), 'https://example.test/found/1600.jpg', 'one file serves both sizes');
 
   usePublishedArtwork(new Map());
+});
+
+/**
+ * Which measure the site values on by default.
+ *
+ * Changed from `avg30` to `trend` on 5 October 2026, after the catalog's averages had
+ * stood still for thirteen days while trend kept moving. These pin the decision down so
+ * a later edit to a function signature cannot quietly undo it — the previous arrangement
+ * repeated the default at four call sites.
+ */
+const fullPrice = (over: Record<string, number | null>) => ({
+  version: 1 as const,
+  date: '2026-10-04',
+  generatedAt: '2026-10-04T19:42:10.039Z',
+  prices: {
+    'S12a-261': {
+      source: 'cardmarket/tcgdex' as const,
+      currency: 'EUR' as const,
+      updated: '2026-10-03T22:54:32.658Z',
+      avg30: 258.62,
+      avg7: 240,
+      avg1: 230,
+      trend: 256.68,
+      low: 120,
+      ...over,
+    },
+  },
+});
+
+test('a card with every figure is valued on the price trend, not the 30-day average', () => {
+  const row = value(card(), fullPrice({}));
+  assert.equal(row.value, 256.68);
+  assert.equal(row.basis, 'trend');
+});
+
+test('asking for the 30-day average still gives the 30-day average', () => {
+  const row = value(card(), fullPrice({}), 'avg30');
+  assert.equal(row.value, 258.62);
+  assert.equal(row.basis, 'avg30');
+});
+
+test('a card the catalog has no trend for falls back to an average rather than dropping out', () => {
+  const row = value(card(), fullPrice({ trend: null }));
+  assert.equal(row.value, 258.62);
+  assert.equal(row.basis, 'avg30', 'the screen must be able to say it is not the trend');
+});
+
+test('every measure has a name to print, so no figure appears unlabelled', () => {
+  assert.equal(basisName('trend'), 'price trend');
+  assert.equal(basisName('avg30'), '30-day average');
+  assert.equal(basisName('avg7'), '7-day average');
+  assert.equal(basisName('avg1'), '1-day average');
+});
+
+test('the default is the one constant, not a literal repeated per function', () => {
+  assert.equal(DEFAULT_BASIS, 'trend');
+  assert.equal(value(card(), fullPrice({})).basis, DEFAULT_BASIS);
 });

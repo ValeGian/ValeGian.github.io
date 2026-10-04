@@ -8,7 +8,13 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CADENCE_DAYS, frozenVerdict, comparableCards, unmovedAcross } from '../scripts/lib/freeze.mjs';
+import {
+  CADENCE_DAYS,
+  averagesLastMoved,
+  frozenVerdict,
+  comparableCards,
+  unmovedAcross,
+} from '../scripts/lib/freeze.mjs';
 
 const card = (avg30: number, trend: number, source = 'cardmarket/tcgdex') => ({
   source,
@@ -75,4 +81,58 @@ test('unmovedAcross looks at every day, not just the ends', () => {
   readings[2]['C-0'] = card(999, 95);
 
   assert.equal(unmovedAcross(readings, ['C-0'], ['avg30']).length, 0, 'a blip in the middle is movement');
+});
+
+/**
+ * When the averages last moved — the question a gap in the history cannot dodge.
+ *
+ * `frozenVerdict` counts its window in files rather than days, and on 4 October 2026 that
+ * made it miss a thirteen-day freeze: a five-day hole in the history meant the last
+ * eleven files still reached back far enough to contain one refresh. This reports a date
+ * instead of a verdict, so there is no window to stretch.
+ */
+const day = (date: string, avg30: number, trend: number, source = 'cardmarket/tcgdex') => ({
+  date,
+  prices: Object.fromEntries(
+    Array.from({ length: 12 }, (_, n) => [`C-${n}`, card(avg30 + n, trend + n, source)]),
+  ),
+});
+
+test('the date of the last change is reported, not the last day on record', () => {
+  const moved = averagesLastMoved([
+    day('2026-09-19', 100, 90),
+    day('2026-09-20', 100, 91),
+    day('2026-09-21', 110, 92),
+    day('2026-09-22', 110, 93),
+  ]);
+  assert.equal(moved, '2026-09-21');
+});
+
+test('a gap in the history cannot hide a freeze, which is why this exists', () => {
+  // The real shape of 4 October 2026: one refresh early, then five missing days, then
+  // nothing. The share-based detector read this as healthy.
+  const moved = averagesLastMoved([
+    day('2026-09-19', 100, 90),
+    day('2026-09-21', 110, 92),
+    day('2026-09-28', 110, 99),
+    day('2026-10-04', 110, 105),
+  ]);
+  assert.equal(moved, '2026-09-21');
+});
+
+test('trend moving on its own is not the averages moving', () => {
+  const moved = averagesLastMoved([day('2026-10-03', 110, 92), day('2026-10-04', 110, 140)]);
+  assert.equal(moved, null);
+});
+
+test('one day on record answers nothing rather than guessing', () => {
+  assert.equal(averagesLastMoved([day('2026-10-04', 110, 92)]), null);
+});
+
+test('a hand-read figure is a different measurement and must not read as movement', () => {
+  const moved = averagesLastMoved([
+    day('2026-10-03', 110, 92),
+    day('2026-10-04', 200, 93, 'cardmarket/manual'),
+  ]);
+  assert.equal(moved, null, 'reading a card by hand would otherwise reset the staleness clock');
 });

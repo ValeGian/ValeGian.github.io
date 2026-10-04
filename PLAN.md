@@ -698,6 +698,54 @@ estimate, computed from completed sales, and it is what their product pages show
 price. Pricing on it would cost nothing and need no hand-reading — the objection is that
 it is a different measure from `avg30`, so every figure already recorded changes meaning.
 
+#### Reversed 2026-10-05: the site values on `trend`
+
+The weekly-cadence conclusion above made a prediction — the next refresh should land in
+the **28 September** snapshot — and it is now falsified. The averages last moved in the
+**21 September** file and have not moved since, on any card, for fourteen days. TCGdex's
+own `updated` stamp advanced every one of those days and `trend` changed on 42 of 46
+owned cards on 4 October, so the feed is being read and only the averages are dead.
+
+The 20 September argument for keeping `avg30` was that the error in a stale average is
+bounded by how fast the card moves. Measured again on 4 October against Cardmarket's live
+product pages, on the four most valuable cards in the collection, that bound is gone — it
+is set by how long the catalog has been dead, which is outside our control and only grows:
+
+| card | real avg30 | ours (stale avg30) | | `trend` | |
+|---|---|---|---|---|---|
+| SV2a-201 | 373.34 | 397.08 | +6.4% | 332.49 | −10.9% |
+| S12a-261 | 256.84 | 258.62 | +0.7% | 256.68 | −0.1% |
+| SV1a-080 | 150.19 | 168.03 | +11.9% | 145.70 | −3.0% |
+| SV1S-101 | 157.87 | 158.27 | +0.3% | 165.36 | +4.7% |
+| **total** | **938.24** | **982.00** | **+4.7%** | **900.23** | **−4.1%** |
+
+Accuracy is a draw: mean absolute error 4.8% against 4.7%, in opposite directions. So the
+decision is not made on accuracy. It is made on the failure each one produces. A stale
+average draws a flat line, and a flat line reads as a stable market rather than a broken
+feed — which is the worst outcome available here. `trend` is live, so the chart tells the
+truth about whether anything is happening, and its error does not accumulate.
+
+**What it costs, stated rather than buried.** `trend` is a different measure, not a
+fresher `avg30`: the median gap between them across the watchlist is 9.8%, the switch
+moved the headline from €2,670.71 to €2,519.46 — −5.7% with no market behind it — and on
+SV2a-201, the single most valuable card, trend sits 10.9% under the real 30-day average.
+Every figure recorded before today was an `avg30`, so the series is redrawn on `trend`
+throughout rather than spliced; the daily files have always carried all four fields, so
+that needed no recomputation and the choice stays reversible from the chips.
+
+**What is on screen.** The headline names its measure ("price trend"). Under the basis
+chips, once the averages have stood still for longer than a refresh cycle, one line says
+when they last moved and how long ago. That date is computed over every day on record by
+`averagesLastMoved` in `scripts/lib/freeze.mjs` and published in `prices/index.json`.
+
+**Why a new detector rather than the existing one.** `frozenVerdict` counts its window in
+files, not days, and the five-day hole left by the 404 outage stretched the last eleven
+files back to 19 September — so the window still contained the 21 September refresh, 1 of
+43 cards read as unmoved, and it reported nothing while the feed had been dead a
+fortnight. `averagesLastMoved` asks a question no gap can dodge: when did any card last
+move. `frozenVerdict` is left in place for the daemon's issue report and is still
+window-blind; see §12.
+
 ### 8.5 Sets the catalog has not published yet
 
 TCGdex publishes the English side of a worldwide release first. Four days after the 30th
@@ -893,10 +941,52 @@ static lookup, never fetched at runtime.
    SV7a, SV8, SV8a, SV9. Their links are built the same way as the fifteen that were
    confirmed, so they are very likely right, but they have not been opened. `npm run
    links:check` lists them; one page load each finishes it (§13 rev 36).
+7. **`frozenVerdict` is still window-blind.** It counts its window in files rather than
+   days, so a gap in the history stretches it and it can miss a freeze — which is exactly
+   what happened on 4 October (§8.4). The screen no longer depends on it: the staleness
+   date comes from `averagesLastMoved`, which a gap cannot fool. What is left is the
+   daemon's issue report, which can still stay quiet through an outage. Fixing it means
+   windowing by date and refusing to answer with too few readings inside it.
+8. **When the catalog's averages come back, revisit the basis.** The 5 October switch to
+   `trend` (§8.4) was made because the averages had been dead a fortnight, not because
+   `trend` is the better measure — on accuracy the two were level. If `prices/index.json`
+   starts reporting a recent `averagesLastMoved` again, `avg30` deserves another hearing.
 
 ---
 
 ## 13. Progress log
+
+### 2026-10-05 — rev 56 (the collection is valued on `trend`) ⚠️
+
+- **The site now values and charts on `trend` by default, not `avg30`.** This reverses
+  rev 30's decision, and the reasoning — both measurements, and what they do and do not
+  settle — is in §8.4 under "Reversed 2026-10-05". The short version: the catalog's
+  averages have not moved since 21 September, measured against Cardmarket on the four
+  most valuable cards the two bases are now equally wrong in opposite directions (+4.7%
+  against −4.1%), so the tie is broken on failure mode rather than accuracy. A dead field
+  draws a flat line and a flat line reads as a stable market.
+- **The headline moved €2,670.71 → €2,519.46 on the switch alone.** No market behind it.
+  Recorded here so a later reader does not mistake it for a crash.
+- **One constant, not four defaults.** `DEFAULT_BASIS` in `money.ts` is what `quote`,
+  `marketValue`, `value`, `cardSeries` and `holdingsSeries` all take. The previous
+  arrangement repeated `'avg30'` at each signature, which is how a decision becomes a
+  parameter nobody owns.
+- **The screen says which measure it used.** The collection headline carries the measure's
+  name under it, and names it only when every priced card agrees — a mixed total is not
+  called by the name of its commonest field.
+- **A staleness line that a gap cannot hide.** `averagesLastMoved` walks every day on
+  record and answers when any card's averages last changed; `build-history.mjs` publishes
+  it in `prices/index.json` and the personal area prints it under the basis chips once it
+  is older than a refresh cycle. Today it reads **21 September**.
+  This was written because `frozenVerdict` missed the freeze entirely: its window is
+  counted in files, and the five-day hole from the 404 outage stretched it back far enough
+  to still contain a refresh. That detector is still blind in the same way — §12.7.
+- Ten tests added (five on the default basis and the measure names, five on
+  `averagesLastMoved` including the gap case and the hand-read case). 108 passing.
+- **What this costs:** `trend` is a different measure, not a fresher average. Median gap
+  to `avg30` across the watchlist is 9.8%, and on SV2a-201 it sits 10.9% below the real
+  30-day average. `avg30` is still collected, still one tap away on the chips, and §12.8
+  says to revisit the default if the catalog ever starts refreshing it again.
 
 ### 2026-10-04 — rev 55 (a 404 from TCGdex gets one second chance) ✅
 

@@ -9,7 +9,7 @@
  * Daily points come from the immutable per-day files, fetched only for the span asked
  * for. Anything coarser comes from one rollup file.
  */
-import { quote, type Basis } from './money.ts';
+import { DEFAULT_BASIS, quote, type Basis } from './money.ts';
 import type { PriceSnapshot } from './types.ts';
 
 export type RangeKey = '1w' | '1m' | '6m' | '1y' | '5y' | 'all';
@@ -47,7 +47,16 @@ export interface Point {
 type RollupEntry = { period: string; days: number } & Partial<Record<Basis | 'low' | 'avg', number | null>>;
 
 export interface HistorySource {
-  index: { days: string[]; firstDay: string | null; lastDay: string | null };
+  index: {
+    days: string[];
+    firstDay: string | null;
+    lastDay: string | null;
+    /**
+     * When the catalog's rolling averages last changed, computed over every day on
+     * record by scripts/build-history.mjs. Null before there are two days to compare.
+     */
+    averagesLastMoved?: string | null;
+  };
   rollups: { weekly: Record<string, RollupEntry[]>; monthly: Record<string, RollupEntry[]> };
   /** Daily snapshots already fetched, keyed by date. */
   daily: Map<string, PriceSnapshot>;
@@ -64,7 +73,12 @@ const json = async <T,>(path: string, fallback: T): Promise<T> => {
 
 export async function loadHistory(): Promise<HistorySource> {
   const [index, rollups] = await Promise.all([
-    json('/data/prices/index.json', { days: [] as string[], firstDay: null, lastDay: null }),
+    json('/data/prices/index.json', {
+      days: [] as string[],
+      firstDay: null,
+      lastDay: null,
+      averagesLastMoved: null,
+    }),
     json('/data/prices/rollups.json', { weekly: {}, monthly: {} }),
   ]);
   return { index, rollups, daily: new Map() };
@@ -121,7 +135,7 @@ const ROLLUP_FALLBACKS: Record<Basis, (Basis)[]> = {
 };
 
 function rollupValue(entry: RollupEntry, basis: Basis): number | null {
-  for (const field of ROLLUP_FALLBACKS[basis] ?? ROLLUP_FALLBACKS.avg30) {
+  for (const field of ROLLUP_FALLBACKS[basis] ?? ROLLUP_FALLBACKS[DEFAULT_BASIS]) {
     const value = entry[field];
     if (typeof value === 'number') return value;
   }
@@ -134,7 +148,7 @@ function rollupValue(entry: RollupEntry, basis: Basis): number | null {
  * Returns an empty list rather than a guess when there is nothing: a chart of one point
  * is not a trend, and the caller shows a figure instead.
  */
-export function cardSeries(source: HistorySource, cardId: string, range: Range, basis: Basis = 'avg30'): Point[] {
+export function cardSeries(source: HistorySource, cardId: string, range: Range, basis: Basis = DEFAULT_BASIS): Point[] {
   if (range.bucket === 'day') {
     return daysNeeded(source, range)
       .map((date) => {
@@ -185,7 +199,7 @@ export function holdingsSeries(
   source: HistorySource,
   holdings: Holding[],
   range: Range,
-  basis: Basis = 'avg30',
+  basis: Basis = DEFAULT_BASIS,
 ): Point[] {
   const byPeriod = new Map<string, { at: number; value: number }>();
 

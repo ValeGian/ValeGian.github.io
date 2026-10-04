@@ -8,7 +8,7 @@
 import { el, frag, need, rebuildPreservingFocus, revealAfterPaint } from './lib/dom.ts';
 import { createStore } from './lib/store.ts';
 import { emptyFilters, type Filters, type SortKey } from './lib/filters.ts';
-import { parseAmount, value, type Basis, type Valued } from './lib/money.ts';
+import { DEFAULT_BASIS, parseAmount, value, type Basis, type Valued } from './lib/money.ts';
 import { loadPublicData, stalenessDays, type PublicData } from './lib/data.ts';
 import { RANGES, cardSeries, daysNeeded, ensureDays, holdingsSeries, loadHistory, type HistorySource, type Range } from './lib/history.ts';
 import { renderChart, renderRangeTabs } from './views/chart.ts';
@@ -146,7 +146,7 @@ const store = createStore<AppState>({
   history: null,
   chartOpen: false,
   reveal: null,
-  basis: 'avg30',
+  basis: DEFAULT_BASIS,
   range: RANGES[0],
   // Grid by default: the picture is what matches a card to the one in the rack, which is
   // what this is used for.
@@ -269,6 +269,7 @@ function valueOverTime(state: AppState, vault: Vault): HTMLElement {
       basisTabs(state),
     ),
     renderChart({ points, range: state.range, label: 'Collection value over time' }),
+    stalenessNote(state),
     vault.collection.items.some((item) => item.purchase.dateIsBootstrap)
       ? el('p', {
           class: 'chart-note ui',
@@ -292,6 +293,7 @@ function cardHistory(state: AppState, cardId: string): HTMLElement {
       basisTabs(state),
     ),
     renderChart({ points, range: state.range, label: 'Card value over time' }),
+    stalenessNote(state),
   );
 }
 
@@ -404,7 +406,7 @@ async function begin(opened: Exclude<Opened, null>, keep: boolean): Promise<void
     vault,
     readOnly,
     tab: loadTab() ?? 'collection',
-    basis: loadBasis() ?? 'avg30',
+    basis: loadBasis() ?? DEFAULT_BASIS,
     hasToken: !readOnly && Boolean(getToken()),
   });
   if (keep) await saveSession({ role: opened.role, keys: opened.keys });
@@ -436,16 +438,55 @@ function rememberWishView(): void {
   });
 }
 
+/**
+ * How long the catalog's averages may sit still before it is worth saying so.
+ *
+ * Cardmarket recomputes them about weekly, so a few identical days are the normal state
+ * and reporting them would be noise. Beyond this they have stopped. Matches
+ * CADENCE_DAYS in scripts/lib/freeze.mjs, which decides the same thing for the daemon.
+ */
+const AVERAGES_STALE_AFTER_DAYS = 10;
+
+const daysSince = (date: string): number => Math.floor((Date.now() - Date.parse(`${date}T12:00:00Z`)) / 86_400_000);
+
+/**
+ * The one line that says the catalog's averages are not being refreshed.
+ *
+ * Shown under the basis chips rather than beside every figure: it is a fact about the
+ * feed, not about any one card. Silent while the averages are moving, which is the state
+ * this is waiting to return to.
+ *
+ * What it says depends on what the reader is looking at. On the default it explains why
+ * the figures are not averages; on any of the three averages it says the figures on
+ * screen are the stale ones, which is the warning that actually matters there.
+ */
+function stalenessNote(state: AppState): HTMLElement | null {
+  const moved = state.history?.index.averagesLastMoved;
+  if (!moved) return null;
+
+  const age = daysSince(moved);
+  if (age < AVERAGES_STALE_AFTER_DAYS) return null;
+
+  const when = new Date(`${moved}T12:00:00Z`).toLocaleDateString('en-IE', { day: 'numeric', month: 'long' });
+  const onAnAverage = state.basis !== 'trend';
+
+  return el('p', {
+    class: 'chart-note ui',
+    text: onAnAverage
+      ? `The catalog's averages last moved on ${when}, ${age} days ago, so these figures are that old. The price trend is live for every card.`
+      : `The catalog's averages last moved on ${when}, ${age} days ago. Values are on the price trend, which is live for every card.`,
+  });
+}
+
 function basisTabs(state: AppState): HTMLElement {
-  // In window order, shortest first. A one-day average is the honest primitive for a
-  // series we aggregate ourselves — a 30-day average already contains the previous 29
-  // days, so rolling it up by week and month smooths what is already smooth and lags by
-  // half the window. It is not the default yet only because the catalog's averages have
-  // stopped moving (PLAN.md §8.4); the daily files keep all four either way.
+  // In window order, shortest first, with the default last because it is not an average:
+  // it is Cardmarket's own smoothed estimate, and it is the default because it is the
+  // only figure the catalog still refreshes (PLAN.md §8.4). The daily files keep all
+  // four, so this choice stays reversible and the history redraws on any of them.
   const choices = [
     ['avg1', '1-day avg', 'One day of completed sales — the finest grain there is, and often no sales at all'],
     ['avg7', '7-day avg', 'A week of completed sales'],
-    ['avg30', '30-day avg', 'Hand-read where we have one, the catalog otherwise'],
+    ['avg30', '30-day avg', 'Hand-read where we have one, the catalog otherwise — see the note below'],
     ['trend', 'Price trend', "Cardmarket's own estimate, live for every card"],
   ] as const;
 

@@ -2,7 +2,7 @@ import { el } from '../lib/dom.ts';
 import { marketLinks, type Market } from '../lib/market.ts';
 
 /**
- * The two "see it on the market" links under a card.
+ * The "see it on the market" links under a card.
  *
  * The market data is held here rather than threaded through every view, for the reason
  * `data.ts` holds the discovered artwork: it is one presentational lookup, read by the
@@ -59,15 +59,18 @@ function marketLink(label: string, link: { href: string; isExact: boolean }): HT
   );
 }
 
-/** Null when neither site can be reached for this card, rather than an empty row. */
+/** Null when no site can be reached for this card, rather than an empty row. */
 export function marketRow(item: Identifiable): HTMLElement | null {
   const links = marketLinks(item, published);
-  if (!links.cardmarket && !links.pricecharting) return null;
+  if (!links.cardmarket && !links.pricecharting && !links.mercari) return null;
 
   return el(
     'div',
     { class: 'market-links' },
     links.cardmarket ? marketLink('Cardmarket', links.cardmarket) : null,
     links.pricecharting ? marketLink('PriceCharting', links.pricecharting) : null,
+    // Last: it prices what a card actually sells for in Japan, which is the sanity check
+    // after the two European references rather than the figure the target is set from.
+    links.mercari ? marketLink('Mercari', links.mercari) : null,
   );
 }

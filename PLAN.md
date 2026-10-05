@@ -956,6 +956,42 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-10-05 — rev 58 (Mercari, and a picture that belongs to the card) ✅
+
+- **Mercari under every card**, beside Cardmarket and PriceCharting. Always a search and
+  labelled as one: Mercari lists sellers, not products, so there is no page per card to
+  harvest. The query is the set code and the collector number, lowercase — what is printed
+  on the card and what a Japanese seller types in a title. It needs no `market.json` entry,
+  so a card still waiting on TCGdex gets this link when it gets no other. Verified against
+  the live site: `m6a 124` returns the right card, ¥999–¥6,000.
+- **It is also the only one of the three that prices the Japanese market.** Cardmarket and
+  PriceCharting are both European references; this is what the card actually sells for
+  where it is bought, which is the figure a target should be sanity-checked against.
+- **Fixed a latent `NaN`.** The Cardmarket search term was `String(Number(number))`, which
+  turns a collector number that is not a numeral into the literal `"NaN"` — `neo4-DL`
+  (Dark Espeon) is one. It never showed because that card's exact link had been harvested
+  by hand. `searchNumber` strips the padding without the arithmetic, and is shared with
+  the Mercari query.
+- **Scraggy and Fuecoco ex had no picture on Lotad's list while they had one on mine**, and
+  the reason is the design rather than the data: the English stand-in lived on the wishlist
+  *item* as `imageBase`, so the picture belonged to whoever added the card. Added later
+  through search, the same card came with nothing. `artwork.json` is keyed by card, so a
+  picture written there is every list's picture.
+- **`npm run artwork:borrow`** fills it for the 53 watched M6a cards that had no entry,
+  taking the English 30th Celebration scans. Nothing is extrapolated: only the pairs
+  hand-verified in `set-map-30th.json` are used — the offset is 6, then 25, 24 and 23 — and
+  each pair is checked against the English set's own card name before its image is taken,
+  so a renumbering stops it rather than silently mispairing. All 53 passed; no skips.
+- Borrowing is temporary by construction: `snapshot-prices.mjs` rebuilds artwork.json as
+  `{ ...previous, ...fetched }`, so the day TCGdex scans the Japanese card its own image
+  replaces the borrowed one with nothing to remember.
+- Five tests on the Mercari links, including the `NaN` case and the catalog-less card.
+  117 passing.
+- **The catalog's averages moved again on 5 October**, after fourteen days still. The
+  staleness line is gone from the screen on its own, which is what it was built to do.
+  §12.8 — whether `avg30` should take the default back — is now a live question rather
+  than a hypothetical.
+
 ### 2026-10-05 — rev 57 (ask them first, marked on the card) ✅
 
 - **A friend's wanted card can carry a `contact` marker**, meaning: ask them before buying

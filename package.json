@@ -19,6 +19,7 @@
     "data:snapshot": "node scripts/snapshot-prices.mjs",
     "price:todo": "node scripts/price-todo.mjs",
     "price:record": "node scripts/record-manual-price.mjs",
+    "artwork:borrow": "node scripts/borrow-30th-artwork.mjs",
     "links:resolve": "node scripts/resolve-links.mjs",
     "links:check": "node scripts/check-market-links.mjs",
     "price:paste": "node scripts/paste-prices.mjs",

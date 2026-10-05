@@ -1,5 +1,5 @@
 /**
- * The two market links under a card.
+ * The market links under a card.
  *
  * The rule being tested is the one that matters: a link may be less convenient than the
  * card's own page, but it must never be a different card. The English printing of the
@@ -91,4 +91,46 @@ test('with no market data at all nothing is invented for Cardmarket', () => {
 
   assert.equal(links.cardmarket, null);
   assert.match(links.pricecharting?.href ?? '', /search-products/);
+});
+
+/**
+ * Mercari, where the card is actually bought.
+ *
+ * Always a search — Mercari lists individual sellers, not products, so there is no page
+ * per card to harvest and no exact link to be had. What matters is that the query cannot
+ * find the English printing: it is the set code and the collector number, both printed on
+ * the Japanese card, and neither is shared with its English twin.
+ */
+test('Mercari is searched by set code and number, as a seller would title it', () => {
+  const links = marketLinks({ cardId: 'M6a-124', setId: 'M6a', number: '124' }, market);
+  assert.equal(
+    links.mercari?.href,
+    'https://jp.mercari.com/en/search?keyword=m6a%20124&sort=score&order=desc',
+  );
+  assert.equal(links.mercari?.isExact, false, 'it is a search and the screen must say so');
+});
+
+test('the catalog’s zero padding is not part of what a seller types', () => {
+  const links = marketLinks({ cardId: 'SV2a-080', setId: 'SV2a', number: '080' }, market);
+  assert.ok(links.mercari?.href.includes('keyword=sv2a%2080'), links.mercari?.href);
+});
+
+test('a number that is not a numeral survives, rather than becoming NaN', () => {
+  // neo4-DL is Dark Espeon. Number('DL') is NaN, and the old Cardmarket search would
+  // have asked the site for "NaN"; it escaped notice only because that card's exact
+  // link had been harvested by hand.
+  const links = marketLinks({ cardId: 'neo4-DL', setId: 'neo4', number: 'DL' }, market);
+  assert.ok(links.mercari?.href.includes('keyword=neo4%20dl'), links.mercari?.href);
+  assert.ok(!links.cardmarket?.href.includes('NaN'), 'no search term may ever be NaN');
+});
+
+test('a card the catalog has not published yet still gets a Mercari link', () => {
+  // The one link such a card can always have: the set code and number are read off the
+  // card itself, long before TCGdex publishes the set.
+  const links = marketLinks({ hint: { setCode: 'M6a', number: '141' } }, market);
+  assert.ok(links.mercari?.href.includes('keyword=m6a%20141'), links.mercari?.href);
+});
+
+test('without a set or a number there is no Mercari link, rather than a bad one', () => {
+  assert.equal(marketLinks({ cardId: 'M6a-124' }, market).mercari, null);
 });

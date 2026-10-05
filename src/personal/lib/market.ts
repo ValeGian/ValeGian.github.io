@@ -14,6 +14,11 @@
  *   so exact links arrive one at a time from the price bookmarklet. Until a card has one,
  *   the link is a search of the right expansion for the card's own number, which is
  *   Cardmarket's own URL shape and cannot resolve to a different card.
+ * - **Mercari** is always a search, and there is nothing to harvest: it is a marketplace
+ *   of individual listings, not a catalogue, so a card has no page of its own there. The
+ *   query is the set code and the number — what is printed on the card and what a
+ *   Japanese seller types in a title — which is why it does not need a name and cannot
+ *   drift onto the English printing.
  */
 import { priceKey } from './data.ts';
 
@@ -36,6 +41,7 @@ export interface MarketLink {
 export interface MarketLinks {
   cardmarket: MarketLink | null;
   pricecharting: MarketLink | null;
+  mercari: MarketLink | null;
 }
 
 interface Identifiable {
@@ -50,6 +56,16 @@ const setOf = (item: Identifiable): string | undefined => item.setId ?? item.hin
 const numberOf = (item: Identifiable): string | undefined => item.number ?? item.hint?.number;
 
 /**
+ * A collector number as a search term: without the padding the catalogs add.
+ *
+ * Not `Number(n)`, which was here before and turns a number that is not a numeral into
+ * the string "NaN" — `neo4-DL` (Dark Espeon) is one, and it would have searched Cardmarket
+ * for "NaN". It only escapes that today because that card's exact link was harvested by
+ * hand. Anything the padding cannot be stripped from is passed through as printed.
+ */
+const searchNumber = (number: string): string => number.replace(/^0+(?=.)/, '');
+
+/**
  * Cardmarket's own search URL, as the site produces it.
  *
  * `searchMode=v2` is not decoration: without it the same URL answers "no matches" for a
@@ -59,8 +75,23 @@ const numberOf = (item: Identifiable): string | undefined => item.number ?? item
  * exactly one product, `Charizard-ex-V3-sv2a201`.
  */
 function cardmarketSearch(slug: string, number: string): string {
-  const term = String(Number(number));
-  return `https://www.cardmarket.com/en/Pokemon/Products/Singles/${slug}?searchString=${encodeURIComponent(term)}&searchMode=v2`;
+  return `https://www.cardmarket.com/en/Pokemon/Products/Singles/${slug}?searchString=${encodeURIComponent(searchNumber(number))}&searchMode=v2`;
+}
+
+/**
+ * Mercari, searched the way a Japanese seller titles a listing.
+ *
+ * The keyword is the set code and the collector number, lowercase, because that pair is
+ * what is printed on the card and what appears in a listing title — a name would be in
+ * Japanese on half the listings and in English on the other half. Sorted by relevance
+ * rather than price: the cheapest match for a loose keyword is usually a different card.
+ *
+ * Needs no market.json entry. Mercari has no page per card to harvest, so this is a
+ * search for every card and is labelled as one, like any other inexact link here.
+ */
+function mercariSearch(setId: string, number: string): string {
+  const keyword = `${setId} ${searchNumber(number)}`.toLowerCase();
+  return `https://jp.mercari.com/en/search?keyword=${encodeURIComponent(keyword)}&sort=score&order=desc`;
 }
 
 /** PriceCharting's search, for a card whose page has not been harvested yet. */
@@ -92,5 +123,10 @@ export function marketLinks(item: Identifiable, market: Market | null): MarketLi
       ? { href: search, isExact: false }
       : null;
 
-  return { cardmarket, pricecharting };
+  // Only the set code and the number, both of which a card has before any catalog knows
+  // about it, so a card waiting on TCGdex gets this link when it gets no other.
+  const mercari =
+    setId && number ? { href: mercariSearch(setId, number), isExact: false } : null;
+
+  return { cardmarket, pricecharting, mercari };
 }

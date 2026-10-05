@@ -859,6 +859,9 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
               targetPriceEur: target,
               priority: edit.priority,
               notes: edit.notes,
+              // Absent rather than false, so unticking it leaves the file as it was
+              // before anyone ticked it and a hundred cards do not each carry a `false`.
+              shouldContactOwner: edit.shouldContactOwner || undefined,
               ...(edit.photo ? { photoUrl: `/${photoPath}` } : {}),
             });
 

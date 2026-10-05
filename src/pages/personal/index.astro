@@ -336,6 +336,17 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     opacity: 0.65;
   }
 
+  /* Solid where the priority tags are outlined. This one is not a property of the card
+     to be weighed up against the others — it is an instruction, and it has to survive
+     being glanced at in a shop with a card in the other hand. */
+  .personal .flag.contact {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--paper);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
   /* Sits beside the range tabs, so the two choices a chart offers are together. */
   .personal .basis-tabs {
     margin-bottom: var(--space-4);
@@ -1246,6 +1257,22 @@ import BaseLayout from '@layouts/BaseLayout.astro';
   .personal .field {
     display: grid;
     gap: var(--space-1);
+  }
+
+  /* A checkbox reads left to right, where every other field here stacks its label above
+     the control. Big enough to hit with a thumb, since this is set in a shop. */
+  .personal .field.check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+  }
+
+  .personal .field.check input {
+    width: auto;
+    min-width: 1.15rem;
+    min-height: 1.15rem;
+    margin: 0;
   }
 
   .personal .owners {

@@ -956,6 +956,28 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-10-05 — rev 57 (ask them first, marked on the card) ✅
+
+- **A friend's wanted card can carry a `contact` marker**, meaning: ask them before buying
+  this one. It is set from the edit form — a single tick, "Ask Tommy before buying" — and
+  read as a solid pill beside the priority tag, in the list, on the grid tile and in the
+  card detail next to the person who wants it.
+- **Solid where the priority tags are outlined.** The others are properties of the card to
+  be weighed up; this one is an instruction, and it has to survive being glanced at in a
+  shop with a card in the other hand. It borrows the accent already in use rather than
+  introducing a colour, so nothing else on the screen had to get louder to compete.
+- **Three conditions, two of them the point.** The marker never appears on my own list,
+  because there is nobody to ask, and it disappears once the card is bought, because the
+  question has been answered — leaving it there would have me ringing someone about a card
+  already in the binder. `shouldShowContact` is exported and tested for exactly that.
+- **Absent rather than false.** Unticking removes the field instead of writing `false`, so
+  a hundred and fifty-six cards do not each carry a flag nobody set.
+- `OWN_LIST` now names which list is mine, in `types.ts`. It was the string `'valerio'` in
+  two places that both meant "this one is not a friend's", and the new rule would have made
+  it three.
+- Four tests, 112 passing. `shouldContactOwner` added to `schemas/wishlist.schema.json`,
+  which is `additionalProperties: false`, so this was not optional.
+
 ### 2026-10-05 — rev 56 (the collection is valued on `trend`) ⚠️
 
 - **The site now values and charts on `trend` by default, not `avg30`.** This reverses

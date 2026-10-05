@@ -16,7 +16,7 @@ import { artworkPanel } from './artwork.ts';
 import { armedButton } from './armed-button.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import { marketRow, setName } from './market.ts';
-import type { Price, PriceSnapshot, Wishlist, WishlistItem } from '../lib/types.ts';
+import { OWN_LIST, type Price, type PriceSnapshot, type Wishlist, type WishlistItem } from '../lib/types.ts';
 
 /**
  * A purchase being entered, before it is committed.
@@ -40,6 +40,8 @@ export interface WishlistEdit {
   target: string;
   priority: WishlistItem['priority'];
   notes: string;
+  /** Only ever set on a friend's list; see WishlistItem.shouldContactOwner. */
+  shouldContactOwner: boolean;
 }
 
 /** 'all' is a filter value, not a priority a card can have. */
@@ -105,6 +107,39 @@ const priceFor = (item: WishlistItem, prices: PriceSnapshot | null): Price | und
  */
 const priorityTag = (item: WishlistItem): HTMLElement =>
   el('span', { class: `flag priority-${item.priority}`, text: item.priority });
+
+/** My own list is the one I do not have to ask anyone about. */
+const isFriendsList = (owner: string): boolean => owner !== OWN_LIST;
+
+/**
+ * Whether this card should say "ask them first".
+ *
+ * Three conditions, and the two beyond the flag itself are the ones worth pinning down.
+ * My own list is excluded because there is nobody to ask; a bought card is excluded
+ * because the question has been answered, and leaving the marker there would have me
+ * ringing someone about a card already in the binder.
+ */
+export function shouldShowContact(item: WishlistItem, owner: string): boolean {
+  return Boolean(item.shouldContactOwner) && item.status !== 'bought' && isFriendsList(owner);
+}
+
+/**
+ * "Ask them first", on the card rather than in a note somewhere.
+ *
+ * Solid where the priority tags are outlined, because this one is not a property of the
+ * card to be weighed up — it is an instruction, and it has to survive being glanced at in
+ * a shop with a card in the other hand.
+ */
+function contactFlag(item: WishlistItem, owner: string, lists: Record<string, Wishlist>): HTMLElement | null {
+  if (!shouldShowContact(item, owner)) return null;
+
+  const who = lists[owner]?.owner ?? owner;
+  return el('span', {
+    class: 'flag contact',
+    text: 'contact',
+    title: `Ask ${who} before buying this card`,
+  });
+}
 
 /** Filter by priority, then order. Shared by every view so they cannot disagree. */
 function arrange(items: WishlistItem[], state: WishlistViewState): WishlistItem[] {
@@ -175,13 +210,14 @@ function wishDetail(key: string, state: WishlistViewState): HTMLElement | null {
   const image = fullImage(sample);
   const measure = basisLabel(reading);
 
-  const row = (list: Wishlist, item: WishlistItem) => {
+  const row = (owner: string, list: Wishlist, item: WishlistItem) => {
     const bought = item.status === 'bought';
     const under = reading && item.targetPriceEur !== null && reading.value <= item.targetPriceEur;
     return el(
       'div',
       { class: 'wanter' },
       el('span', { class: 'wanter-name', text: list.owner }),
+      contactFlag(item, owner, state.lists),
       el('span', {
         class: 'numeric',
         text: item.targetPriceEur === null ? 'any price' : `target ${money(item.targetPriceEur)}`,
@@ -245,7 +281,7 @@ function wishDetail(key: string, state: WishlistViewState): HTMLElement | null {
           ),
         ),
         el('p', { class: 'wanters-heading ui', text: wanters.length === 1 ? 'Wanted by' : `Wanted by ${wanters.length} people` }),
-        el('div', { class: 'wanters' }, ...wanters.map(({ list, item }) => row(list, item))),
+        el('div', { class: 'wanters' }, ...wanters.map(({ owner, list, item }) => row(owner, list, item))),
         // Both market sites, for checking the asking price against the list's target.
         marketRow(sample),
       ),
@@ -492,6 +528,22 @@ function editRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
           onInput: (event: Event) => set({ notes: (event.target as HTMLInputElement).value }),
         }),
       ),
+      // Only on a friend's list: there is nobody to ask about my own cards, and an
+      // unanswerable question on the form would be read as one worth answering.
+      isFriendsList(edit.owner)
+        ? el(
+            'label',
+            { class: 'field check', for: 'edit-contact' },
+            el('input', {
+              id: 'edit-contact',
+              type: 'checkbox',
+              checked: edit.shouldContactOwner,
+              onChange: (event: Event) =>
+                set({ shouldContactOwner: (event.target as HTMLInputElement).checked }),
+            }),
+            el('span', { text: `Ask ${state.lists[edit.owner]?.owner ?? edit.owner} before buying` }),
+          )
+        : null,
       photoField(item, edit, state),
       el(
         'div',
@@ -543,6 +595,7 @@ function wishRow(
         subtitle(item),
         showOwner ? el('span', { class: 'owner', text: state.lists[owner]?.owner ?? owner }) : null,
         bought ? null : priorityTag(item),
+        contactFlag(item, owner, state.lists),
       ),
       item.notes ? el('span', { class: 'wish-note', text: item.notes }) : null,
     ),
@@ -626,6 +679,7 @@ function wishActions(item: WishlistItem, owner: string, state: WishlistViewState
               target: item.targetPriceEur === null ? '' : String(item.targetPriceEur),
               priority: item.priority,
               notes: item.notes ?? '',
+              shouldContactOwner: item.shouldContactOwner ?? false,
             }),
         })
       : null,
@@ -680,6 +734,7 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
         { class: 'tile-figures ui' },
         showOwner ? el('span', { class: 'owner', text: state.lists[owner]?.owner ?? owner }) : null,
         bought ? null : priorityTag(item),
+        contactFlag(item, owner, state.lists),
         bought
           ? el('span', { class: 'bought-badge ui', text: 'bought' })
           : market === null
@@ -788,7 +843,7 @@ function listBlock(owner: string, list: Wishlist, state: WishlistViewState): HTM
   // these are the part of it that is finished.
   const purchased = list.items.filter((item) => item.status === 'bought');
   const figures = balance(list);
-  const isFriend = owner !== 'valerio';
+  const isFriend = isFriendsList(owner);
 
   return el(
     'section',

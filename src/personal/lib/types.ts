@@ -1,5 +1,14 @@
 /** Shapes shared across the personal area. Mirrors schemas/ — keep both in step. */
 
+/**
+ * Which wishlist is mine rather than a friend's.
+ *
+ * The two are not the same kind of thing: a card I want becomes a collection item when it
+ * is bought, a friend's stays on their list and its cost joins what they owe. Named once
+ * so that difference is not a string literal repeated wherever it matters.
+ */
+export const OWN_LIST = 'valerio';
+
 export type Condition = 'M' | 'NM' | 'EX' | 'GD' | 'LP' | 'PL' | 'PO';
 export type Currency = 'EUR' | 'JPY' | 'USD';
 
@@ -70,6 +79,15 @@ export interface WishlistItem {
   targetPriceEur: number | null;
   priority: 'high' | 'normal' | 'low';
   notes?: string;
+  /**
+   * Ask them before buying this one.
+   *
+   * Only meaningful on someone else's list. A friend may have found a copy already, want
+   * a particular printing, or not want it at today's price — and a card in a shop in
+   * Japan is a decision made in a minute, with no time to work out then whether this is
+   * one of those. So the question is put on the card itself, where it is read.
+   */
+  shouldContactOwner?: boolean;
   addedAt: string;
   boughtAt?: string;
   purchase?: Purchase;

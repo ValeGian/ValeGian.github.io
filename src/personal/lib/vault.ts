@@ -12,7 +12,7 @@
  */
 import { resealPayload } from '../../lib/crypto.mjs';
 import { derivePublicFiles } from '../../lib/watchlist.mjs';
-import type { Collection, CollectionItem, Purchase, Wishlist, WishlistItem } from './types.ts';
+import { OWN_LIST, type Collection, type CollectionItem, type Purchase, type Wishlist, type WishlistItem } from './types.ts';
 
 const PERSONAL_PATH = 'public/data/personal';
 const DATA_PATH = 'public/data';
@@ -259,7 +259,7 @@ export async function markBought(
   const item = list.items.find((candidate) => candidate.id === wishId);
   if (!item) throw new Error(`No wishlist item ${wishId}`);
 
-  if (owner !== 'valerio') {
+  if (owner !== OWN_LIST) {
     item.status = 'bought';
     item.boughtAt = purchase.date;
     item.purchase = purchase;

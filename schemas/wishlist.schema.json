@@ -103,6 +103,10 @@
         "notes": {
           "type": "string"
         },
+        "shouldContactOwner": {
+          "type": "boolean",
+          "description": "Ask the person whose list this is before buying the card. Only meaningful on a friend's list."
+        },
         "addedAt": {
           "$ref": "common.schema.json#/$defs/isoDate"
         },

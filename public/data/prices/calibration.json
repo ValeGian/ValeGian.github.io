@@ -1,14 +1,14 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-08T13:35:39.769Z",
-  "days": 15,
+  "generatedAt": "2026-10-09T13:22:23.274Z",
+  "days": 16,
   "cards": 80,
   "medianRelativeError": {
-    "avg7": 0.1377,
+    "avg7": 0.1217,
     "avg30": null
   },
   "samples": {
-    "avg7": 607,
+    "avg7": 679,
     "avg30": 0
   },
   "frozenCards": [],

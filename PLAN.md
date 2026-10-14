@@ -956,6 +956,24 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-10-14 — rev 59 (three pictures, one of them a different card) ✅
+
+- **`M1S-088`, `SV11B-104` and `M2a-239` showed a wrong picture or none.** TCGdex lists all
+  three with a null `image`, so `picture()` fell through to the derived asset path. For
+  `M2a` and `SV11B` that path is a 404, hence the empty frame. **For `M1S` it is worse:
+  `ja/M/M1S/088` is served, and it is card 084/063 — アセロラのいたずら SR, not メガラティアス
+  ex.** TCGdex has the file under the wrong number, so a 200 from a derived path proves
+  nothing about which card it is.
+- All three now come from the publisher's database, in `artwork.json`, each matched by the
+  number and rarity on its detail page and then checked by eye: `048474` is 088/063 SAR,
+  `049999` is 239/193 SAR, `047928` is 104/086 AR. Each name has 3–25 printings, so the
+  name alone identified none of them.
+- **Open risk:** the daily job lets a TCGdex `image` overwrite an `artwork.json` entry. If
+  TCGdex fills `M1S-088` with the same mislabeled file, the wrong card comes back. Worth
+  checking after `M1S` gets its scans.
+- `M2a-245` is watched and has no TCGdex artwork either (null `image`, derived path 404).
+  It may be covered by a stored `imageBase`; not checked, as that needs the vault open.
+
 ### 2026-10-05 — rev 58 (Mercari, and a picture that belongs to the card) ✅
 
 - **Mercari under every card**, beside Cardmarket and PriceCharting. Always a search and

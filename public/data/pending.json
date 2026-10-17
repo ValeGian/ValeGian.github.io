@@ -1,5 +1,16 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-17T19:03:46.182Z",
-  "items": []
+  "generatedAt": "2026-10-17T19:07:53.069Z",
+  "items": [
+    {
+      "id": "itm_0064",
+      "hint": {
+        "setCode": "M6a",
+        "setName": "30th Anniversary",
+        "number": "121",
+        "nameEn": "Lugia"
+      },
+      "pendingSince": "2026-10-17"
+    }
+  ]
 }

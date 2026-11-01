@@ -1,18 +1,12 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-26T09:35:44.197Z",
+  "generatedAt": "2026-11-01T04:25:26.656Z",
   "cards": [
-    {
-      "cardId": "M6-087"
-    },
     {
       "cardId": "M6-110"
     },
     {
       "cardId": "M6a-133"
-    },
-    {
-      "cardId": "M6a-137"
     },
     {
       "cardId": "S10a-074"
@@ -81,12 +75,6 @@
     },
     {
       "cardId": "SV10-124"
-    },
-    {
-      "cardId": "SV10-127"
-    },
-    {
-      "cardId": "SV11W-171"
     },
     {
       "cardId": "SV1a-080",
@@ -180,9 +168,6 @@
       "variantId": "jr7oetx1mqug9"
     },
     {
-      "cardId": "SV5K-080"
-    },
-    {
       "cardId": "SV5M-073",
       "variantId": "jr7oetx1mqug9"
     },
@@ -204,12 +189,6 @@
     {
       "cardId": "SV7a-073",
       "variantId": "endfynwn4n10gzq"
-    },
-    {
-      "cardId": "SV8-109"
-    },
-    {
-      "cardId": "SV8-131"
     },
     {
       "cardId": "SV9-102",

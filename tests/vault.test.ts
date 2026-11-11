@@ -8,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { encrypt } from '../src/lib/crypto.mjs';
-import { addCard, applyResolutions, buildWrites, deleteCard, markBought, newCardId, type Vault } from '../src/personal/lib/vault.ts';
+import { addCard, applyResolutions, buildWrites, deleteCard, markBought, newCardId, reviseBoughtPrice, type Vault } from '../src/personal/lib/vault.ts';
 import { totals, value } from '../src/personal/lib/money.ts';
 import { balance } from '../src/personal/views/wishlists.ts';
 import type { CollectionItem, Purchase, Wishlist } from '../src/personal/lib/types.ts';
@@ -103,6 +103,25 @@ test('settlements reduce what is owed, and the balance is derived not stored', a
   assert.equal(figures.bought, 300);
   assert.equal(figures.settled, 120);
   assert.equal(figures.owed, 180);
+});
+
+test("correcting a friend's bought price changes what they owe, and only their file", async () => {
+  const vault = await makeVault();
+  await markBought(vault, 'tommy', 'wish_0010', purchase(287.6));
+
+  const writes = await reviseBoughtPrice(vault, 'tommy', 'wish_0010', purchase(28.76));
+
+  assert.equal(balance(vault.wishlists.tommy).owed, 28.76);
+  assert.equal(vault.wishlists.tommy.items[0].status, 'bought', 'still bought, at the corrected price');
+  const personal = writes.map((write) => write.path).filter((path) => path.startsWith('public/data/personal/'));
+  assert.deepEqual(personal, ['public/data/personal/tommy.enc']);
+});
+
+test('a wanted card has no price to correct', async () => {
+  const vault = await makeVault();
+
+  await assert.rejects(reviseBoughtPrice(vault, 'tommy', 'wish_0010', purchase(10)), /has not been bought/);
+  assert.equal(vault.wishlists.tommy.items[0].purchase, undefined, 'nothing is owed for a card nobody bought');
 });
 
 test('ids do not collide after a deletion', async () => {

@@ -956,6 +956,33 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-11-11 — rev 60 (correcting what a bought card cost) ✅
+
+- **A card bought for a friend can have its price corrected.** Bought rows and tiles on a
+  friend's list now have a **Change price** button. It opens the same form as **Bought**,
+  filled in with the price on record, and saving changes what that friend owes. Before
+  this, a price typed wrong in a shop could only be fixed by editing `.local/` on a laptop.
+  My own bought cards already had this, through **Edit** on the collection card.
+- **One rule for when a rate is fetched**, now shared by both forms (`revisePurchase` in
+  `fx.ts`). Change only the amount and the rate on record is kept. Change the currency or
+  the date and that day's rate is fetched. The date of a friend's card is not editable, so
+  a new currency there is priced on the day it was bought, not today.
+- **A behaviour change on the collection side.** Changing only the amount used to fetch
+  the rate again. The result is the same for a Frankfurter rate, but a rate written down
+  at the time (`user-recorded`) was replaced. It is kept now, and a typo can be fixed
+  offline.
+- Building a purchase was copied in three places (add card, mark bought, edit card). It is
+  now `purchaseAt`.
+- `reviseBoughtPrice` refuses a card that has not been bought. A wanted card with a
+  purchase would count towards what its owner owes before anyone had bought it.
+- 16 new tests. Two failures were already there and are not from this change:
+  `history.test.ts` "each range reads the resolution it was defined with" has a fixed
+  September fixture against a `1m` window measured from today, so it started failing when
+  the calendar moved on. `tests/market.test.ts` lines 115/123/131 fail `astro check`
+  because the `assert.ok` message is `string | undefined`.
+- **Not handled:** if the rate lookup fails (offline, with a new currency), the form does
+  nothing and says nothing. **Bought** has always behaved this way.
+
 ### 2026-10-14 — rev 59 (three pictures, one of them a different card) ✅
 
 - **`M1S-088`, `SV11B-104` and `M2a-239` showed a wrong picture or none.** TCGdex lists all

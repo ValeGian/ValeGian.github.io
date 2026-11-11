@@ -161,7 +161,7 @@ function editForm(
     el('p', {
       class: 'detail-note',
       text:
-        'Change the amount, currency or date and the rate for that date is fetched and frozen in. Leave them alone and the rate on record is kept.',
+        'Change the currency or date and the rate for that date is fetched and frozen in. Change only the amount and the rate on record is kept.',
     }),
     el(
       'div',

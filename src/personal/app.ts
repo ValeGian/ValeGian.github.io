@@ -18,7 +18,7 @@ import { EVERYONE, renderWishlists, type BuyEdit, type PriorityFilter, type Wish
 import { blankFields, renderAddCard, searchCards, type AddCardState, type AddMode } from './views/add-card.ts';
 import { renderPublishBar } from './views/publish-bar.ts';
 import { usePublishedMarket } from './views/market.ts';
-import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markBought, newCardId, updateCard, updateWish, type Envelope, type Resolution, type Vault } from './lib/vault.ts';
+import { addCard, addWishToMany, applyResolutions, deleteCard, deleteWish, markBought, newCardId, reviseBoughtPrice, updateCard, updateWish, type Envelope, type Resolution, type Vault, type Write } from './lib/vault.ts';
 import { savePending } from './lib/local.ts';
 import { discardPending, forgetToken, getToken, listPending, publish, rememberToken } from './lib/sync.ts';
 import { resume, unlock } from '../lib/unlock.mjs';
@@ -631,9 +631,9 @@ async function saveWish(owners: string[], item: Omit<WishlistItem, 'id'>): Promi
 /**
  * Applies an edit to an owned card.
  *
- * The exchange rate is only re-fetched when the money actually changed. A card bought at
- * a rate that was recorded at the time keeps it — recomputing from today would restate
- * what was paid, which is the one thing a ledger must not do.
+ * The exchange rate is only re-fetched when the currency or the date changed; see
+ * revisePurchase. A card bought at a rate that was recorded at the time keeps it —
+ * recomputing from today would restate what was paid, which a ledger must never do.
  */
 async function saveCardEdit(): Promise<void> {
   const { vault, editingCard } = store.get();
@@ -646,25 +646,12 @@ async function saveCardEdit(): Promise<void> {
   const quantity = Number(editingCard.quantity);
   if (!Number.isFinite(amount) || amount <= 0 || !Number.isFinite(quantity) || quantity < 1) return;
 
-  const moneyChanged =
-    amount !== item.purchase.amount ||
-    editingCard.currency !== item.purchase.currency ||
-    editingCard.date !== item.purchase.date;
-
-  let purchase = { ...item.purchase, amount, currency: editingCard.currency, date: editingCard.date };
-
-  if (moneyChanged) {
-    const { convert } = await import('./lib/fx.ts');
-    const converted = await convert(amount, editingCard.currency, editingCard.date);
-    purchase = {
-      ...purchase,
-      amountEur: converted.amountEur,
-      fxRate: converted.fxRate,
-      fxSource: editingCard.currency === 'EUR' ? 'identity' : 'frankfurter',
-      // The import date no longer stands in once a real one has been given.
-      dateIsBootstrap: editingCard.date === item.purchase.date ? item.purchase.dateIsBootstrap : false,
-    };
-  }
+  const { revisePurchase } = await import('./lib/fx.ts');
+  const purchase = await revisePurchase(item.purchase, {
+    amount,
+    currency: editingCard.currency,
+    date: editingCard.date,
+  });
 
   const writes = await updateCard(vault, editingCard.itemId, {
     condition: editingCard.condition,
@@ -687,6 +674,29 @@ async function saveCardEdit(): Promise<void> {
   await refreshPendingCount();
   store.update({ editingCard: null });
   schedulePublish();
+}
+
+/** Marks a wanted card bought today, at today's rate. */
+async function recordPurchase(vault: Vault, buying: BuyEdit, amount: number): Promise<Write[]> {
+  const { purchaseAt } = await import('./lib/fx.ts');
+  const date = new Date().toISOString().slice(0, 10);
+  const purchase = await purchaseAt(amount, buying.currency, date);
+  return (await markBought(vault, buying.owner, buying.itemId, purchase)).writes;
+}
+
+/**
+ * Corrects what a card bought for a friend cost.
+ *
+ * The date stays as recorded: the card was bought when it was bought. Only the amount
+ * and the currency are being fixed.
+ */
+async function correctBoughtPrice(vault: Vault, buying: BuyEdit, amount: number): Promise<Write[]> {
+  const item = vault.wishlists[buying.owner]?.items.find((candidate) => candidate.id === buying.itemId);
+  if (!item?.purchase) throw new Error(`No purchase on record for ${buying.owner}/${buying.itemId}`);
+
+  const { revisePurchase } = await import('./lib/fx.ts');
+  const purchase = await revisePurchase(item.purchase, { amount, currency: buying.currency, date: item.purchase.date });
+  return reviseBoughtPrice(vault, buying.owner, buying.itemId, purchase);
 }
 
 async function removeCard(itemId: string): Promise<void> {
@@ -905,17 +915,9 @@ function adminView(state: AppState, vault: Vault): DocumentFragment {
             const amount = parseAmount(buying.amount);
             if (amount === null) return;
 
-            const date = new Date().toISOString().slice(0, 10);
-            const { convert } = await import('./lib/fx');
-            const converted = await convert(amount, buying.currency, date);
-            const { writes } = await markBought(vault, buying.owner, buying.itemId, {
-              date,
-              amount,
-              currency: buying.currency,
-              amountEur: converted.amountEur,
-              fxRate: converted.fxRate,
-              fxSource: buying.currency === 'EUR' ? 'identity' : 'frankfurter',
-            });
+            const writes = buying.isRevision
+              ? await correctBoughtPrice(vault, buying, amount)
+              : await recordPurchase(vault, buying, amount);
             await savePending(writes);
             await refreshPendingCount();
             store.update({ buyingWish: null });

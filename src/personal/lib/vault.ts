@@ -236,6 +236,28 @@ export async function updateWish(
   return buildWrites(vault, [owner]);
 }
 
+/**
+ * Corrects what a card bought for a friend cost.
+ *
+ * Only a bought card can be corrected. A wanted card given a purchase would count towards
+ * what its owner owes before anyone had bought it. My own bought cards are collection
+ * items, and their price is corrected there.
+ */
+export async function reviseBoughtPrice(
+  vault: Vault,
+  owner: string,
+  wishId: string,
+  purchase: Purchase,
+): Promise<Write[]> {
+  const item = vault.wishlists[owner]?.items.find((candidate) => candidate.id === wishId);
+  if (!item) throw new Error(`No wishlist item ${wishId} for ${owner}`);
+  if (item.status !== 'bought') throw new Error(`${owner}/${wishId} has not been bought, so it has no price to correct`);
+
+  item.purchase = purchase;
+  item.boughtAt = purchase.date;
+  return buildWrites(vault, [owner]);
+}
+
 export async function deleteWish(vault: Vault, owner: string, id: string): Promise<Write[]> {
   const list = vault.wishlists[owner];
   list.items = list.items.filter((item) => item.id !== id);

@@ -15,7 +15,7 @@
  * time results arrived — which is exactly what used to happen to the price.
  */
 import { el, frag } from '../lib/dom.ts';
-import { convert } from '../lib/fx.ts';
+import { purchaseAt } from '../lib/fx.ts';
 import { searchCards, cardDetail, pricedVariantId, looksLikeCardId, type CardHit } from '../lib/tcgdex.ts';
 import { saveErrorMessage } from '../lib/errors.ts';
 import { toEnglish } from '../../lib/card-name.mjs';
@@ -443,20 +443,12 @@ export function renderAddCard(state: AddCardState): HTMLElement {
     state.onChange({ saving: true, error: '' });
 
     try {
-      const money = await convert(amount, fields.currency, fields.date);
       const base = {
         id: state.nextId(),
         condition: 'NM' as const,
         isGraded: false as const,
         quantity: Number(fields.quantity) || 1,
-        purchase: {
-          date: fields.date,
-          amount,
-          currency: fields.currency,
-          amountEur: money.amountEur,
-          fxRate: money.fxRate,
-          fxSource: (fields.currency === 'EUR' ? 'identity' : 'frankfurter') as 'identity' | 'frankfurter',
-        },
+        purchase: await purchaseAt(amount, fields.currency, fields.date),
         notes: fields.notes,
       };
 

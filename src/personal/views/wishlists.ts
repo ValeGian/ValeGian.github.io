@@ -16,7 +16,7 @@ import { artworkPanel } from './artwork.ts';
 import { armedButton } from './armed-button.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import { marketRow, setName } from './market.ts';
-import { OWN_LIST, type Price, type PriceSnapshot, type Wishlist, type WishlistItem } from '../lib/types.ts';
+import { OWN_LIST, type Currency, type Price, type PriceSnapshot, type Purchase, type Wishlist, type WishlistItem } from '../lib/types.ts';
 
 /**
  * A purchase being entered, before it is committed.
@@ -29,7 +29,9 @@ export interface BuyEdit {
   owner: string;
   itemId: string;
   amount: string;
-  currency: 'JPY' | 'EUR';
+  currency: Currency;
+  /** Correcting the price of a card already bought, rather than buying it. */
+  isRevision?: boolean;
 }
 
 export interface WishlistEdit {
@@ -300,6 +302,32 @@ function targetMarker(item: WishlistItem, price: Price | undefined): HTMLElement
   });
 }
 
+const CURRENCY_LABEL: Record<Currency, string> = { JPY: 'JPY ¥', EUR: 'EUR €', USD: 'USD $' };
+
+/**
+ * What confirming will record, said before it is recorded.
+ *
+ * A correction is priced at the rate already on record while the currency stays the same,
+ * so it can show the euro figure the friend will be asked for. A new currency needs that
+ * day's rate, which is only fetched when the form is confirmed.
+ */
+export function recordingNote(amount: number, currency: Currency, previous?: Purchase): string {
+  const typed = `${amount.toLocaleString('en-GB')} ${currency}`;
+  if (!previous) return `Recording ${typed}, converted at today's rate.`;
+  if (currency === 'EUR') return `Recording ${money(amount)}.`;
+  if (currency === previous.currency) return `Recording ${typed}, at the rate on record: ${money(amount * previous.fxRate)}.`;
+  return `Recording ${typed}, converted at the rate on the day it was bought.`;
+}
+
+/**
+ * Whether a card's recorded price can be corrected here.
+ *
+ * Only a friend's cards stay on a list once bought. Mine move to the collection and are
+ * corrected from there.
+ */
+export const canCorrectPrice = (item: WishlistItem, canEdit: boolean): boolean =>
+  canEdit && item.status === 'bought' && Boolean(item.purchase);
+
 /**
  * What a card cost, asked for in the page rather than by the browser.
  *
@@ -308,11 +336,15 @@ function targetMarker(item: WishlistItem, price: Price | undefined): HTMLElement
  * cramped grey box with no currency control, so the currency had to be guessed from
  * whatever was typed. Here the amount and the currency are two fields, and the currency
  * is a choice rather than a guess.
+ *
+ * The same form corrects a price already recorded. The question is the same, and a price
+ * typed in a hurry in a shop is the one most likely to need it.
  */
 function buyRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
   const buying = state.buying;
   if (!buying) return el('li');
 
+  const previous = buying.isRevision ? item.purchase : undefined;
   const set = (change: Partial<BuyEdit>) => state.onBuyField?.(change);
 
   /**
@@ -323,7 +355,7 @@ function buyRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
    * things that have to answer every keystroke are held here and written to directly.
    */
   const note = el('p', { class: 'detail-note' });
-  const confirm = el('button', { type: 'submit', text: 'Confirm' });
+  const confirm = el('button', { type: 'submit', text: previous ? 'Save' : 'Confirm' });
 
   const reflect = (typed: string, currency: BuyEdit['currency']) => {
     const amount = parseAmount(typed);
@@ -331,7 +363,7 @@ function buyRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
     note.textContent =
       amount === null
         ? 'Enter what you paid, in whichever currency you paid it.'
-        : `Recording ${amount.toLocaleString('en-GB')} ${currency}, converted at today's rate.`;
+        : recordingNote(amount, currency, previous);
   };
 
   const amountField = el('input', {
@@ -358,8 +390,11 @@ function buyRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
         reflect(amountField.value, currency);
       },
     },
-    el('option', { value: 'JPY', text: 'JPY ¥', selected: buying.currency === 'JPY' }),
-    el('option', { value: 'EUR', text: 'EUR €', selected: buying.currency === 'EUR' }),
+    // A price recorded in some other currency keeps it on offer. Otherwise the select
+    // would show yen while the edit still holds that currency, and save the hidden one.
+    ...[...new Set<Currency>(['JPY', 'EUR', buying.currency])].map((code) =>
+      el('option', { value: code, text: CURRENCY_LABEL[code], selected: buying.currency === code }),
+    ),
   );
 
   reflect(buying.amount, buying.currency);
@@ -376,7 +411,10 @@ function buyRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
           void state.onConfirmBuy?.();
         },
       },
-      el('p', { class: 'wish-edit-title', text: `Bought ${displayName(item, state.names)}` }),
+      el('p', {
+        class: 'wish-edit-title',
+        text: `${previous ? 'What it cost:' : 'Bought'} ${displayName(item, state.names)}`,
+      }),
       el(
         'div',
         { class: 'grid-fields' },
@@ -643,7 +681,8 @@ function removeButton(item: WishlistItem, owner: string, state: WishlistViewStat
 }
 
 /**
- * Marking a card bought, and changing what you would pay for it.
+ * Marking a card bought, and changing what you would pay for it — or, once bought,
+ * correcting what it cost.
  *
  * Shared by the row and the tile. They had drifted: the grid showed the picture, the
  * target and the market price — everything needed to decide — and then offered no way to
@@ -653,7 +692,8 @@ function removeButton(item: WishlistItem, owner: string, state: WishlistViewStat
  * and the browser's idea of which one was clicked is its own business.
  */
 function wishActions(item: WishlistItem, owner: string, state: WishlistViewState): HTMLElement | null {
-  if (item.status === 'bought' || !state.canEdit) return null;
+  if (item.status === 'bought') return boughtActions(item, owner, state);
+  if (!state.canEdit) return null;
 
   return el(
     'span',
@@ -684,6 +724,24 @@ function wishActions(item: WishlistItem, owner: string, state: WishlistViewState
         })
       : null,
     removeButton(item, owner, state),
+  );
+}
+
+/** A bought card has one thing left to change: what it cost, which its owner pays back. */
+function boughtActions(item: WishlistItem, owner: string, state: WishlistViewState): HTMLElement | null {
+  if (!canCorrectPrice(item, state.canEdit) || !item.purchase || !state.onStartBuy) return null;
+  const { amount, currency } = item.purchase;
+
+  return el(
+    'span',
+    { class: 'wish-actions' },
+    el('button', {
+      type: 'button',
+      class: 'chip',
+      text: 'Change price',
+      onClick: () =>
+        state.onStartBuy?.({ owner, itemId: item.id, amount: String(amount), currency, isRevision: true }),
+    }),
   );
 }
 

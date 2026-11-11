@@ -956,6 +956,19 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-11-11 — rev 61 (Ditto's picture moved) ✅
+
+- **`M6a-121` lost its picture.** The PriceCharting image from rev 50 (`corrpd2i5xhfosaz4kvo`)
+  now returns 404, because PriceCharting replaced the product's image under a new id
+  (`vdq6grhrhk4om22t`). The new one was read off the product page in a real browser
+  (curl still gets 403) and checked by eye: メタモン, HP 70, **M6a 121/103 AR**, 30th stamp,
+  illus. Ounishi.
+- Neither better source has it yet: TCGdex `image` is null and the derived path is a 404.
+  The publisher's database lists only Ditto 093/103 for M6a.
+- **A PriceCharting link can rot without warning**, and the only symptom is an empty
+  frame. All 133 `artwork.json` links were checked and return 200 today. `M6a-114` is the
+  only other PriceCharting entry.
+
 ### 2026-11-11 — rev 60 (correcting what a bought card cost) ✅
 
 - **A card bought for a friend can have its price corrected.** Bought rows and tiles on a

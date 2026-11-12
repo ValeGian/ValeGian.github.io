@@ -956,6 +956,16 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-11-12 — rev 66 (code changes are tested on push) ✅
+
+- **The Data workflow now also runs on `src/**`, `tests/**`, `package.json` and
+  `package-lock.json`.** It already ran the unit tests, but only on pushes that touched
+  data, scripts or schemas, and the Deploy workflow only builds. So a code-only push was
+  never tested. The `history.test.ts` failure (rev 64) surfaced on a phone's data push
+  instead, and from there it also stopped `npm run validate` running.
+- A site-copy change now triggers a run too. That is about 20 seconds, which is cheaper
+  than missing a broken test.
+
 ### 2026-11-12 — rev 65 (a bought tile shows what it cost) ✅
 
 - **In grid view, a bought card's tile now leads with what it was bought for**, in the bold

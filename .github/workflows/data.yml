@@ -3,10 +3,17 @@ name: Data
 on:
   push:
     branches: [master]
+    # Everything the steps below read. The code and its tests are here because the unit
+    # tests cover them: without these, a code-only push was never tested, and a failure
+    # only showed up on the next data push, where it also stopped validation running.
     paths:
       - 'schemas/**'
       - 'scripts/**'
       - 'public/data/**'
+      - 'src/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/data.yml'
   pull_request:
   workflow_dispatch:

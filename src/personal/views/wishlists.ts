@@ -16,7 +16,7 @@ import { artworkPanel } from './artwork.ts';
 import { armedButton } from './armed-button.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import { marketRow, setName } from './market.ts';
-import { OWN_LIST, type Currency, type Price, type PriceSnapshot, type Purchase, type Wishlist, type WishlistItem } from '../lib/types.ts';
+import { DEFAULT_CURRENCY, OWN_LIST, type Currency, type Price, type PriceSnapshot, type Purchase, type Wishlist, type WishlistItem } from '../lib/types.ts';
 
 /**
  * A purchase being entered, before it is committed.
@@ -33,6 +33,14 @@ export interface BuyEdit {
   /** Correcting the price of a card already bought, rather than buying it. */
   isRevision?: boolean;
 }
+
+/** The Bought form for a card not yet bought: no amount, in the default currency. */
+export const blankBuy = (owner: string, itemId: string): BuyEdit => ({
+  owner,
+  itemId,
+  amount: '',
+  currency: DEFAULT_CURRENCY,
+});
 
 export interface WishlistEdit {
   /** A picture chosen by hand, kept until the edit is saved. */
@@ -391,8 +399,8 @@ function buyRow(item: WishlistItem, state: WishlistViewState): HTMLElement {
       },
     },
     // A price recorded in some other currency keeps it on offer. Otherwise the select
-    // would show yen while the edit still holds that currency, and save the hidden one.
-    ...[...new Set<Currency>(['JPY', 'EUR', buying.currency])].map((code) =>
+    // would show euros while the edit still holds that currency, and save the hidden one.
+    ...[...new Set<Currency>(['EUR', 'JPY', buying.currency])].map((code) =>
       el('option', { value: code, text: CURRENCY_LABEL[code], selected: buying.currency === code }),
     ),
   );
@@ -725,8 +733,7 @@ function wishActions(item: WishlistItem, owner: string, state: WishlistViewState
           type: 'button',
           class: 'mark-bought',
           text: 'Bought',
-          // Yen by default: these are bought in Japan, and a shop is where this is used.
-          onClick: () => state.onStartBuy?.({ owner, itemId: item.id, amount: '', currency: 'JPY' }),
+          onClick: () => state.onStartBuy?.(blankBuy(owner, item.id)),
         })
       : null,
     state.onStartEdit

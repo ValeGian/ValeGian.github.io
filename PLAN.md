@@ -956,6 +956,22 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-11-12 — rev 63 (a new price starts in euros) ✅
+
+- **Add card and Bought now start in EUR, not JPY.** This reverses the "yen by default:
+  these are bought in Japan" choice. Yen is still one tap away in the select.
+- **One constant, `DEFAULT_CURRENCY` in `types.ts`.** The two forms each had their own
+  `'JPY'`. They now share one value, so they cannot disagree about what a blank price is
+  in. The Bought form's starting state is now `blankBuy`, which mirrors add-card's
+  `blankFields`.
+- **EUR is listed first** in every currency select (add card, Bought / Change price, the
+  collection edit form). Change price and Edit still open in whatever currency the
+  purchase was recorded in.
+- `parseAmount` already reads a euro decimal written either way (`12,50` and `12.50` are
+  both 12.5), so nothing there had to change.
+- 3 tests in `default-currency.test.ts`, 140 passing. Same single `history.test.ts`
+  failure as rev 60.
+
 ### 2026-11-12 — rev 62 (a bought card can come off a friend's list) ✅
 
 - **Bought rows and tiles on a friend's list now have Remove**, beside Change price. For

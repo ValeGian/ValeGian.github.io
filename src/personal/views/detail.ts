@@ -139,7 +139,7 @@ function editForm(
         el(
           'select',
           { id: 'edit-currency', onChange: (event: Event) => onField({ currency: (event.target as HTMLSelectElement).value as Currency }) },
-          ...(['JPY', 'EUR'] as const).map((code) => el('option', { value: code, text: code, selected: edit.currency === code })),
+          ...(['EUR', 'JPY'] as const).map((code) => el('option', { value: code, text: code, selected: edit.currency === code })),
         ),
       ),
       labelled('edit-date', 'Date', text('edit-date', edit.date, 'date', { type: 'date' })),

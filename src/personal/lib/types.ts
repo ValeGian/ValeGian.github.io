@@ -12,6 +12,14 @@ export const OWN_LIST = 'valerio';
 export type Condition = 'M' | 'NM' | 'EX' | 'GD' | 'LP' | 'PL' | 'PO';
 export type Currency = 'EUR' | 'JPY' | 'USD';
 
+/**
+ * What a new purchase is priced in until someone picks otherwise.
+ *
+ * Shared by adding a card and marking one bought, so the two forms cannot disagree about
+ * which currency a blank price is in.
+ */
+export const DEFAULT_CURRENCY: Currency = 'EUR';
+
 export interface Purchase {
   date: string;
   dateIsBootstrap?: boolean;

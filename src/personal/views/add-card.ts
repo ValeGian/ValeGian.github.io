@@ -22,7 +22,7 @@ import { toEnglish } from '../../lib/card-name.mjs';
 import { cardThumb } from './thumb.ts';
 import { preparePhoto, type PreparedPhoto } from '../lib/photo.ts';
 import type { NameTable } from '../lib/data.ts';
-import type { CollectionItem, Currency, WishlistItem } from '../lib/types.ts';
+import { DEFAULT_CURRENCY, type CollectionItem, type Currency, type WishlistItem } from '../lib/types.ts';
 
 export type AddMode = 'collection' | 'wishlist';
 
@@ -84,7 +84,7 @@ export const today = (): string => new Date().toISOString().slice(0, 10);
 export const blankFields = (): AddCardFields => ({
   query: '',
   amount: '',
-  currency: 'JPY',
+  currency: DEFAULT_CURRENCY,
   date: today(),
   quantity: '1',
   notes: '',
@@ -342,8 +342,8 @@ function purchaseFields(state: AddCardState): HTMLElement {
           id: 'add-currency',
           onChange: (event: Event) => state.onChange({ currency: (event.target as HTMLSelectElement).value as Currency }),
         },
-        el('option', { value: 'JPY', text: 'JPY ¥', selected: state.currency === 'JPY' }),
         el('option', { value: 'EUR', text: 'EUR €', selected: state.currency === 'EUR' }),
+        el('option', { value: 'JPY', text: 'JPY ¥', selected: state.currency === 'JPY' }),
       ),
     ),
     field('add-date', 'Date', textField('add-date', state.date, (date) => state.onField({ date }), { type: 'date', required: true })),

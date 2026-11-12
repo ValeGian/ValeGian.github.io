@@ -310,25 +310,46 @@ function targetMarker(item: WishlistItem, price: Price | undefined): HTMLElement
   });
 }
 
-/**
- * The figure a grid tile leads with: what the card is wanted at, or once bought, what it
- * cost.
- *
- * A tile has room for one bold number. On a wanted card that is the target, because the
- * decision is whether to buy. On a bought card the decision is made, and the figure that
- * still matters is the one its owner pays back.
- */
-export function tileLeadFigure(item: WishlistItem): { text: string; className: string; title: string } {
-  if (item.status === 'bought') {
-    return item.purchase
-      ? { text: money(item.purchase.amountEur), className: 'paid-price numeric', title: 'What it was bought for' }
-      : { text: 'paid —', className: 'paid-price numeric', title: 'Bought, with no price on record' };
-  }
-
-  return item.targetPriceEur === null
-    ? { text: 'any price', className: 'target-price numeric', title: 'Wanted at any price' }
-    : { text: money(item.targetPriceEur), className: 'target-price numeric', title: 'Target price' };
+export interface TileFigure {
+  text: string;
+  className: string;
+  title: string;
 }
+
+/**
+ * The two figures on a grid tile: one bold, then one smaller and labelled.
+ *
+ * On a wanted card the bold one is the target, because the decision is whether to buy,
+ * and the market price follows as what it is judged against. On a bought card the
+ * decision is made: the bold one is what it cost, the figure its owner pays back, and the
+ * target follows as what it was wanted at. The market price no longer decides anything
+ * there, and is one tap away in the card's detail.
+ */
+export function tileFigures(item: WishlistItem, market: number | null): [lead: TileFigure, second: TileFigure] {
+  if (item.status === 'bought') return [paidFigure(item), targetLabel(item)];
+
+  const lead: TileFigure =
+    item.targetPriceEur === null
+      ? { text: 'any price', className: 'target-price numeric', title: 'Wanted at any price' }
+      : { text: money(item.targetPriceEur), className: 'target-price numeric', title: 'Target price' };
+  const second: TileFigure = {
+    text: market === null ? 'market —' : `market ${money(market)}`,
+    className: 'value numeric',
+    title: 'Market price',
+  };
+  return [lead, second];
+}
+
+const paidFigure = (item: WishlistItem): TileFigure =>
+  item.purchase
+    ? { text: money(item.purchase.amountEur), className: 'paid-price numeric', title: 'What it was bought for' }
+    : { text: 'paid —', className: 'paid-price numeric', title: 'Bought, with no price on record' };
+
+const targetLabel = (item: WishlistItem): TileFigure => ({
+  text: item.targetPriceEur === null ? 'any price' : `target ${money(item.targetPriceEur)}`,
+  className: 'value numeric',
+  title: item.targetPriceEur === null ? 'Wanted at any price' : 'Target price',
+});
 
 const CURRENCY_LABEL: Record<Currency, string> ={ JPY: 'JPY ¥', EUR: 'EUR €', USD: 'USD $' };
 
@@ -824,7 +845,7 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
   const market = quote(priceFor(item, state.prices))?.value ?? null;
   const bought = item.status === 'bought';
   const under = market !== null && item.targetPriceEur !== null && market <= item.targetPriceEur;
-  const lead = tileLeadFigure(item);
+  const figures = tileFigures(item, market);
 
   return el(
     'li',
@@ -842,8 +863,7 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
       el(
         'span',
         { class: 'tile-figures ui' },
-        el('span', { class: lead.className, text: lead.text, title: lead.title }),
-        el('span', { class: 'value numeric', text: market === null ? 'market —' : `market ${money(market)}` }),
+        ...figures.map((figure) => el('span', { class: figure.className, text: figure.text, title: figure.title })),
       ),
       el(
         'span',

@@ -9,7 +9,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { canCorrectPrice, recordingNote, removalLabels, tileLeadFigure } from '../src/personal/views/wishlists.ts';
+import { canCorrectPrice, recordingNote, removalLabels, tileFigures } from '../src/personal/views/wishlists.ts';
 import { money } from '../src/personal/lib/money.ts';
 import type { Purchase, WishlistItem } from '../src/personal/lib/types.ts';
 
@@ -74,20 +74,29 @@ test('removing a wanted card mentions no money, because none is owed for it', ()
   assert.deepEqual(labels, { armedLabel: 'Remove?', title: 'Remove Pikachu from this list' });
 });
 
-test('a bought tile leads with what it was bought for, not the target', () => {
-  const lead = tileLeadFigure(card());
+test('a bought tile shows what it was bought for, then its target, and no market price', () => {
+  const [lead, second] = tileFigures(card(), 8);
 
   assert.equal(lead.text, money(6.72));
   assert.equal(lead.className, 'paid-price numeric');
+  assert.equal(second.text, `target ${money(10)}`);
 });
 
-test('a bought tile with no price on record says so rather than showing the target', () => {
-  assert.equal(tileLeadFigure(card({ purchase: undefined })).text, 'paid —');
+test('a bought tile with no price on record says so rather than showing the target in its place', () => {
+  const [lead] = tileFigures(card({ purchase: undefined }), 8);
+
+  assert.equal(lead.text, 'paid —');
 });
 
-test('a wanted tile still leads with its target', () => {
+test('a bought tile wanted at any price says so in place of a target', () => {
+  const [, second] = tileFigures(card({ targetPriceEur: null }), 8);
+
+  assert.equal(second.text, 'any price');
+});
+
+test('a wanted tile still shows its target, then the market price', () => {
   const wanted = card({ status: 'wanted', purchase: undefined, boughtAt: undefined });
 
-  assert.deepEqual(tileLeadFigure(wanted), { text: money(10), className: 'target-price numeric', title: 'Target price' });
-  assert.equal(tileLeadFigure({ ...wanted, targetPriceEur: null }).text, 'any price');
+  assert.deepEqual(tileFigures(wanted, 8).map((figure) => figure.text), [money(10), `market ${money(8)}`]);
+  assert.deepEqual(tileFigures({ ...wanted, targetPriceEur: null }, null).map((figure) => figure.text), ['any price', 'market —']);
 });

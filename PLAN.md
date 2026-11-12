@@ -956,6 +956,17 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-11-12 — rev 67 (a bought tile shows its target, not the market) ✅
+
+- **A bought tile in grid view now shows the bought price, then `target €…` where
+  `market €…` was.** The market price decides nothing once a card is bought; what it cost
+  next to what it was wanted at is what is worth reading. The market price is still in
+  the card's detail.
+- Wanted tiles are unchanged: target, then market, because the market price is what a
+  target is judged against in a shop.
+- `tileFigures` now chooses both figures on a tile and replaces rev 65's
+  `tileLeadFigure`. 4 tests, 147 passing.
+
 ### 2026-11-12 — rev 66 (code changes are tested on push) ✅
 
 - **The Data workflow now also runs on `src/**`, `tests/**`, `package.json` and

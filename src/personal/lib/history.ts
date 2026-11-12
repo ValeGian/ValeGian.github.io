@@ -116,9 +116,24 @@ export function daysNeeded(source: HistorySource, range: Range): string[] {
   return range.days === null ? all : all.slice(-range.days);
 }
 
-function withinRange(at: number, range: Range): boolean {
+/**
+ * Where a range's window is measured back from: the last day on record, not today.
+ *
+ * The daily ranges already count back from the last file on record (`daysNeeded`), and the
+ * coarser ones have to agree with them, or a week and a month disagree about when "now"
+ * is. It also keeps a chart whole through a gap in the price job — a month is still a
+ * month of readings rather than whatever is left of one — and makes a series depend only
+ * on the data it is drawn from. With no day on record there is nothing to measure from,
+ * and today stands in.
+ */
+function windowEnd(source: HistorySource): number {
+  const lastDay = source.index.lastDay;
+  return lastDay ? Date.parse(`${lastDay}T12:00:00Z`) : Date.now();
+}
+
+function withinRange(at: number, range: Range, end: number): boolean {
   if (range.days === null) return true;
-  return at >= Date.now() - range.days * 86_400_000;
+  return at >= end - range.days * 86_400_000;
 }
 
 /**
@@ -162,6 +177,7 @@ export function cardSeries(source: HistorySource, cardId: string, range: Range, 
 
   const entries = (range.bucket === 'week' ? source.rollups.weekly : source.rollups.monthly)[cardId] ?? [];
   const at = range.bucket === 'week' ? midOfWeek : midOfMonth;
+  const end = windowEnd(source);
 
   return entries
     .map((entry) => {
@@ -172,7 +188,7 @@ export function cardSeries(source: HistorySource, cardId: string, range: Range, 
       return value === null ? null : { period: entry.period, at: at(entry.period), value };
     })
     .filter((point): point is Point => point !== null)
-    .filter((point) => withinRange(point.at, range));
+    .filter((point) => withinRange(point.at, range, end));
 }
 
 export interface Holding {

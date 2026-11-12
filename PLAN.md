@@ -956,6 +956,27 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-11-12 — rev 64 (a chart's window ends at the last day on record) ✅
+
+- **The Data workflow had failed on every browser update since the calendar passed
+  mid-October.** The cause was the `history.test.ts` failure noted in rev 60. Because unit
+  tests run before `npm run validate` in `data.yml`, **the data files pushed from the
+  phone were not being validated**. That step runs again now.
+- **The cause was in the code, not the fixture.** `withinRange` measured the 1M, 6M and
+  1Y windows back from `Date.now()`, but `daysNeeded` measures 1W back from the last file
+  on record. The two disagreed about when "now" is, and the test's September data fell
+  out of the month window once a month had passed. The 6M and 1Y tests would have
+  followed in March and August 2027.
+- **Every range is now measured back from `index.lastDay`.** Today is only used when no
+  day is on record. A series now depends only on the data it is drawn from. A gap in the
+  price job no longer shortens the month chart either: it still shows a month of readings.
+- **What this costs:** after a long outage, 1M shows the last month that has data, not
+  an empty chart. The dates on the axis and the staleness line under the basis chips
+  (rev 56) already show how old it is.
+- Two tests: old history stays charted when measured from the last day, and today is
+  used when there is no day on record. 143 passing, none failing. The three
+  `market.test.ts` errors from `astro check` (rev 60) remain; CI does not run `astro check`.
+
 ### 2026-11-12 — rev 63 (a new price starts in euros) ✅
 
 - **Add card and Bought now start in EUR, not JPY.** This reverses the "yen by default:

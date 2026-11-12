@@ -59,6 +59,24 @@ test('a range excludes periods older than its window', () => {
   assert.equal(cardSeries(history, 'A', range('1y')).length, 2, 'a year reaches back past August');
 });
 
+test('a range is measured back from the last day on record, so old history stays charted', () => {
+  // The fixture's last day is 2026-09-19. Measured from the wall clock, the month range
+  // emptied the moment the calendar moved a month past it.
+  const history = source();
+  history.rollups.weekly.A.unshift({ period: '2026-W30', avg30: 5, trend: 5, days: 7 });
+
+  const month = cardSeries(history, 'A', range('1m')).map((point) => point.period);
+  assert.deepEqual(month, ['2026-W38'], 'late July is more than a month before the last day');
+});
+
+test('with no day on record, a range is measured back from today', () => {
+  const history = source();
+  history.index = { days: [], firstDay: null, lastDay: null };
+
+  assert.deepEqual(cardSeries(history, 'A', range('1m')), [], 'September 2026 is more than a month ago');
+  assert.equal(cardSeries(history, 'A', range('all')).length, 2, 'an unbounded range still shows everything');
+});
+
 test('a card counts only from when it was bought', () => {
   const history = source();
   const points = holdingsSeries(history, [{ cardId: 'A', quantity: 1, boughtOn: '2026-09-18' }], range('1w'));

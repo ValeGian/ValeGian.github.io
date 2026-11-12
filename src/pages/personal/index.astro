@@ -684,8 +684,10 @@ import BaseLayout from '@layouts/BaseLayout.astro';
    * is what it is being judged against. They used to be the other way round — the target
    * grey, the market price at full strength and unlabelled — so the eye landed on the
    * number that was not the point. Weight and colour do the work; nothing is boxed.
+   * A bought tile leads with what it cost instead, at the same weight.
    */
-  .personal .target-price {
+  .personal .target-price,
+  .personal .paid-price {
     color: var(--ink);
     font-weight: 600;
   }

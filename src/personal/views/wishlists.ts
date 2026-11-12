@@ -310,7 +310,27 @@ function targetMarker(item: WishlistItem, price: Price | undefined): HTMLElement
   });
 }
 
-const CURRENCY_LABEL: Record<Currency, string> = { JPY: 'JPY ¥', EUR: 'EUR €', USD: 'USD $' };
+/**
+ * The figure a grid tile leads with: what the card is wanted at, or once bought, what it
+ * cost.
+ *
+ * A tile has room for one bold number. On a wanted card that is the target, because the
+ * decision is whether to buy. On a bought card the decision is made, and the figure that
+ * still matters is the one its owner pays back.
+ */
+export function tileLeadFigure(item: WishlistItem): { text: string; className: string; title: string } {
+  if (item.status === 'bought') {
+    return item.purchase
+      ? { text: money(item.purchase.amountEur), className: 'paid-price numeric', title: 'What it was bought for' }
+      : { text: 'paid —', className: 'paid-price numeric', title: 'Bought, with no price on record' };
+  }
+
+  return item.targetPriceEur === null
+    ? { text: 'any price', className: 'target-price numeric', title: 'Wanted at any price' }
+    : { text: money(item.targetPriceEur), className: 'target-price numeric', title: 'Target price' };
+}
+
+const CURRENCY_LABEL: Record<Currency, string> ={ JPY: 'JPY ¥', EUR: 'EUR €', USD: 'USD $' };
 
 /**
  * What confirming will record, said before it is recorded.
@@ -804,6 +824,7 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
   const market = quote(priceFor(item, state.prices))?.value ?? null;
   const bought = item.status === 'bought';
   const under = market !== null && item.targetPriceEur !== null && market <= item.targetPriceEur;
+  const lead = tileLeadFigure(item);
 
   return el(
     'li',
@@ -821,10 +842,7 @@ function gridTile(item: WishlistItem, owner: string, state: WishlistViewState, s
       el(
         'span',
         { class: 'tile-figures ui' },
-        el('span', {
-          class: 'target-price numeric',
-          text: item.targetPriceEur === null ? 'any price' : money(item.targetPriceEur),
-        }),
+        el('span', { class: lead.className, text: lead.text, title: lead.title }),
         el('span', { class: 'value numeric', text: market === null ? 'market —' : `market ${money(market)}` }),
       ),
       el(

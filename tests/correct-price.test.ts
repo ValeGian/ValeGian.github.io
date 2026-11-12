@@ -4,11 +4,12 @@
  * Two things are worth pinning down. The button appears only where there is a price to
  * correct and someone allowed to correct it. The note under the amount says what will
  * actually be recorded, because the euro figure is what the friend is asked to pay.
- * Removing a bought card changes the same figure, so its button names the amount too.
+ * Removing a bought card changes the same figure, so its button names the amount too, and
+ * a bought tile in the grid leads with it.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { canCorrectPrice, recordingNote, removalLabels } from '../src/personal/views/wishlists.ts';
+import { canCorrectPrice, recordingNote, removalLabels, tileLeadFigure } from '../src/personal/views/wishlists.ts';
 import { money } from '../src/personal/lib/money.ts';
 import type { Purchase, WishlistItem } from '../src/personal/lib/types.ts';
 
@@ -71,4 +72,22 @@ test('removing a wanted card mentions no money, because none is owed for it', ()
   const labels = removalLabels(card({ status: 'wanted', purchase: undefined, boughtAt: undefined }), 'Pikachu', 'Tommy');
 
   assert.deepEqual(labels, { armedLabel: 'Remove?', title: 'Remove Pikachu from this list' });
+});
+
+test('a bought tile leads with what it was bought for, not the target', () => {
+  const lead = tileLeadFigure(card());
+
+  assert.equal(lead.text, money(6.72));
+  assert.equal(lead.className, 'paid-price numeric');
+});
+
+test('a bought tile with no price on record says so rather than showing the target', () => {
+  assert.equal(tileLeadFigure(card({ purchase: undefined })).text, 'paid —');
+});
+
+test('a wanted tile still leads with its target', () => {
+  const wanted = card({ status: 'wanted', purchase: undefined, boughtAt: undefined });
+
+  assert.deepEqual(tileLeadFigure(wanted), { text: money(10), className: 'target-price numeric', title: 'Target price' });
+  assert.equal(tileLeadFigure({ ...wanted, targetPriceEur: null }).text, 'any price');
 });

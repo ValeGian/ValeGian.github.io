@@ -956,6 +956,18 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-11-12 — rev 65 (a bought tile shows what it cost) ✅
+
+- **In grid view, a bought card's tile now leads with what it was bought for**, in the bold
+  spot where a wanted card shows its target. The target stopped mattering once the card was
+  bought; the price is what the friend pays back. The "bought" badge underneath labels it.
+  A bought card with no purchase on record reads `paid —` rather than showing the target,
+  which would be mistaken for the price paid.
+- `tileLeadFigure` chooses between the two. The paid figure has its own `paid-price` class
+  with the same style as `target-price`, so the markup does not call a price paid a target.
+- List view is unchanged: it already shows `bought €…` on the row.
+- 3 tests, 146 passing. Not checked in a browser, which needs the vault unlocked.
+
 ### 2026-11-12 — rev 64 (a chart's window ends at the last day on record) ✅
 
 - **The Data workflow had failed on every browser update since the calendar passed

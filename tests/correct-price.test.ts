@@ -4,10 +4,11 @@
  * Two things are worth pinning down. The button appears only where there is a price to
  * correct and someone allowed to correct it. The note under the amount says what will
  * actually be recorded, because the euro figure is what the friend is asked to pay.
+ * Removing a bought card changes the same figure, so its button names the amount too.
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { canCorrectPrice, recordingNote } from '../src/personal/views/wishlists.ts';
+import { canCorrectPrice, recordingNote, removalLabels } from '../src/personal/views/wishlists.ts';
 import { money } from '../src/personal/lib/money.ts';
 import type { Purchase, WishlistItem } from '../src/personal/lib/types.ts';
 
@@ -57,4 +58,17 @@ test('a correction in euros needs no conversion to explain', () => {
 
 test('a new purchase is still converted at today’s rate', () => {
   assert.equal(recordingNote(1200, 'JPY'), "Recording 1,200 JPY, converted at today's rate.");
+});
+
+test('removing a bought card says, before the second tap, how much less is owed', () => {
+  const labels = removalLabels(card(), 'Pikachu', 'Tommy');
+
+  assert.equal(labels.armedLabel, `Remove? −${money(6.72)}`);
+  assert.equal(labels.title, `Remove Pikachu from this list. Tommy will owe ${money(6.72)} less.`);
+});
+
+test('removing a wanted card mentions no money, because none is owed for it', () => {
+  const labels = removalLabels(card({ status: 'wanted', purchase: undefined, boughtAt: undefined }), 'Pikachu', 'Tommy');
+
+  assert.deepEqual(labels, { armedLabel: 'Remove?', title: 'Remove Pikachu from this list' });
 });

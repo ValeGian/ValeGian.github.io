@@ -258,8 +258,21 @@ export async function reviseBoughtPrice(
   return buildWrites(vault, [owner]);
 }
 
+/**
+ * Takes a card off a list, wanted or bought.
+ *
+ * Removing a friend's bought card also takes its cost out of what they owe: the balance
+ * is summed from the bought cards on the list, so there is no separate figure to adjust.
+ * Settlements are left alone — money already handed over was handed over, and if it now
+ * exceeds what was bought, the balance says so.
+ *
+ * An unknown card is refused rather than ignored, so a stale row cannot report a removal
+ * that changed nothing.
+ */
 export async function deleteWish(vault: Vault, owner: string, id: string): Promise<Write[]> {
   const list = vault.wishlists[owner];
+  if (!list?.items.some((item) => item.id === id)) throw new Error(`No wishlist item ${id} for ${owner}`);
+
   list.items = list.items.filter((item) => item.id !== id);
   return buildWrites(vault, [owner]);
 }

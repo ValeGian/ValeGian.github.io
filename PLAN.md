@@ -956,6 +956,26 @@ static lookup, never fetched at runtime.
 
 ## 13. Progress log
 
+### 2026-11-12 — rev 62 (a bought card can come off a friend's list) ✅
+
+- **Bought rows and tiles on a friend's list now have Remove**, beside Change price. For
+  a card returned, or marked bought by mistake. Before this, the only way to undo a
+  purchase was editing `.local/` on a laptop.
+- **What they owe follows with nothing else to update.** The balance is summed from the
+  bought cards on the list (§6.2), so removing one takes its cost out of "Owes me" on the
+  same save.
+- **The armed button names the amount**: `Remove? −€6.72`, with a title saying who will
+  owe that much less. A wanted card still just asks `Remove?`. `removalLabels` decides
+  which.
+- **Settlements are not touched.** Money handed over stays handed over. If it now exceeds
+  what was bought, "Owes me" goes negative, which is the truth: that much is owed back.
+- **`deleteWish` now refuses an unknown card or list** instead of saving a file with
+  nothing changed. A missing list used to throw a bare `TypeError`.
+- The buttons only appear for the admin with write access (`canEdit`), like Change price.
+- 5 tests, 137 passing. The one failure is still `history.test.ts` from rev 60, and
+  `astro check` still reports only the three `market.test.ts` errors from rev 60.
+- Not checked in a browser: that needs the vault unlocked.
+
 ### 2026-11-11 — rev 61 (Ditto's picture moved) ✅
 
 - **`M6a-121` lost its picture.** The PriceCharting image from rev 50 (`corrpd2i5xhfosaz4kvo`)

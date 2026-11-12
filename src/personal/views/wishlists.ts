@@ -663,6 +663,27 @@ function wishRow(
 }
 
 /**
+ * What removing a card will do, said on the button before it is done.
+ *
+ * A bought card carries money: taking it off the list lowers what its owner owes by what
+ * it cost. That is the part worth reading before the second tap, so the armed label
+ * names the amount rather than only asking.
+ */
+export function removalLabels(
+  item: WishlistItem,
+  cardName: string,
+  ownerName: string,
+): { armedLabel: string; title: string } {
+  const cost = item.status === 'bought' ? item.purchase?.amountEur : undefined;
+  if (cost === undefined) return { armedLabel: 'Remove?', title: `Remove ${cardName} from this list` };
+
+  return {
+    armedLabel: `Remove? −${money(cost)}`,
+    title: `Remove ${cardName} from this list. ${ownerName} will owe ${money(cost)} less.`,
+  };
+}
+
+/**
  * Removing a card, in two taps rather than behind a dialog.
  *
  * A card removed by accident has to be searched for and added again, with its target and
@@ -670,19 +691,20 @@ function wishRow(
  */
 function removeButton(item: WishlistItem, owner: string, state: WishlistViewState): HTMLElement | null {
   if (!state.onDeleteWish) return null;
+  const labels = removalLabels(item, displayName(item, state.names), state.lists[owner]?.owner ?? owner);
 
   return armedButton({
     label: 'Remove',
-    armedLabel: 'Remove?',
+    armedLabel: labels.armedLabel,
     className: 'chip danger',
-    title: `Remove ${displayName(item, state.names)} from this list`,
+    title: labels.title,
     onConfirm: () => void state.onDeleteWish?.(owner, item.id),
   });
 }
 
 /**
  * Marking a card bought, and changing what you would pay for it — or, once bought,
- * correcting what it cost.
+ * correcting what it cost or taking it off the list.
  *
  * Shared by the row and the tile. They had drifted: the grid showed the picture, the
  * target and the market price — everything needed to decide — and then offered no way to
@@ -727,22 +749,33 @@ function wishActions(item: WishlistItem, owner: string, state: WishlistViewState
   );
 }
 
-/** A bought card has one thing left to change: what it cost, which its owner pays back. */
+/**
+ * A bought card has two things left to do: correct what it cost, or come off the list —
+ * a card returned, or bought by mistake. Either way, what its owner owes follows, because
+ * the balance is summed from the bought cards on the list.
+ */
 function boughtActions(item: WishlistItem, owner: string, state: WishlistViewState): HTMLElement | null {
-  if (!canCorrectPrice(item, state.canEdit) || !item.purchase || !state.onStartBuy) return null;
-  const { amount, currency } = item.purchase;
+  if (!state.canEdit) return null;
 
   return el(
     'span',
     { class: 'wish-actions' },
-    el('button', {
-      type: 'button',
-      class: 'chip',
-      text: 'Change price',
-      onClick: () =>
-        state.onStartBuy?.({ owner, itemId: item.id, amount: String(amount), currency, isRevision: true }),
-    }),
+    changePriceButton(item, owner, state),
+    removeButton(item, owner, state),
   );
+}
+
+function changePriceButton(item: WishlistItem, owner: string, state: WishlistViewState): HTMLElement | null {
+  if (!canCorrectPrice(item, state.canEdit) || !item.purchase || !state.onStartBuy) return null;
+  const { amount, currency } = item.purchase;
+
+  return el('button', {
+    type: 'button',
+    class: 'chip',
+    text: 'Change price',
+    onClick: () =>
+      state.onStartBuy?.({ owner, itemId: item.id, amount: String(amount), currency, isRevision: true }),
+  });
 }
 
 /**

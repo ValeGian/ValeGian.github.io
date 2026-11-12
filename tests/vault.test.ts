@@ -8,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { encrypt } from '../src/lib/crypto.mjs';
-import { addCard, applyResolutions, buildWrites, deleteCard, markBought, newCardId, reviseBoughtPrice, type Vault } from '../src/personal/lib/vault.ts';
+import { addCard, applyResolutions, buildWrites, deleteCard, deleteWish, markBought, newCardId, reviseBoughtPrice, type Vault } from '../src/personal/lib/vault.ts';
 import { totals, value } from '../src/personal/lib/money.ts';
 import { balance } from '../src/personal/views/wishlists.ts';
 import type { CollectionItem, Purchase, Wishlist } from '../src/personal/lib/types.ts';
@@ -122,6 +122,40 @@ test('a wanted card has no price to correct', async () => {
 
   await assert.rejects(reviseBoughtPrice(vault, 'tommy', 'wish_0010', purchase(10)), /has not been bought/);
   assert.equal(vault.wishlists.tommy.items[0].purchase, undefined, 'nothing is owed for a card nobody bought');
+});
+
+test("removing a friend's bought card takes its cost out of what they owe, and only their file", async () => {
+  const vault = await makeVault();
+  vault.wishlists.tommy.items.push(wish('wish_0011'));
+  await markBought(vault, 'tommy', 'wish_0010', purchase(287.6));
+  await markBought(vault, 'tommy', 'wish_0011', purchase(40));
+
+  const writes = await deleteWish(vault, 'tommy', 'wish_0010');
+
+  assert.deepEqual(vault.wishlists.tommy.items.map((item) => item.id), ['wish_0011']);
+  assert.equal(balance(vault.wishlists.tommy).owed, 40, 'the other purchase is still owed');
+  const personal = writes.map((write) => write.path).filter((path) => path.startsWith('public/data/personal/'));
+  assert.deepEqual(personal, ['public/data/personal/tommy.enc']);
+});
+
+test('removing a bought card leaves settlements alone, even when they now exceed what was bought', async () => {
+  const vault = await makeVault();
+  await markBought(vault, 'tommy', 'wish_0010', purchase(300));
+  vault.wishlists.tommy.settlements.push({ date: '2026-11-02', amountEur: 120 });
+
+  await deleteWish(vault, 'tommy', 'wish_0010');
+
+  const figures = balance(vault.wishlists.tommy);
+  assert.equal(figures.settled, 120, 'money handed over stays handed over');
+  assert.equal(figures.owed, -120, 'the balance says the money is now owed back');
+});
+
+test('removing a card that is not on the list is refused rather than ignored', async () => {
+  const vault = await makeVault();
+
+  await assert.rejects(deleteWish(vault, 'tommy', 'wish_9999'), /No wishlist item wish_9999 for tommy/);
+  await assert.rejects(deleteWish(vault, 'nobody', 'wish_0010'), /No wishlist item wish_0010 for nobody/);
+  assert.equal(vault.wishlists.tommy.items.length, 1);
 });
 
 test('ids do not collide after a deletion', async () => {

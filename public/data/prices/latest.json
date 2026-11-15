@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "date": "2026-11-14",
-  "generatedAt": "2026-11-14T13:33:57.621Z",
+  "date": "2026-11-15",
+  "generatedAt": "2026-11-15T13:57:47.669Z",
   "prices": {
     "S12a-212": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.348Z",
+      "updated": "2026-11-14T22:16:19.034Z",
       "avg30": 103.09,
       "avg7": 81.16,
       "avg1": 70.98,
@@ -17,7 +17,7 @@
     "S12a-213": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 40.25,
       "avg7": 34.47,
       "avg1": 41.65,
@@ -28,7 +28,7 @@
     "S12a-215": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 44.88,
       "avg7": 48.8,
       "avg1": 35,
@@ -39,7 +39,7 @@
     "S12a-218": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.364Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 33.95,
       "avg7": 39.81,
       "avg1": 30,
@@ -50,7 +50,7 @@
     "S12a-221": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.364Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 119.4,
       "avg7": 107.85,
       "avg1": 87.5,
@@ -61,7 +61,7 @@
     "S12a-228": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.364Z",
+      "updated": "2026-11-14T22:16:19.047Z",
       "avg30": 49.83,
       "avg7": 50.91,
       "avg1": 53.49,
@@ -72,7 +72,7 @@
     "S12a-233": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 13.64,
       "avg7": 12.07,
       "avg1": 11.13,
@@ -83,7 +83,7 @@
     "S12a-234": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 31.21,
       "avg7": 28.66,
       "avg1": 27.81,
@@ -94,7 +94,7 @@
     "S12a-259": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.056Z",
       "avg30": 89.64,
       "avg7": 89.43,
       "avg1": 74.32,
@@ -105,7 +105,7 @@
     "S12a-260": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.364Z",
+      "updated": "2026-11-14T22:16:19.047Z",
       "avg30": 93.99,
       "avg7": 99.24,
       "avg1": 79.49,
@@ -116,7 +116,7 @@
     "S12a-261": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.034Z",
       "avg30": 213.85,
       "avg7": 211.31,
       "avg1": 209.98,
@@ -127,7 +127,7 @@
     "S12a-262": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.347Z",
+      "updated": "2026-11-14T22:16:19.047Z",
       "avg30": 143.09,
       "avg7": 150.56,
       "avg1": 154.98,
@@ -138,7 +138,7 @@
     "S8b-195": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.373Z",
+      "updated": "2026-11-14T22:16:19.052Z",
       "avg30": 13.94,
       "avg7": 12.19,
       "avg1": 10.89,
@@ -149,7 +149,7 @@
     "SV1a-080": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.364Z",
+      "updated": "2026-11-14T22:16:19.056Z",
       "avg30": 129.54,
       "avg7": 122.7,
       "avg1": 103.99,
@@ -160,7 +160,7 @@
     "SV1S-083": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 16.11,
       "avg7": 10.7,
       "avg1": 11.39,
@@ -171,7 +171,7 @@
     "SV1S-084": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.357Z",
+      "updated": "2026-11-14T22:16:19.056Z",
       "avg30": 10.63,
       "avg7": 10.62,
       "avg1": 11.28,
@@ -182,7 +182,7 @@
     "SV1S-101": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.041Z",
       "avg30": 158.02,
       "avg7": 142.27,
       "avg1": 155,
@@ -193,7 +193,7 @@
     "SV1V-086": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 15.39,
       "avg7": 17.08,
       "avg1": 12.27,
@@ -204,7 +204,7 @@
     "SV2a-166": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.052Z",
       "avg30": 18.14,
       "avg7": 18.1,
       "avg1": 29.92,
@@ -215,7 +215,7 @@
     "SV2a-167": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.348Z",
+      "updated": "2026-11-14T22:16:19.052Z",
       "avg30": 12.95,
       "avg7": 14.53,
       "avg1": 17.56,
@@ -226,7 +226,7 @@
     "SV2a-168": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 25.53,
       "avg7": 24.38,
       "avg1": 30.23,
@@ -237,7 +237,7 @@
     "SV2a-169": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.052Z",
       "avg30": 16.53,
       "avg7": 14.84,
       "avg1": 12.62,
@@ -248,7 +248,7 @@
     "SV2a-170": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.052Z",
       "avg30": 23.06,
       "avg7": 22.75,
       "avg1": 25.46,
@@ -259,7 +259,7 @@
     "SV2a-171": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 13.45,
       "avg7": 14.23,
       "avg1": 16.91,
@@ -270,7 +270,7 @@
     "SV2a-182": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.348Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 12.36,
       "avg7": 12.61,
       "avg1": 10.27,
@@ -281,7 +281,7 @@
     "SV2a-183": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 24,
       "avg7": 28.17,
       "avg1": 18.89,
@@ -292,7 +292,7 @@
     "SV2a-200": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 106.26,
       "avg7": 103.29,
       "avg1": 101.96,
@@ -303,7 +303,7 @@
     "SV2a-201": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 358.67,
       "avg7": 338.98,
       "avg1": 388.33,
@@ -314,7 +314,7 @@
     "SV2a-202": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 116.99,
       "avg7": 115.34,
       "avg1": 104.66,
@@ -325,7 +325,7 @@
     "SV2a-203": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 61.28,
       "avg7": 64.72,
       "avg1": 90.75,
@@ -336,7 +336,7 @@
     "SV2D-092": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 44.86,
       "avg7": 38.84,
       "avg1": 30.5,
@@ -347,7 +347,7 @@
     "SV2P-077": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.056Z",
       "avg30": 10.34,
       "avg7": 11.29,
       "avg1": 8.42,
@@ -358,7 +358,7 @@
     "SV3-110": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 14.43,
       "avg7": 13.43,
       "avg1": 11.57,
@@ -369,7 +369,7 @@
     "SV3a-069": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.348Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 25.7,
       "avg7": 30.01,
       "avg1": 43.31,
@@ -380,7 +380,7 @@
     "SV4a-339": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 2.26,
       "avg7": 2.1,
       "avg1": 1.85,
@@ -391,7 +391,7 @@
     "SV5M-073": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.364Z",
+      "updated": "2026-11-14T22:16:19.047Z",
       "avg30": 11.98,
       "avg7": 12.86,
       "avg1": 10.65,
@@ -402,7 +402,7 @@
     "SV5M-074": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.348Z",
+      "updated": "2026-11-14T22:16:19.043Z",
       "avg30": 10.36,
       "avg7": 12.71,
       "avg1": 9.45,
@@ -413,7 +413,7 @@
     "SV6-104": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.360Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 2.99,
       "avg7": 2.99,
       "avg1": 2.71,
@@ -424,7 +424,7 @@
     "SV7a-073": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.357Z",
+      "updated": "2026-11-14T22:16:19.052Z",
       "avg30": 2.6,
       "avg7": 2.38,
       "avg1": 2.14,
@@ -435,7 +435,7 @@
     "SV9-102": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.347Z",
+      "updated": "2026-11-14T22:16:19.056Z",
       "avg30": 8.84,
       "avg7": 7.11,
       "avg1": 6.79,
@@ -446,7 +446,7 @@
     "SV9-109": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.373Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 13.07,
       "avg7": 11.51,
       "avg1": 9.96,
@@ -490,7 +490,7 @@
     "S12a-211": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.056Z",
       "avg30": 50.92,
       "avg7": 55.65,
       "avg1": 43.33,
@@ -501,7 +501,7 @@
     "SV7a-070": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.347Z",
+      "updated": "2026-11-14T22:16:19.047Z",
       "avg30": 12.49,
       "avg7": 13.03,
       "avg1": 10.91,
@@ -1231,7 +1231,7 @@
     "S10a-074": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.358Z",
+      "updated": "2026-11-14T22:16:19.056Z",
       "avg30": 31.9,
       "avg7": 29.77,
       "avg1": 43.74,
@@ -1275,7 +1275,7 @@
     "S9-103": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.052Z",
       "avg30": 188.96,
       "avg7": 146.54,
       "avg1": 49,
@@ -1286,7 +1286,7 @@
     "SV7a-067": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.350Z",
+      "updated": "2026-11-14T22:16:19.032Z",
       "avg30": 2.7,
       "avg7": 2.46,
       "avg1": 2.4,
@@ -1396,7 +1396,7 @@
     "S10a-077": {
       "source": "cardmarket/tcgdex",
       "currency": "EUR",
-      "updated": "2026-11-13T22:16:19.348Z",
+      "updated": "2026-11-14T22:16:19.047Z",
       "avg30": 12.97,
       "avg7": 10.82,
       "avg1": 12.5,

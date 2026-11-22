@@ -6,7 +6,7 @@
     "location": "Rome, Italy",
     "portrait": "/portrait.jpg",
     "description": "Valerio Giannini, AI Tech Lead and LLM inference engineer at Translated: production LLM serving, speculative decoding and low-precision inference.",
-    "bio": "I make large language models fast and reliable in production. At Translated I'm the AI tech lead for LLM inference: I own the decoder behind Lara, our LLM translation service, lead the team around it, and deploy the open 100–500B models we use internally for work like coding.\n\nDay to day that means vLLM internals, speculative decoding, low-precision inference and GPU kernel work on NVIDIA Hopper and Blackwell, and measuring all of it carefully enough to trust the numbers.\n\nI joined Translated in 2022 to work on context-aware machine translation, the subject of my MSc thesis at the University of Pisa, and was the main maintainer of ModernMT, its neural MT engine, until 2025, while moving down the stack to the GPUs. Before that I was a software engineering intern at Amazon in Luxembourg."
+    "bio": "I make large language models fast and reliable in production. At Translated I'm the AI tech lead for LLM inference: I own the decoder behind Lara, our LLM translation service, where custom FP8 kernels and speculative decoding cut peak-load p99 latency about 3× and doubled decoding speed. I lead the team around it, and run the large open-weight models (100–500B parameters) we use internally for coding and other general work.\n\nDay to day that means vLLM internals, speculative decoding, low-precision inference and GPU kernel work on NVIDIA Hopper and Blackwell (H100/H200 and B200-class) GPUs, and measuring all of it carefully enough to trust the numbers.\n\nI joined Translated in 2022 to work on context-aware machine translation, the subject of my MSc thesis at the University of Pisa, and was the main maintainer of ModernMT, its neural MT engine, until 2025, while moving down the stack to the GPUs. Before that I was a software engineering intern at Amazon in Luxembourg."
   },
   "links": {
     "email": "46gianninivalerio@gmail.com",
@@ -73,12 +73,12 @@
         },
         {
           "title": "Low-precision inference",
-          "description": "FP8 in production, and quantization-aware distillation that takes models to NVFP4 with limited quality loss."
+          "description": "FP8 in production, and quantization-aware distillation that takes models to NVFP4 (4-bit) with limited quality loss."
         },
         {
           "title": "Lara Mini",
           "href": "https://huggingface.co/translated/Lara-4-Mini-Base",
-          "description": "Core team member for Translated's open MoE base model, state of the art in its size class. I also added it to Hugging Face Transformers.",
+          "description": "Core team member for Translated's open MoE base model, state of the art in its size class; co-author of the <a href=\"https://arxiv.org/abs/2611.16956\">technical report</a>. I also added it to Hugging Face Transformers.",
           "aside": "2026"
         }
       ]
@@ -96,7 +96,7 @@
         {
           "title": "vLLM",
           "href": "https://github.com/vllm-project/vllm/pull/67978",
-          "description": "Lara Mini support with tensor, pipeline and expert parallelism (in review), and the root cause of a silent bug in expert-parallel load balancing that dropped GSM8K accuracy from 86% to 56%.",
+          "description": "Lara Mini support with tensor, pipeline and expert parallelism (in review), and the root cause of a <a href=\"https://github.com/vllm-project/vllm/issues/67054\">silent bug in expert-parallel load balancing</a> that dropped GSM8K accuracy from 86% to 56%.",
           "aside": "2026"
         },
         {
@@ -114,12 +114,6 @@
           "title": "Inside liteinfer",
           "href": "https://valegian.github.io/liteinfer/inside/",
           "description": "An interactive field guide to LLM inference: prefill and decode, KV caching, paged memory and continuous batching, each measured on an engine small enough to read in an afternoon.",
-          "aside": "2026"
-        },
-        {
-          "title": "Lara Mini Base: Language Diversity as a Resource, Not a Trade-off",
-          "href": "https://arxiv.org/abs/2611.16956",
-          "description": "Technical report on arXiv, from the core model and training team.",
           "aside": "2026"
         },
         {

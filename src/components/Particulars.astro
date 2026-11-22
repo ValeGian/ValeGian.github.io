@@ -11,7 +11,7 @@ const { identity, links, experience, education } = profile;
 const entries = [
   {
     label: 'Now',
-    lines: experience.filter((role) => role.isCurrent).map((role) => `${role.role}, ${role.organisation}, since ${role.since}`),
+    lines: experience.filter((role) => role.isCurrent).map((role) => `${role.organisation}, since ${role.since}`),
   },
   {
     label: 'Before',
@@ -75,9 +75,13 @@ const entries = [
   .elsewhere {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
-    margin: var(--space-6) 0 0;
+    gap: 0 var(--space-4);
+    margin: var(--space-4) 0 0;
     max-width: none;
+  }
+
+  .elsewhere a {
+    padding-block: var(--space-3);
   }
 
   @media (min-width: 60rem) {

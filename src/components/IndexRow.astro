@@ -20,7 +20,7 @@ const { title, href, description, meta = [], aside } = Astro.props;
     {href ? <a href={href}>{title}</a> : title}
   </h3>
   {aside && <span class="row-aside numeric">{aside}</span>}
-  <p class="row-description">{description}</p>
+  <p class="row-description" set:html={description} />
   {meta.length > 0 && (
     <p class="row-meta ui">
       {meta.map((item) => <span>{item}</span>)}
@@ -42,10 +42,6 @@ const { title, href, description, meta = [], aside } = Astro.props;
     grid-column: 1;
   }
 
-  .row-title a {
-    text-decoration-color: var(--rule-strong);
-  }
-
   .row-aside {
     grid-column: 2;
     grid-row: 1;
@@ -57,6 +53,7 @@ const { title, href, description, meta = [], aside } = Astro.props;
   .row-description {
     grid-column: 1 / -1;
     margin: 0;
+    max-width: 72ch;
     color: var(--muted);
   }
 

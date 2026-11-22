@@ -5,11 +5,25 @@ import IndexRow from '@components/IndexRow.astro';
 import Particulars from '@components/Particulars.astro';
 import profile from '@data/profile.json';
 
-const { identity, sections } = profile;
+const { identity, links, education, sections } = profile;
 const paragraphs = identity.bio.split('\n\n');
+
+// Tells search engines whose page this is (schema.org Person).
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: `${identity.firstName} ${identity.lastName}`,
+  jobTitle: identity.headline,
+  worksFor: { '@type': 'Organization', name: 'Translated' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: education[0].institution },
+  url: Astro.site?.href,
+  image: new URL(identity.portrait, Astro.site).href,
+  sameAs: links.profiles.map((profileLink) => profileLink.url),
+};
 ---
 
 <BaseLayout title="Valerio Giannini" description={identity.description}>
+  <script type="application/ld+json" set:html={JSON.stringify(person)} />
   <div class="page">
     <section class="intro">
       <div class="nameplate">

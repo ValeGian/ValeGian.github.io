@@ -3,12 +3,15 @@ import profile from '@data/profile.json';
 
 const { links, identity } = profile;
 const year = new Date().getFullYear();
-const reachable = links.profiles;
+const [github, linkedin] = links.profiles;
 ---
 
 <footer class="colophon">
   <div class="page colophon-inner">
-    <p class="ui">{identity.location}. Reach me on {reachable.map((profileLink, index) => (<Fragment>{index === 0 ? '' : index === reachable.length - 1 ? ' or ' : ', '}<a href={profileLink.url} rel="me">{profileLink.platform}</a></Fragment>))}.</p>
+    <p class="ui">
+      {identity.location}. Reach me by <a href={`mailto:${links.email}`}>email</a>, on
+      <a href={linkedin.url} rel="me">{linkedin.platform}</a> or <a href={github.url} rel="me">{github.platform}</a>.
+    </p>
     <p class="ui muted">© {year} Valerio Giannini</p>
   </div>
 </footer>

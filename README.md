@@ -1,8 +1,11 @@
 # valegian.github.io
 
-Personal site of Valerio Giannini, and a private tracker for a Japanese Pokémon card
-collection. Built with [Astro](https://astro.build), published to GitHub Pages by GitHub
-Actions.
+Personal website of Valerio Giannini: [valegian.github.io](https://valegian.github.io). Built
+with [Astro](https://astro.build), published to GitHub Pages by GitHub Actions. The page's
+content lives in one file, `src/data/profile.json`.
+
+The repository also hosts a private hobby app under `/personal` (a tracker for a Japanese
+Pokémon card collection), which the rest of this README and `PLAN.md` describe.
 
 There is no server and no database. Card data and daily market-price snapshots are plain
 JSON files in this repository; the personal files are encrypted in the browser before
@@ -29,7 +32,7 @@ Requires Node 20 or newer.
 | `src/pages/` | routes |
 | `src/personal/` | the gated collection app |
 | `src/lib/` | crypto, catalog names, watchlist derivation — shared by the site and the scripts |
-| `src/data/profile.json`, `transcripts.json` | CV content, read at build time |
+| `src/data/profile.json` | the website's content, read at build time |
 | `public/data/` | everything fetched at runtime, including the encrypted personal files |
 | `scripts/` | data pipeline and maintenance |
 | `schemas/` | JSON Schema for every data file |

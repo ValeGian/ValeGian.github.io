@@ -13,10 +13,14 @@ import SiteFooter from '@components/SiteFooter.astro';
 interface Props {
   title: string;
   description: string;
+  /** Keeps the page out of search engines (the gated personal area). */
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, noindex = false } = Astro.props;
 const fullTitle = title === 'Valerio Giannini' ? title : `${title} — Valerio Giannini`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const image = new URL('/portrait.jpg', Astro.site);
 ---
 
 <!doctype html>
@@ -24,12 +28,17 @@ const fullTitle = title === 'Valerio Giannini' ? title : `${title} — Valerio G
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="description" content={description} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Valerio Giannini" />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary" />
     <title>{fullTitle}</title>
   </head>
   <body>

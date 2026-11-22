@@ -5,22 +5,20 @@ import IndexRow from '@components/IndexRow.astro';
 import Particulars from '@components/Particulars.astro';
 import profile from '@data/profile.json';
 
-const { identity, experience, projects } = profile;
-const current = experience.find((role) => role.isCurrent);
-const featured = projects.filter((project) => project.featured);
+const { identity, sections } = profile;
 const paragraphs = identity.bio.split('\n\n');
 ---
 
-<BaseLayout
-  title="Valerio Giannini"
-  description="Valerio Giannini — AI Tech Lead at Translated, working on LLM inference."
->
+<BaseLayout title="Valerio Giannini" description={identity.description}>
   <div class="page">
     <section class="intro">
-      <h1>Valerio Giannini</h1>
-      <p class="role ui">
-        {current ? `${current.role} at ${current.organisation}` : identity.headline}
-      </p>
+      <div class="nameplate">
+        <img class="portrait" src={identity.portrait} alt="Valerio Giannini" width="112" height="112" />
+        <div>
+          <h1>Valerio Giannini</h1>
+          <p class="role ui">{identity.headline} at Translated</p>
+        </div>
+      </div>
       <div class="intro-body">
         <div class="intro-prose">
           {paragraphs.map((paragraph) => <p class="lede">{paragraph}</p>)}
@@ -29,18 +27,13 @@ const paragraphs = identity.bio.split('\n\n');
       </div>
     </section>
 
-    <RuledIndex heading="What I'm building">
-      {featured.map((project) => (
-        <IndexRow
-          title={project.title}
-          href={project.link}
-          description={project.description}
-          meta={project.languages}
-          aside={project.lastActivity?.slice(0, 4) ?? project.date.slice(0, 4)}
-        />
-      ))}
-    </RuledIndex>
-
+    {sections.map((section) => (
+      <RuledIndex heading={section.heading} id={section.id}>
+        {section.items.map((item) => (
+          <IndexRow title={item.title} href={item.href} description={item.description} aside={item.aside} />
+        ))}
+      </RuledIndex>
+    ))}
   </div>
 </BaseLayout>
 
@@ -49,16 +42,31 @@ const paragraphs = identity.bio.split('\n\n');
     padding-block: var(--space-16) 0;
   }
 
+  .nameplate {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .portrait {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: none;
+  }
+
   h1 {
     font-size: var(--size-display);
     letter-spacing: -0.03em;
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
   }
 
   .role {
     font-size: var(--size-lg);
     color: var(--muted);
-    margin-bottom: var(--space-8);
+    margin: 0;
     max-width: none;
   }
 
@@ -76,6 +84,13 @@ const paragraphs = identity.bio.split('\n\n');
     max-width: 56ch;
   }
 
+  @media (min-width: 40rem) {
+    .portrait {
+      width: 7rem;
+      height: 7rem;
+    }
+  }
+
   @media (min-width: 60rem) {
     .intro-body {
       grid-template-columns: minmax(0, 1fr) 17rem;
@@ -83,5 +98,4 @@ const paragraphs = identity.bio.split('\n\n');
       align-items: start;
     }
   }
-
 </style>

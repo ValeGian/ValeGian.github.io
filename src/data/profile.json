@@ -2,308 +2,149 @@
   "identity": {
     "firstName": "Valerio",
     "lastName": "Giannini",
-    "headline": "AI Tech Lead / AI Inference Engineer",
-    "nationality": "Italian",
-    "birthday": "1998-12-30",
-    "portrait": null,
-    "bio": "I'm an AI Tech Lead at Translated, working on LLM inference. Before that I was a software development engineer intern at Amazon in Luxembourg. I studied Computer Engineering and then Artificial Intelligence and Data Engineering at the University of Pisa.\n\nMost of what I build in my own time is inference infrastructure: liteinfer, an engine written from scratch to make paged KV caches and continuous batching readable, and variantGPT, a testbed for comparing attention mechanisms under identical conditions.",
-    "bioStatus": "draft",
-    "pronouns": "he/him",
-    "location": "Livorno, Tuscany, Italy",
-    "linkedinHeadline": "AI Tech Lead @ Translated | Ex SDE Intern @ Amazon Luxembourg",
-    "bioSource": "Assembled from the LinkedIn top card and this repository. LinkedIn has no About section to copy."
+    "headline": "AI Tech Lead, LLM Inference Engineer",
+    "location": "Rome, Italy",
+    "portrait": "/portrait.jpg",
+    "description": "Valerio Giannini, AI Tech Lead and LLM inference engineer at Translated: production LLM serving, speculative decoding and low-precision inference.",
+    "bio": "I make large language models fast and reliable in production. At Translated I'm the AI tech lead for LLM inference: I own the decoder behind Lara, our LLM translation service, lead the team around it, and deploy the open 100–500B models we use internally for work like coding.\n\nDay to day that means vLLM internals, speculative decoding, low-precision inference and GPU kernel work on NVIDIA Hopper and Blackwell, and measuring all of it carefully enough to trust the numbers.\n\nI joined Translated in 2022 to work on context-aware machine translation, the subject of my MSc thesis at the University of Pisa, and was the main maintainer of ModernMT, its neural MT engine, until 2025, while moving down the stack to the GPUs. Before that I was a software engineering intern at Amazon in Luxembourg."
   },
   "links": {
     "email": "46gianninivalerio@gmail.com",
     "profiles": [
       {
         "platform": "GitHub",
-        "url": "https://github.com/ValeGian",
-        "handle": "ValeGian"
+        "url": "https://github.com/ValeGian"
       },
       {
         "platform": "LinkedIn",
-        "url": "https://www.linkedin.com/in/valerio-giannini/",
-        "handle": "valerio-giannini"
-      },
-      {
-        "platform": "Telegram",
-        "url": "https://telegram.me/valeGiann",
-        "handle": "valeGiann"
-      },
-      {
-        "platform": "Instagram",
-        "url": "https://www.instagram.com/valegiann/",
-        "handle": "valegiann"
+        "url": "https://www.linkedin.com/in/valerio-giannini/"
       }
     ]
   },
-  "education": [
-    {
-      "degree": "M.Sc. Artificial Intelligence and Data Engineering",
-      "institution": "University of Pisa",
-      "country": "Italy",
-      "startYear": 2020,
-      "endYear": 2023,
-      "grade": "110/110 cum laude",
-      "syllabus": "https://computer.ing.unipi.it/aide-lm/study-plan-20-21",
-      "transcript": "/resources/master-transcript.pdf",
-      "shortName": "M.Sc. Artificial Intelligence and Data Engineering",
-      "gradeNote": "Full marks with honours, the maximum mark in the Italian system"
-    },
-    {
-      "degree": "B.Sc. Ingegneria Informatica (Computer Engineering)",
-      "institution": "University of Pisa",
-      "country": "Italy",
-      "startYear": 2017,
-      "endYear": 2020,
-      "endMonth": 9,
-      "grade": "110/110 cum laude",
-      "gradeNote": "Full marks with honours, the maximum mark in the Italian system",
-      "syllabus": "https://computer.ing.unipi.it/inginf-l/piano-di-studi-19-20",
-      "transcript": "/resources/bachelor-transcript.pdf",
-      "shortName": "B.Sc. Computer Engineering"
-    }
-  ],
   "experience": [
     {
-      "role": "AI Tech Lead",
+      "role": "AI Tech Lead, LLM Inference Engineer",
       "organisation": "Translated",
-      "location": "Italy",
-      "startDate": null,
-      "endDate": null,
-      "isCurrent": true,
-      "summary": ""
+      "location": "Rome",
+      "since": 2024,
+      "isCurrent": true
     },
     {
-      "role": "Software Development Engineer Intern",
+      "role": "Machine Learning Engineer",
+      "organisation": "Translated",
+      "location": "Rome",
+      "isCurrent": false
+    },
+    {
+      "role": "Software Engineering Intern",
       "organisation": "Amazon",
       "location": "Luxembourg",
-      "startDate": null,
-      "endDate": null,
-      "isCurrent": false,
-      "summary": ""
+      "isCurrent": false
     }
   ],
-  "skills": {
-    "summary": "I have worked with a wide variety of programming languages and love learning how to use new tools. My interest mainly revolves around AI, but I continually try to expand my knowledge of other areas, focusing on the most cutting-edge technologies.",
-    "languages": [
-      "Python",
-      "C++",
-      "C",
-      "Java",
-      "TypeScript",
-      "JavaScript",
-      "SQL",
-      "Matlab",
-      "PHP",
-      "Erlang"
-    ],
-    "tools": [
-      "PyTorch",
-      "CUDA",
-      "Docker",
-      "Kubernetes",
-      "AWS CDK",
-      "Git",
-      "MySQL",
-      "MongoDB",
-      "Neo4j",
-      "LevelDB",
-      "GlassFish"
-    ]
-  },
-  "projects": [
+  "education": [
     {
-      "slug": "liteinfer",
-      "title": "liteinfer",
-      "description": "A lightweight, hackable LLM inference engine built from scratch — paged KV cache, prefix caching, tensor parallelism, torch.compile and CUDA graphs, each isolated and benchmarkable.",
-      "type": "personal",
-      "featured": true,
-      "date": "2026-05-03",
-      "lastActivity": "2026-09-12",
-      "link": "https://github.com/ValeGian/liteinfer",
-      "package": "https://pypi.org/project/liteinfer/",
-      "languages": [
-        "Python",
-        "PyTorch",
-        "CUDA"
+      "shortName": "MSc Artificial Intelligence and Data Engineering",
+      "institution": "University of Pisa",
+      "endYear": 2023,
+      "grade": "110/110 cum laude"
+    },
+    {
+      "shortName": "BSc Computer Engineering",
+      "institution": "University of Pisa",
+      "endYear": 2020,
+      "grade": "110/110 cum laude"
+    }
+  ],
+  "sections": [
+    {
+      "id": "work",
+      "heading": "Selected work",
+      "items": [
+        {
+          "title": "Production LLM serving",
+          "description": "Custom FP8 GEMM, attention and fused kernels that met a p99 latency target off-the-shelf engines couldn't: about 3× lower peak-load p99 on Hopper, 2× on Blackwell, and the same traffic on fewer GPUs.",
+          "aside": "2026"
+        },
+        {
+          "title": "Speculative decoding",
+          "description": "Trained Medusa, EAGLE-3 and DSpark draft models and brought them to production, where DSpark now doubles decoding speed.",
+          "aside": "2024–2026"
+        },
+        {
+          "title": "Low-precision inference",
+          "description": "FP8 in production, and quantization-aware distillation that takes models to NVFP4 with limited quality loss."
+        },
+        {
+          "title": "Lara Mini",
+          "href": "https://huggingface.co/translated/Lara-4-Mini-Base",
+          "description": "Core team member for Translated's open MoE base model, state of the art in its size class. I also added it to Hugging Face Transformers.",
+          "aside": "2026"
+        }
       ]
     },
     {
-      "slug": "variantgpt",
-      "title": "variantGPT",
-      "description": "Research framework for training GPT-2 with interchangeable attention mechanisms — MHA, MQA, GQA, sliding-window, linear, sparse (BigBird) and MLA (DeepSeek-V2) — compared under identical conditions.",
-      "type": "personal",
-      "featured": true,
-      "date": "2025-08-19",
-      "lastActivity": "2026-05-03",
-      "link": "https://github.com/ValeGian/variantGPT",
-      "languages": [
-        "Python",
-        "PyTorch"
+      "id": "open-source",
+      "heading": "Open source",
+      "items": [
+        {
+          "title": "Hugging Face Transformers",
+          "href": "https://github.com/huggingface/transformers/pull/50819",
+          "description": "Added Lara Mini, a hybrid Gated DeltaNet and MoE model; merged and featured in the v5.24.0 release notes.",
+          "aside": "2026"
+        },
+        {
+          "title": "vLLM",
+          "href": "https://github.com/vllm-project/vllm/pull/67978",
+          "description": "Lara Mini support with tensor, pipeline and expert parallelism (in review), and the root cause of a silent bug in expert-parallel load balancing that dropped GSM8K accuracy from 86% to 56%.",
+          "aside": "2026"
+        },
+        {
+          "title": "TensorRT-LLM and SGLang",
+          "description": "Bug reports and root-cause analyses for TensorRT-LLM from production use, and fixes in SGLang's SpecForge.",
+          "aside": "2024–2025"
+        }
       ]
     },
     {
-      "slug": "specforge",
-      "title": "SpecForge",
-      "description": "Contributions to sgl-project/SpecForge — training speculative decoding models and porting them for serving.",
-      "type": "contribution",
-      "featured": true,
-      "date": "2025-10-07",
-      "lastActivity": "2025-10-07",
-      "link": "https://github.com/ValeGian/SpecForge",
-      "upstream": "https://github.com/sgl-project/SpecForge",
-      "languages": [
-        "Python"
+      "id": "writing",
+      "heading": "Writing and talks",
+      "items": [
+        {
+          "title": "Inside liteinfer",
+          "href": "https://valegian.github.io/liteinfer/inside/",
+          "description": "An interactive field guide to LLM inference: prefill and decode, KV caching, paged memory and continuous batching, each measured on an engine small enough to read in an afternoon.",
+          "aside": "2026"
+        },
+        {
+          "title": "Lara Mini Base: Language Diversity as a Resource, Not a Trade-off",
+          "href": "https://arxiv.org/abs/2611.16956",
+          "description": "Technical report on arXiv, from the core model and training team.",
+          "aside": "2026"
+        },
+        {
+          "title": "NVIDIA Inference Council EMEA",
+          "description": "Panelist on speculative decoding, Paris.",
+          "aside": "2026"
+        }
       ]
     },
     {
-      "slug": "music-classifier",
-      "title": "MusicClassifier",
-      "description": "Generates accurate, reproducible machine-learning models that predict a song's genre from its audio features.",
-      "type": "personal",
-      "featured": false,
-      "date": "2021-10-24",
-      "link": "https://github.com/ValeGian/MusicClassifier",
-      "languages": [
-        "Python",
-        "Scikit-learn",
-        "Pandas"
-      ]
-    },
-    {
-      "slug": "federated-dbscan",
-      "title": "FederatedDBSCAN",
-      "description": "A federated formulation of DBSCAN clustering.",
-      "type": "university",
-      "course": "Data Mining and Machine Learning",
-      "featured": false,
-      "date": "2021-02-05",
-      "link": "https://github.com/ValeGian/DataMining-MachineLearning_FederatedDBSCAN",
-      "languages": [
-        "Python",
-        "SciPy",
-        "NumPy",
-        "Scikit-learn",
-        "Pandas"
-      ]
-    },
-    {
-      "slug": "smartpool",
-      "title": "SmartPool",
-      "description": "An IoT system monitoring and controlling a swimming pool.",
-      "type": "university",
-      "course": "Internet of Things",
-      "featured": false,
-      "date": "2021-07-16",
-      "link": "https://github.com/ValeGian/InternetOfThings_SmartPool",
-      "languages": [
-        "C",
-        "Java"
-      ]
-    },
-    {
-      "slug": "ceph-file-manager",
-      "title": "Ceph File Manager",
-      "description": "A file manager built on a Ceph distributed storage cluster.",
-      "type": "university",
-      "course": "Cloud Computing",
-      "featured": false,
-      "date": "2021-05-31",
-      "link": "https://github.com/ValeGian/CloudComputing_Ceph_File_Manager",
-      "languages": [
-        "Python",
-        "Docker"
-      ]
-    },
-    {
-      "slug": "pagerank",
-      "title": "PageRank",
-      "description": "Implementation of the PageRank algorithm on Hadoop and Spark.",
-      "type": "university",
-      "course": "Cloud Computing",
-      "featured": false,
-      "date": "2021-05-14",
-      "link": "https://github.com/ValeGian/CloudComputing_PageRank",
-      "languages": [
-        "Java",
-        "Python",
-        "Hadoop",
-        "Spark"
-      ]
-    },
-    {
-      "slug": "covid-tracker",
-      "title": "CovidTracker",
-      "description": "A distributed contact-tracing system.",
-      "type": "university",
-      "course": "Distributed Systems and Middleware Technologies",
-      "featured": false,
-      "date": "2020-12-24",
-      "link": "https://github.com/ValeGian/DistributedSystems-MiddlewareTechnologies_CovidTracker",
-      "languages": [
-        "Java",
-        "Erlang"
-      ]
-    },
-    {
-      "slug": "unimusic",
-      "title": "UniMusic",
-      "description": "A music application backed by both MongoDB and Neo4j.",
-      "type": "university",
-      "course": "Large-Scale and Multi-Structured Databases",
-      "featured": false,
-      "date": "2020-12-02",
-      "link": "https://github.com/ValeGian/LargeScale-MultiStructuredDatabase_UniMusic",
-      "languages": [
-        "Java",
-        "JavaFX",
-        "MongoDB",
-        "Neo4j"
-      ]
-    },
-    {
-      "slug": "frogger",
-      "title": "Frogger",
-      "description": "A Java/JavaFX version of the Frogger arcade game.",
-      "type": "university",
-      "featured": false,
-      "date": "2020-04-18",
-      "link": "https://github.com/ValeGian/Frogger-Game",
-      "languages": [
-        "Java",
-        "JavaFX"
-      ]
-    },
-    {
-      "slug": "pacman",
-      "title": "PacMan",
-      "description": "A version of Pac-Man written with Java 8 and the JavaFX 2.2 API.",
-      "type": "personal",
-      "featured": false,
-      "date": "2019-12-04",
-      "link": "https://github.com/ValeGian/JavaFX_PacMan",
-      "languages": [
-        "Java",
-        "JavaFX"
-      ]
-    },
-    {
-      "slug": "hardware-ecommerce",
-      "title": "Hardware E-Commerce Website",
-      "description": "An e-commerce site built for the Web Development course. The site itself is in Italian.",
-      "type": "university",
-      "course": "Web Development",
-      "featured": false,
-      "date": "2018-02-20",
-      "link": "https://github.com/ValeGian/Hardware-ECommerce-Website",
-      "languages": [
-        "JavaScript",
-        "Ajax",
-        "PHP",
-        "HTML5",
-        "CSS3"
+      "id": "projects",
+      "heading": "Side projects",
+      "items": [
+        {
+          "title": "liteinfer",
+          "href": "https://github.com/ValeGian/liteinfer",
+          "description": "An LLM inference engine written from scratch: paged KV cache, Triton paged attention, continuous batching, chunked prefill and CUDA graphs. On PyPI.",
+          "aside": "2026"
+        },
+        {
+          "title": "variantGPT",
+          "href": "https://github.com/ValeGian/variantGPT",
+          "description": "GPT-2 trained with seven attention variants, from multi-head to DeepSeek's MLA, under the same budget and compared.",
+          "aside": "2025–2026"
+        }
       ]
     }
   ]

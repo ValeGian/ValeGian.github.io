@@ -9,14 +9,24 @@ import profile from '@data/profile.json';
 const { identity, links, experience, education } = profile;
 
 const entries = [
-  { label: 'Now', lines: experience.filter((role) => role.isCurrent).map((role) => `${role.role}, ${role.organisation}`) },
-  { label: 'Before', lines: experience.filter((role) => !role.isCurrent).map((role) => `${role.role}, ${role.organisation}, ${role.location}`) },
-  { label: 'Studied', lines: education.map((entry) => `${entry.shortName}, ${entry.endYear}`) },
+  {
+    label: 'Now',
+    lines: experience.filter((role) => role.isCurrent).map((role) => `${role.role}, ${role.organisation}, since ${role.since}`),
+  },
+  {
+    label: 'Before',
+    lines: experience.filter((role) => !role.isCurrent).map((role) => `${role.role}, ${role.organisation}`),
+  },
+  {
+    // Both degrees share university and grade, so they are said once.
+    label: 'Studied',
+    lines: [
+      ...education.map((entry) => `${entry.shortName}, ${entry.endYear}`),
+      `${education[0].institution}, both ${education[0].grade}`,
+    ],
+  },
   { label: 'Based in', lines: [identity.location] },
-].filter((entry) => entry.lines.length > 0);
-
-const shown = new Set(['GitHub', 'LinkedIn']);
-const profiles = links.profiles.filter((profileLink) => shown.has(profileLink.platform));
+];
 ---
 
 <aside class="particulars">
@@ -29,7 +39,8 @@ const profiles = links.profiles.filter((profileLink) => shown.has(profileLink.pl
     ))}
   </dl>
   <p class="elsewhere">
-    {profiles.map((profileLink) => <a href={profileLink.url} rel="me">{profileLink.platform}</a>)}
+    <a href={`mailto:${links.email}`}>Email</a>
+    {links.profiles.map((profileLink) => <a href={profileLink.url} rel="me">{profileLink.platform}</a>)}
   </p>
 </aside>
 
@@ -55,6 +66,10 @@ const profiles = links.profiles.filter((profileLink) => shown.has(profileLink.pl
   dd {
     margin: 0;
     text-wrap: pretty;
+  }
+
+  dd + dd {
+    margin-top: var(--space-2);
   }
 
   .elsewhere {
